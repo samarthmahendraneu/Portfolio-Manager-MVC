@@ -1,57 +1,38 @@
 package Model;
 
-/**
- * getStockSymbol()
- * getStockPrice(Date date)
- * getStockQuantity()
- */
-public class Stock implements StockInterface{
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
+public class Stock implements Serializable {
+  private String symbol;
+  private int quantity;
+  private BigDecimal purchasePrice;
+  private LocalDate purchaseDate;
 
-  private String stockSymbol;
-  private String stockName;
-  private double stockPrice;
-  private int stockQuantity;
-  /**
-   * getStockSymbol()
-   *
-   * @return the stock symbol
-   */
-  @Override
-  public String getStockSymbol() {
-    return this.stockSymbol;
+  public Stock(String symbol, int quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
+    this.symbol = symbol;
+    this.quantity = quantity;
+    this.purchasePrice = purchasePrice;
+    this.purchaseDate = purchaseDate;
   }
 
-  /**
-   * getStockPrice(Date date)
-   *
-   * @param date the date
-   * @return the stock price
-   */
-  @Override
-  public double getStockPrice(String date) {
-    // TODO integrate with API
-    return 0;
+  // Getters
+  public String getSymbol() {
+    return symbol;
   }
 
-  /**
-   * getStockQuantity()
-   *
-   * @return the stock quantity
-   */
-  @Override
-  public int getStockQuantity() {
-    return this.stockQuantity;
+  public int getQuantity() {
+    return quantity;
   }
 
-  /**
-   * getStockName()
-   *
-   * @return the stock name
-   */
-  @Override
-  public String getStockName() {
-    return this.stockName;
+  public BigDecimal getPurchasePrice() {
+    return purchasePrice;
   }
 
+  public LocalDate getPurchaseDate() {
+    return purchaseDate;
+  }
+
+  // Setters, toString(), equals(), and hashCode() methods omitted for brevity
 }

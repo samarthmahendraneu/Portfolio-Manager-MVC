@@ -1,44 +1,33 @@
 package Model;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Portfolio implements PortfolioInterface {
-
-  // list of stocks
+public class Portfolio {
+  private final String name;
   private List<Stock> stocks;
 
-  /**
-   * addStock(Stock stock)
-   *
-   * @param stock the stock
-   */
-  @Override
+  public Portfolio(String name,  List<Stock> initialStocks) {
+    this.name = name;
+    this.stocks = initialStocks != null ? new ArrayList<>(initialStocks) : new ArrayList<>();
+  }
   public void addStock(Stock stock) {
-    this.stocks.add(stock);
+    stocks.add(stock);
   }
 
-  /**
-   * getPortfolioValue(Date date)
-   *
-   * @param date the date
-   * @return the portfolio value
-   */
-  @Override
-  public double getPortfolioValue(String date) {
-    float sum = 0;
-    for (Stock stock : this.stocks) {
-      sum += stock.getStockPrice(date);
-    }
-    return sum;
-
+  public BigDecimal calculateTotalValue() {
+    return stocks.stream()
+            .map(stock -> stock.getPurchasePrice().multiply(BigDecimal.valueOf(stock.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
-  /**
-   * getStocks()
-   *
-   * @return the stocks
-   */
-  @Override
-  public Stock[] getStocks() {
-    return (Stock[]) this.stocks.toArray();
+  public List<Stock> getStocks() {
+    return new ArrayList<>(stocks); // Return a copy to protect internal list
   }
+  public String getName() {
+    return name;
+  }
+
+
 }

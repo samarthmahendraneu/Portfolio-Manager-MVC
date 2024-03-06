@@ -1,39 +1,21 @@
-package Model;
+package Service;
 
-/**
- * /**
- *  * getStockSymbol()
- *  * getStockPrice(Date date)
- *  * getStockQuantity()
- * */
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 public interface StockInterface {
-
+  /**
+   * Fetches the most recent closing price for a given stock symbol.
+   * @param symbol The stock symbol.
+   * @return The most recent closing price as a BigDecimal.
+   */
+  BigDecimal fetchRecentClosePrice(String symbol);
 
   /**
-   * getStockSymbol()
-   * @return the stock symbol
+   * Fetches the closing price of a stock on a specific date.
+   * @param symbol The stock symbol.
+   * @param date The date for which the price is requested.
+   * @return The closing price on the specified date as a BigDecimal, or null if not available.
    */
-  String getStockSymbol();
-
-  /**
-   * getStockPrice(Date date)
-   * @param date the date
-   * @return the stock price
-   */
-  double getStockPrice(String date);
-
-  /**
-   * getStockQuantity()
-   * @return the stock quantity
-   */
-  int getStockQuantity();
-
-  /**
-   * getStockName()
-   * @return the stock name
-   */
-  String getStockName();
-
-
-
+  BigDecimal fetchPriceOnDate(String symbol, LocalDate date);
 }
