@@ -8,7 +8,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-public class StockService implements Service.StockInterface {
+import Utilities.StockDataCache;
+import Utilities.StockInfo;
+
+public class StockService implements Model.StockInterface {
+  private StockDataCache cache = new StockDataCache(); // Instance of your caching class
 
   private final String apiKey;
 
@@ -22,10 +26,37 @@ public class StockService implements Service.StockInterface {
     return parseCsvForClosePrice(csvData);
   }
 
+
   @Override
   public BigDecimal fetchPriceOnDate(String symbol, LocalDate date) {
+    if (!cache.hasStockData(symbol, date)) {
+      fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
+    }
+    StockInfo info = cache.getStockData(symbol, date);
+    return info != null ? info.getClose() : BigDecimal.ZERO;
+  }
+
+  private void fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
-    return parseCsvForSpecificDate(csvData, date);
+    parseAndCacheCsvData(csvData, symbol);
+  }
+
+  private void parseAndCacheCsvData(String csvData, String symbol) {
+    try (Scanner scanner = new Scanner(csvData)) {
+      scanner.nextLine(); // Skip header
+      while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        String[] values = line.split(",");
+        LocalDate date = LocalDate.parse(values[0]);
+        BigDecimal open = new BigDecimal(values[1]);
+        BigDecimal high = new BigDecimal(values[2]);
+        BigDecimal low = new BigDecimal(values[3]);
+        BigDecimal close = new BigDecimal(values[4]);
+        long volume = Long.parseLong(values[6]);
+        StockInfo stockInfo = new StockInfo(date, open, high, low, close, volume);
+        cache.addStockData(symbol, date, stockInfo);
+      }
+    }
   }
 
   private String makeApiRequest(String symbol) {

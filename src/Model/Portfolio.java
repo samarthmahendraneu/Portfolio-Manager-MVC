@@ -6,11 +6,14 @@ import java.util.List;
 
 public class Portfolio {
   private final String name;
-  private List<Stock> stocks;
+  private List<Stock> stocks = new ArrayList<>();
 
-  public Portfolio(String name,  List<Stock> initialStocks) {
+  public Portfolio(String name) {
     this.name = name;
-    this.stocks = initialStocks != null ? new ArrayList<>(initialStocks) : new ArrayList<>();
+  }
+  public Portfolio(String name, List<Stock> initialStocks) {
+    this.name = name;
+    this.stocks = new ArrayList<>(initialStocks);
   }
   public void addStock(Stock stock) {
     stocks.add(stock);
