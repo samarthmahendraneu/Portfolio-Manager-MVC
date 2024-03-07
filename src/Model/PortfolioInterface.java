@@ -14,7 +14,7 @@ public interface PortfolioInterface {
   void addStock(Stock stock);
 
   /**
-   * getPortfolioValue(Date date)
+   * getPortfolioValue(Date)
    * @param date the date
    * @return the portfolio value
    */

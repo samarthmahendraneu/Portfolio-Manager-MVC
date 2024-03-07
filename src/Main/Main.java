@@ -4,19 +4,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Scanner;
-
-import Model.Portfolio;
-import Model.Stock;
 import Service.PortfolioService;
 import Service.StockService;
 
 public class Main {
-  private static Scanner scanner = new Scanner(System.in);
-  private static  StockService stockService = new StockService("W0M1JOKC82EZEQA8");
-
-  private static PortfolioService portfolioService =
-          new PortfolioService(stockService);
-
+  private static final Scanner scanner = new Scanner(System.in);
+  private static final StockService stockService = new StockService("W0M1JOKC82EZEQA8");
+  private static final PortfolioService portfolioService = new PortfolioService(stockService);
 
   public static void main(String[] args) {
     boolean running = true;
@@ -63,90 +57,59 @@ public class Main {
   private static void createNewPortfolio() {
     System.out.println("Enter new portfolio name:");
     String name = scanner.nextLine().trim();
-
-    Portfolio newPortfolio = new Portfolio(name);
-    portfolioService.addPortfolio(newPortfolio);  // Assuming this method adds the portfolio to the service
-
-    System.out.println("Portfolio '" + name + "' created. Add stocks to this portfolio:");
-
-    while (true) {
-      System.out.println("Enter stock symbol (or 'done' to finish):");
-      String symbol = scanner.nextLine().trim();
-      if ("done".equalsIgnoreCase(symbol)) break;
-
-      System.out.println("Enter quantity:");
-      int quantity = Integer.parseInt(scanner.nextLine().trim());
-
-      System.out.println("Enter purchase date (YYYY-MM-DD):");
-      LocalDate date = LocalDate.parse(scanner.nextLine().trim());
-
-      BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
-
-      if (price.compareTo(BigDecimal.ZERO) > 0) {
-        Stock stock = new Stock(symbol, quantity, price, date);
-        newPortfolio.addStock(stock); // Assuming addStock method exists
-        System.out.println(String.format("Added %d shares of %s at %s on %s.", quantity, symbol, price, date));
-      } else {
-        System.out.println("Failed to fetch price for " + symbol + " on " + date + ". Stock not added.");
-      }
-    }
+    portfolioService.createAndPopulatePortfolio(name, scanner);
+    System.out.println("Portfolio '" + name + "' has been created and populated.");
   }
-
 
   private static void examinePortfolio() {
     System.out.println("Available portfolios:");
-    portfolioService.listPortfolios().forEach(p -> System.out.println(p.getName()));
+    portfolioService.listPortfolioNames().forEach(System.out::println);
 
     System.out.println("Enter the name of the portfolio to examine:");
     String name = scanner.nextLine().trim();
-    Portfolio portfolio = portfolioService.getPortfolioByName(name);
-
-    if (portfolio != null) {
-      System.out.println("Stocks in " + name + ":");
-      portfolio.getStocks().forEach(stock ->
-              System.out.println(stock.getSymbol() + " - Quantity: " + stock.getQuantity() + ", Purchase Price: " + stock.getPurchasePrice() + ", Purchase Date: " + stock.getPurchaseDate()));
-    } else {
-      System.out.println("Portfolio not found.");
-    }
+    portfolioService.getPortfolioByName(name)
+            .ifPresentOrElse(
+                    portfolio -> {
+                      System.out.println("Stocks in " + name + ":");
+                      portfolio.getStocks().forEach(stock ->
+                              System.out.println(stock.getSymbol() + " - Quantity: " + stock.getQuantity() + ", Purchase Price: " + stock.getPurchasePrice() + ", Purchase Date: " + stock.getPurchaseDate()));
+                    },
+                    () -> System.out.println("Portfolio not found.")
+            );
   }
-
 
   private static void calculatePortfolioValue() {
     System.out.println("Enter the name of the portfolio:");
     String name = scanner.nextLine().trim();
     System.out.println("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
-    LocalDate date = LocalDate.parse(scanner.nextLine().trim());
-
-    BigDecimal value = portfolioService.calculatePortfolioValue(name, date);
-    System.out.println("Value of the portfolio '" + name + "' on " + date + ": " + value);
-  }
-
-
-  private static void savePortfolio() {
-    System.out.println("Enter the name of the portfolio to save:");
-    String name = scanner.nextLine().trim();
-    System.out.println("Enter the file path to save the portfolio:");
-    String filePath = scanner.nextLine().trim();
-
+    String dateInput = scanner.nextLine().trim();
     try {
-      portfolioService.savePortfoliosToCSV(filePath); // Assuming this method in PortfolioService handles saving to a file
-      System.out.println("Portfolio saved successfully to " + filePath);
-    } catch (IOException e) {
-      System.out.println("Failed to save portfolio: " + e.getMessage());
+      BigDecimal value = portfolioService.calculatePortfolioValue(name, LocalDate.parse(dateInput));
+      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": " + value);
+    } catch (Exception e) {
+      System.out.println("Error calculating portfolio value: " + e.getMessage());
     }
   }
 
+  private static void savePortfolio() {
+    System.out.println("Enter the file path to save the portfolio:");
+    String filePath = scanner.nextLine().trim();
+    try {
+      portfolioService.savePortfoliosToCSV(filePath);
+      System.out.println("Portfolios have been saved successfully to " + filePath);
+    } catch (IOException e) {
+      System.out.println("Failed to save portfolios: " + e.getMessage());
+    }
+  }
 
   private static void loadPortfolio() {
     System.out.println("Enter the file path to load portfolios from:");
     String filePath = scanner.nextLine().trim();
-
     try {
-      portfolioService.loadPortfoliosFromCSV(filePath); // Using the existing loadPortfoliosFromCSV method
-      System.out.println("Portfolios loaded successfully.");
+      portfolioService.loadPortfoliosFromCSV(filePath);
+      System.out.println("Portfolios have been loaded successfully.");
     } catch (IOException e) {
       System.out.println("Failed to load portfolios: " + e.getMessage());
     }
   }
-
 }

@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class StockInfo {
-  private LocalDate date;
-  private BigDecimal open;
-  private BigDecimal high;
-  private BigDecimal low;
-  private BigDecimal close;
-  private long volume;
+  private final LocalDate date;
+  private final BigDecimal open;
+  private final BigDecimal high;
+  private final BigDecimal low;
+  private final BigDecimal close;
+  private final long volume;
 
   public StockInfo(LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, long volume) {
     this.date = date;
