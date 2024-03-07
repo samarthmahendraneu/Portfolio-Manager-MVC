@@ -1,4 +1,6 @@
-package Model;
+package Interface;
+
+import Model.Stock;
 
 /**
  * class for portfolio interface.

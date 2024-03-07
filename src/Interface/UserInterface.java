@@ -1,5 +1,8 @@
-package Model;
+package Interface;
 import java.util.List;
+
+import Model.Portfolio;
+import Model.Stock;
 
 /**
  * class for user interface.

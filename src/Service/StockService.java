@@ -8,10 +8,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+import Interface.StockInterface;
 import Utilities.StockDataCache;
 import Utilities.StockInfo;
 
-public class StockService implements Model.StockInterface {
+public class StockService implements StockInterface {
   private StockDataCache cache = new StockDataCache(); // Instance of your caching class
 
   private final String apiKey;

@@ -2,7 +2,9 @@ package Model;
 
 import java.util.List;
 
-public class User implements UserInterface{
+import Interface.UserInterface;
+
+public class User implements UserInterface {
 
 
   // list of portfolio
