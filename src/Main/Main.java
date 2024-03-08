@@ -57,7 +57,7 @@ public class Main {
   private static void createNewPortfolio() {
     System.out.println("Enter new portfolio name:");
     String name = scanner.nextLine().trim();
-    portfolioService.createAndPopulatePortfolio(name, scanner);
+    //portfolioService.createAndPopulatePortfolio(name, scanner);
     System.out.println("Portfolio '" + name + "' has been created and populated.");
   }
 

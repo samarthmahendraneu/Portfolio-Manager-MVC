@@ -13,7 +13,7 @@ import Utilities.StockDataCache;
 import Utilities.StockInfo;
 
 public class StockService implements StockInterface {
-  private StockDataCache cache = new StockDataCache(); // Instance of your caching class
+  private final StockDataCache cache = new StockDataCache(); // Instance of your caching class
 
   private final String apiKey;
 
@@ -53,7 +53,7 @@ public class StockService implements StockInterface {
         BigDecimal high = new BigDecimal(values[2]);
         BigDecimal low = new BigDecimal(values[3]);
         BigDecimal close = new BigDecimal(values[4]);
-        long volume = Long.parseLong(values[6]);
+        long volume = Long.parseLong(values[5]);
         StockInfo stockInfo = new StockInfo(date, open, high, low, close, volume);
         cache.addStockData(symbol, date, stockInfo);
       }
@@ -64,7 +64,7 @@ public class StockService implements StockInterface {
     StringBuilder response = new StringBuilder();
     try {
       String urlString = String.format(
-              "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s&datatype=csv&apikey=%s",
+              "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&datatype=csv&apikey=%s",
               symbol, this.apiKey);
       URL url = new URL(urlString);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -112,7 +112,7 @@ public class StockService implements StockInterface {
   }
 
   public static void main(String[] args) {
-    StockService service = new StockService("W0M1JOKC82EZEQA8");
+    StockService service = new StockService("8WGFWEOZ5SVHAF75");
     BigDecimal recentClosePrice = service.fetchRecentClosePrice("IBM");
     System.out.println("Most Recent Close Price: " + recentClosePrice);
 
