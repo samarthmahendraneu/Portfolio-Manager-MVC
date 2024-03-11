@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class PortfolioService implements PortfolioServiceInterface {
 
-  private List<Portfolio> portfolios = new ArrayList<>();
+  private final List<Portfolio> portfolios = new ArrayList<>();
   private final StockService stockService;
 
   /**
@@ -68,9 +68,6 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
 
     // check if quantity is whole number
-    if (quantity != (int) quantity) {
-      throw new IllegalArgumentException("Quantity must be a whole number: " + quantity);
-    }
 
     // check if date is in the future
     if (date.isAfter(LocalDate.now())) {
@@ -167,7 +164,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     if (!file.exists()) {
       throw new IOException("File not found: " + filePath);
     }
-    List<Portfolio> loadedPortfolios = new ArrayList<>();
+    List<Portfolio> loadedPortfolios;
     try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
       reader.readLine(); // Skip header
       Map<String, Portfolio> portfolioMap = new HashMap<>();
@@ -178,7 +175,7 @@ public class PortfolioService implements PortfolioServiceInterface {
             LocalDate.parse(data[4]));
         portfolio.addStock(stock);
       });
-      loadedPortfolios.addAll(portfolioMap.values());
+      loadedPortfolios = new ArrayList<>(portfolioMap.values());
     }
     portfolios.clear();
     portfolios.addAll(loadedPortfolios);

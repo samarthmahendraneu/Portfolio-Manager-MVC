@@ -8,7 +8,7 @@ import java.util.Map;
  * This class is used to store stock data in memory to avoid making repeated API calls to fetch the same data.
  */
 public class StockDataCache {
-  private Map<String, Map<LocalDate, StockInfo>> stockDataCache = new HashMap<>();
+  private final Map<String, Map<LocalDate, StockInfo>> stockDataCache = new HashMap<>();
 
   /**
    * Adds stock data to the cache.

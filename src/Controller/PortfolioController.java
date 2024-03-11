@@ -12,16 +12,16 @@ import java.time.LocalDate;
  * managing portfolios. It interacts with the PortfolioService and StockService classes to perform
  * operations on portfolios and stocks.
  */
-public class PortfolioControllerBasic implements PortfolioControllerInterface {
+public class PortfolioController implements PortfolioControllerInterface {
 
-  private PortfolioService portfolioService;
+  private final PortfolioService portfolioService;
 
   /**
    * Constructor for the PortfolioControllerBasic class.
    *
    * @param stockService The StockService model object to be used by the controller.
    */
-  public PortfolioControllerBasic(StockService stockService) {
+  public PortfolioController(StockService stockService) {
     this.portfolioService = new PortfolioService(stockService);
   }
 
