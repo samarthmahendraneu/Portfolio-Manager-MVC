@@ -11,15 +11,31 @@ import java.util.Scanner;
 import Model.Utilities.StockDataCache;
 import Model.Utilities.StockInfo;
 
-public class StockService {
+/**
+ * Service class for fetching stock data and calculating stock prices.
+ */
+public class StockService implements StockServiceInterface {
+
   private final StockDataCache cache = new StockDataCache(); // Instance of your caching class
 
   private final String apiKey;
 
+  /**
+   * Constructor for the StockService class.
+   *
+   * @param apiKey The API key to be used for fetching stock data.
+   */
   public StockService(String apiKey) {
     this.apiKey = apiKey;
   }
 
+  /**
+   * Fetches the closing price of the stock with the given symbol on the given date.
+   *
+   * @param symbol The symbol of the stock to fetch.
+   * @param date   The date for which to fetch the stock price.
+   * @return The closing price of the stock on the given date.
+   */
   public BigDecimal fetchPriceOnDate(String symbol, LocalDate date) {
     if (!cache.hasStockData(symbol, date)) {
       fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
@@ -28,6 +44,13 @@ public class StockService {
     return info != null ? info.getClose() : BigDecimal.ZERO;
   }
 
+  /**
+   * Fetches the closing price of the stock with the given symbol on the previous trading day.
+   *
+   * @param symbol The symbol of the stock to fetch.
+   * @param date   The date for which to fetch the previous close price.
+   * @return The closing price of the stock on the previous trading day.
+   */
   public BigDecimal fetchPreviousClosePrice(String symbol, LocalDate date) {
     BigDecimal previousClosePrice = this.fetchPriceOnDate(symbol, date);
     int traversecount = 0;
@@ -40,11 +63,22 @@ public class StockService {
     return previousClosePrice;
   }
 
+  /**
+   * Fetches stock data for the given symbol from the API and caches it.
+   *
+   * @param symbol The symbol of the stock to fetch.
+   */
   private void fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
     parseAndCacheCsvData(csvData, symbol);
   }
 
+  /**
+   * Parses the given CSV data and caches it.
+   *
+   * @param csvData The CSV data to parse and cache.
+   * @param symbol  The symbol of the stock for which the data is being cached.
+   */
   private void parseAndCacheCsvData(String csvData, String symbol) {
     try (Scanner scanner = new Scanner(csvData)) {
       scanner.nextLine(); // Skip header
@@ -63,17 +97,24 @@ public class StockService {
     }
   }
 
+  /**
+   * Makes an API request to fetch stock data for the given symbol.
+   *
+   * @param symbol The symbol of the stock to fetch.
+   * @return The response from the API as a string.
+   */
   private String makeApiRequest(String symbol) {
     StringBuilder response = new StringBuilder();
     try {
       String urlString = String.format(
-              "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&datatype=csv&apikey=%s",
-              symbol, this.apiKey);
+          "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&datatype=csv&apikey=%s",
+          symbol, this.apiKey);
       URL url = new URL(urlString);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      BufferedReader reader = new BufferedReader(
+          new InputStreamReader(connection.getInputStream()));
       String line;
       while ((line = reader.readLine()) != null) {
         response.append(line).append("\n");

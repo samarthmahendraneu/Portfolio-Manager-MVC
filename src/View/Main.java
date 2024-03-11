@@ -3,11 +3,18 @@ package View;
 import View.PortfolioView;
 import java.util.Scanner;
 
-
+/**
+ * Main class for the Portfolio Management System.
+ */
 public class Main {
 
   private static final Scanner scanner = new Scanner(System.in);
 
+  /**
+   * Main method for the Portfolio Management System.
+   *
+   * @param args Command-line arguments.
+   */
   public static void main(String[] args) {
     boolean running = true;
     PortfolioView view = new PortfolioView();

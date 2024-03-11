@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+/**
+ * Class to represent the view for the portfolio.
+ */
 public class PortfolioView {
 
   private static final Scanner scanner = new Scanner(System.in);
@@ -15,6 +18,9 @@ public class PortfolioView {
   private final PortfolioControllerBasic portfolioControllerBasic = new PortfolioControllerBasic(
       stockService);
 
+  /**
+   * to create a new portfolio
+   */
   public void createNewPortfolio() {
     System.out.println("Enter new portfolio name:");
     String name = scanner.nextLine().trim();
@@ -40,9 +46,13 @@ public class PortfolioView {
   }
 
 
+  /**
+   * to examine a portfolio
+   */
   public void examinePortfolio() {
     System.out.println("Available portfolios:");
-    this.portfolioControllerBasic.getPortfolioService().listPortfolioNames().forEach(System.out::println);
+    this.portfolioControllerBasic.getPortfolioService().listPortfolioNames()
+        .forEach(System.out::println);
 
     System.out.println("Enter the name of the portfolio to examine:");
     String name = scanner.nextLine().trim();
@@ -59,6 +69,9 @@ public class PortfolioView {
         );
   }
 
+  /**
+   * to calculate the portfolio value
+   */
   public void calculatePortfolioValue() {
     System.out.println("Enter the name of the portfolio:");
     String name = scanner.nextLine().trim();
@@ -73,6 +86,9 @@ public class PortfolioView {
     }
   }
 
+  /**
+   * to save the portfolio
+   */
   public void savePortfolio() {
     System.out.println("Enter the file path to save the portfolio:");
     String filePath = scanner.nextLine().trim();
@@ -80,6 +96,9 @@ public class PortfolioView {
     System.out.println("Portfolios have been saved successfully to " + filePath);
   }
 
+  /**
+   * to load the portfolio
+   */
   public void loadPortfolio() {
     System.out.println("Enter the file path to load portfolios from:");
     String filePath = scanner.nextLine().trim();

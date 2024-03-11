@@ -9,15 +9,18 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 /**
  * Service class for managing portfolios.
  */
 public class PortfolioService implements PortfolioServiceInterface {
+
   private List<Portfolio> portfolios = new ArrayList<>();
   private final StockService stockService;
 
   /**
    * Constructor for the PortfolioService class.
+   *
    * @param stockService The StockService model object to be used by the service.
    */
   public PortfolioService(StockService stockService) {
@@ -26,31 +29,37 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Adds a portfolio to the list of portfolios.
+   *
    * @param portfolio The portfolio to add.
    */
   public void addPortfolio(Portfolio portfolio) {
     Objects.requireNonNull(portfolio, "Portfolio cannot be null");
     if (portfolios.stream().anyMatch(p -> p.getName().equalsIgnoreCase(portfolio.getName()))) {
-      throw new IllegalArgumentException("A portfolio with the name '" + portfolio.getName() + "' already exists.");
+      throw new IllegalArgumentException(
+          "A portfolio with the name '" + portfolio.getName() + "' already exists.");
     }
     portfolios.add(portfolio);
   }
 
 
-
   /**
    * Adds a stock to the given portfolio with the given symbol, quantity, and date.
+   *
    * @param portfolioName The name of the portfolio to which the stock will be added.
-   * @param symbol The symbol of the stock to be added.
-   * @param quantity The quantity of the stock to be added.
-   * @param date The date on which the stock was purchased.
+   * @param symbol        The symbol of the stock to be added.
+   * @param quantity      The quantity of the stock to be added.
+   * @param date          The date on which the stock was purchased.
    */
-  public void addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date) {
-    Portfolio portfolio = getPortfolioByName(portfolioName).orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+  public void addStockToPortfolio(String portfolioName, String symbol, int quantity,
+      LocalDate date) {
+    Portfolio portfolio = getPortfolioByName(portfolioName).orElseThrow(
+        () -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
 
     // check if stock already exists in portfolio
-    if (portfolio.getStocks().stream().anyMatch(s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
-      throw new IllegalArgumentException("Stock already exists in portfolio: " + symbol + " on " + date);
+    if (portfolio.getStocks().stream().anyMatch(
+        s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
+      throw new IllegalArgumentException(
+          "Stock already exists in portfolio: " + symbol + " on " + date);
     }
 
     // check if quantity is positive
@@ -59,7 +68,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
 
     // check if quantity is whole number
-    if (quantity != (int)quantity) {
+    if (quantity != (int) quantity) {
       throw new IllegalArgumentException("Quantity must be a whole number: " + quantity);
     }
 
@@ -68,7 +77,6 @@ public class PortfolioService implements PortfolioServiceInterface {
       throw new IllegalArgumentException("Date cannot be in the future: " + date);
     }
 
-
     BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
     Stock stock = new Stock(symbol, quantity, price, date);
     portfolio.addStock(stock);
@@ -76,19 +84,21 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Fetches a portfolio by its name.
+   *
    * @param name The name of the portfolio to fetch.
    * @return An Optional containing the portfolio if found, or an empty Optional otherwise.
    */
   public Optional<Portfolio> getPortfolioByName(String name) {
     return portfolios.stream()
-            .filter(p -> p.getName().equalsIgnoreCase(name))
-            .findFirst();
+        .filter(p -> p.getName().equalsIgnoreCase(name))
+        .findFirst();
   }
 
   /**
    * Calculates the total value of a portfolio on a given date.
+   *
    * @param portfolioName The name of the portfolio.
-   * @param onDate The date for which the value is to be calculated.
+   * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
    */
   public BigDecimal calculatePortfolioValue(String portfolioName, LocalDate onDate) {
@@ -112,6 +122,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Returns a list of all portfolio names.
+   *
    * @return A list of all portfolio names.
    */
   public List<String> listPortfolioNames() {
@@ -120,6 +131,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Saves the portfolios to a CSV file at the given file path.
+   *
    * @param filePath The file path to which the portfolios will be saved.
    * @throws IOException If an error occurs while writing to the file.
    */
@@ -129,8 +141,8 @@ public class PortfolioService implements PortfolioServiceInterface {
       for (Portfolio portfolio : portfolios) {
         for (Stock stock : portfolio.getStocks()) {
           writer.append(String.join(",", portfolio.getName(), stock.getSymbol(),
-                  String.valueOf(stock.getQuantity()), stock.getPurchasePrice().toString(),
-                  stock.getPurchaseDate().toString())).append("\n");
+              String.valueOf(stock.getQuantity()), stock.getPurchasePrice().toString(),
+              stock.getPurchaseDate().toString())).append("\n");
         }
       }
     }
@@ -138,6 +150,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Loads portfolios from a CSV file at the given file path.
+   *
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IOException If an error occurs while reading from the file.
    */
@@ -153,7 +166,8 @@ public class PortfolioService implements PortfolioServiceInterface {
       reader.lines().forEach(line -> {
         String[] data = line.split(",");
         Portfolio portfolio = portfolioMap.computeIfAbsent(data[0], Portfolio::new);
-        Stock stock = new Stock(data[1], Integer.parseInt(data[2]), new BigDecimal(data[3]), LocalDate.parse(data[4]));
+        Stock stock = new Stock(data[1], Integer.parseInt(data[2]), new BigDecimal(data[3]),
+            LocalDate.parse(data[4]));
         portfolio.addStock(stock);
       });
       loadedPortfolios.addAll(portfolioMap.values());
@@ -164,6 +178,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Checks if a portfolio with the given name exists.
+   *
    * @param portfolioName The name of the portfolio to check.
    * @return True if the portfolio exists, false otherwise.
    */
@@ -189,7 +204,8 @@ public class PortfolioService implements PortfolioServiceInterface {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
           BigDecimal priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
           BigDecimal purchasePrice = stock.getPurchasePrice();
-          BigDecimal profitAndLoss = priceOnDate.subtract(purchasePrice).multiply(new BigDecimal(stock.getQuantity()));
+          BigDecimal profitAndLoss = priceOnDate.subtract(purchasePrice)
+              .multiply(new BigDecimal(stock.getQuantity()));
           totalProfitAndLoss = totalProfitAndLoss.add(profitAndLoss);
         }
       }
