@@ -1,13 +1,13 @@
 package Controller;
 
-import Service.PortfolioService;
-import Service.StockService;
+import Model.Service.PortfolioService;
+import Model.Service.StockService;
 import Model.Portfolio;
 import Model.Stock;
-import View.MainFrame;
-import View.PortfolioDetailsEntryWindow;
-import View.PortfolioManagementOptionsWindow;
-import View.PortfolioNameEntryWindow;
+import Viewv2.MainFrame;
+import Viewv2.PortfolioDetailsEntryWindow;
+import Viewv2.PortfolioManagementOptionsWindow;
+import Viewv2.PortfolioNameEntryWindow;
 
 import javax.swing.*;
 
@@ -36,7 +36,7 @@ public class PortfolioController {
     PortfolioNameEntryWindow nameEntryWindow = new PortfolioNameEntryWindow();
     nameEntryWindow.addConfirmButtonListener(e -> {
       String portfolioName = nameEntryWindow.getPortfolioName();
-      if (!portfolioName.isEmpty()) {
+      if (!portfolioName.isEmpty() || portfolioService.portfolioExists(portfolioName)){
         Portfolio newPortfolio = new Portfolio(portfolioName);
         portfolioService.addPortfolio(newPortfolio);
         nameEntryWindow.dispose(); // Close the window
@@ -163,6 +163,6 @@ public class PortfolioController {
   }
 
   private void loadPortfolio() {
-    // Implementation for loading a portfolio, similar to previous examples.
+    // TODO : Implementation for loading a portfolio, similar to previous examples.
   }
 }

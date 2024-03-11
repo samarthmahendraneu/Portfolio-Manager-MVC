@@ -1,10 +1,9 @@
 package Model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Portfolio {
+public class Portfolio implements PortfolioInterface {
   private final String name;
   private List<Stock> stocks = new ArrayList<>();
 
@@ -15,14 +14,10 @@ public class Portfolio {
     this.name = name;
     this.stocks = new ArrayList<>(initialStocks);
   }
+
+
   public void addStock(Stock stock) {
     stocks.add(stock);
-  }
-
-  public BigDecimal calculateTotalValue() {
-    return stocks.stream()
-            .map(stock -> stock.getPurchasePrice().multiply(BigDecimal.valueOf(stock.getQuantity())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   public List<Stock> getStocks() {
@@ -31,6 +26,4 @@ public class Portfolio {
   public String getName() {
     return name;
   }
-
-
 }

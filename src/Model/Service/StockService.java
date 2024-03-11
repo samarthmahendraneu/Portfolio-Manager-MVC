@@ -1,4 +1,4 @@
-package Service;
+package Model.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,11 +8,10 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-import Interface.StockInterface;
-import Utilities.StockDataCache;
-import Utilities.StockInfo;
+import Model.Utilities.StockDataCache;
+import Model.Utilities.StockInfo;
 
-public class StockService implements StockInterface {
+public class StockService {
   private final StockDataCache cache = new StockDataCache(); // Instance of your caching class
 
   private final String apiKey;
@@ -21,20 +20,24 @@ public class StockService implements StockInterface {
     this.apiKey = apiKey;
   }
 
-  @Override
-  public BigDecimal fetchRecentClosePrice(String symbol) {
-    String csvData = makeApiRequest(symbol);
-    return parseCsvForClosePrice(csvData);
-  }
-
-
-  @Override
   public BigDecimal fetchPriceOnDate(String symbol, LocalDate date) {
     if (!cache.hasStockData(symbol, date)) {
       fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
     }
     StockInfo info = cache.getStockData(symbol, date);
     return info != null ? info.getClose() : BigDecimal.ZERO;
+  }
+
+  public BigDecimal fetchPreviousClosePrice(String symbol, LocalDate date) {
+    BigDecimal previousClosePrice = this.fetchPriceOnDate(symbol, date);
+    int traversecount = 0;
+    // traverse 4 days back to get the previous close price
+    while (previousClosePrice.equals(BigDecimal.ZERO) && traversecount < 4) {
+      date = date.minusDays(1);
+      previousClosePrice = this.fetchPriceOnDate(symbol, date);
+      traversecount++;
+    }
+    return previousClosePrice;
   }
 
   private void fetchAndCacheStockData(String symbol) {
@@ -80,44 +83,5 @@ public class StockService implements StockInterface {
       System.out.println("An error occurred while fetching stock data: " + e.getMessage());
     }
     return response.toString();
-  }
-
-  private BigDecimal parseCsvForClosePrice(String csvData) {
-    try (Scanner scanner = new Scanner(csvData)) {
-      scanner.nextLine(); // Skip header
-      if (scanner.hasNextLine()) {
-        String[] values = scanner.nextLine().split(",");
-        return new BigDecimal(values[4]); // Assuming close price is in the 5th column
-      }
-    }
-    return BigDecimal.ZERO;
-  }
-
-  private BigDecimal parseCsvForSpecificDate(String csvData, LocalDate date) {
-    try (Scanner scanner = new Scanner(csvData)) {
-      scanner.nextLine(); // Skip header
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        String[] values = line.split(",");
-        LocalDate lineDate = LocalDate.parse(values[0]);
-        if (date.equals(lineDate)) {
-          return new BigDecimal(values[4]); // Assuming close price is in the 5th column
-        }
-      }
-    } catch (Exception e) {
-      System.out.println("An error occurred while parsing the CSV data: " + e.getMessage());
-    }
-    System.out.println("No data found for the specified date: " + date);
-    return BigDecimal.ZERO;
-  }
-
-  public static void main(String[] args) {
-    StockService service = new StockService("8WGFWEOZ5SVHAF75");
-    BigDecimal recentClosePrice = service.fetchRecentClosePrice("IBM");
-    System.out.println("Most Recent Close Price: " + recentClosePrice);
-
-    LocalDate date = LocalDate.of(2024, 3, 6); // Example date
-    BigDecimal priceOnDate = service.fetchPriceOnDate("IBM", date);
-    System.out.println("Price on " + date + ": " + priceOnDate);
   }
 }

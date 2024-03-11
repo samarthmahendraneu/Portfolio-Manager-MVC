@@ -1,7 +1,7 @@
 
 import Controller.PortfolioController;
-import Service.StockService;
-import View.MainFrame;
+import Model.Service.StockService;
+import Viewv2.MainFrame;
 import javax.swing.SwingUtilities;
 
 public class App {
