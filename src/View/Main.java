@@ -1,7 +1,8 @@
 package View;
 
-import View.PortfolioView;
+import Model.Service.StockService;
 import java.util.Scanner;
+import Controller.PortfolioController;
 
 /**
  * Main class for the Portfolio Management System.
@@ -17,7 +18,9 @@ public class Main {
    */
   public static void main(String[] args) {
     boolean running = true;
-    PortfolioView view = new PortfolioView();
+    PortfolioController portfolioController = new PortfolioController(new StockService("W0M1JOKC82EZEQA8"));
+    PortfolioView view = new PortfolioView(portfolioController);
+
     while (running) {
       System.out.println("\nPortfolio Management System:");
       System.out.println("1. Create a new portfolio");
@@ -55,5 +58,6 @@ public class Main {
           System.out.println("Invalid option. Please try again.");
       }
     }
+    scanner.close(); // Close the scanner to prevent resource leak
   }
 }

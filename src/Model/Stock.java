@@ -8,10 +8,10 @@ import java.time.LocalDate;
  * Class to represent a stock in a portfolio.
  */
 public class Stock implements Serializable {
-  private String symbol;
-  private int quantity;
-  private BigDecimal purchasePrice;
-  private LocalDate purchaseDate;
+  private final String symbol;
+  private final int quantity;
+  private final BigDecimal purchasePrice;
+  private final LocalDate purchaseDate;
 
   /**
    * Constructor for the Stock class.
