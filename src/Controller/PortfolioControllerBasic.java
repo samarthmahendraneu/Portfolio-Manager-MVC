@@ -44,6 +44,11 @@ public class PortfolioControllerBasic implements PortfolioControllerInterface {
     if (this.portfolioService.portfolioExists(name)) {
       throw new IllegalArgumentException("Portfolio already exists: " + name);
     }
+
+    // empty portfolio name
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("Portfolio name cannot be empty");
+    }
     Portfolio portfolio = new Portfolio(name);
     this.portfolioService.addPortfolio(portfolio);
     return portfolio;
@@ -99,5 +104,10 @@ public class PortfolioControllerBasic implements PortfolioControllerInterface {
     } catch (Exception e) {
       throw new IllegalArgumentException("Error loading portfolio from file: " + e.getMessage());
     }
+  }
+
+  /** get number of portfolios */
+  public int getNumPortfolios() {
+    return this.portfolioService.getNumberOfPortfolios();
   }
 }
