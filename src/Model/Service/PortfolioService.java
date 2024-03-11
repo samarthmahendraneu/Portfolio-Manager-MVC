@@ -121,6 +121,14 @@ public class PortfolioService implements PortfolioServiceInterface {
   }
 
   /**
+   * Returns number of portfolios.
+   * @return number of portfolios.
+   */
+  public int getNumberOfPortfolios() {
+    return portfolios.size();
+  }
+
+  /**
    * Returns a list of all portfolio names.
    *
    * @return A list of all portfolio names.
