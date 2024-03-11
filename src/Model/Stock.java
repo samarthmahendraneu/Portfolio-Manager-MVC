@@ -1,57 +1,63 @@
 package Model;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 /**
- * getStockSymbol()
- * getStockPrice(Date date)
- * getStockQuantity()
+ * Class to represent a stock in a portfolio.
  */
-public class Stock implements StockInterface{
+public class Stock implements Serializable {
+  private String symbol;
+  private int quantity;
+  private BigDecimal purchasePrice;
+  private LocalDate purchaseDate;
 
-
-  private String stockSymbol;
-  private String stockName;
-  private double stockPrice;
-  private int stockQuantity;
   /**
-   * getStockSymbol()
-   *
-   * @return the stock symbol
+   * Constructor for the Stock class.
+   * @param symbol The symbol of the stock.
+   * @param quantity The quantity of the stock.
+   * @param purchasePrice The purchase price of the stock.
+   * @param purchaseDate The date on which the stock was purchased.
    */
-  @Override
-  public String getStockSymbol() {
-    return this.stockSymbol;
+  public Stock(String symbol, int quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
+    this.symbol = symbol;
+    this.quantity = quantity;
+    this.purchasePrice = purchasePrice;
+    this.purchaseDate = purchaseDate;
   }
 
   /**
-   * getStockPrice(Date date)
-   *
-   * @param date the date
-   * @return the stock price
+   * Getter for the symbol of the stock.
+   * @return The symbol of the stock.
    */
-  @Override
-  public double getStockPrice(String date) {
-    // TODO integrate with API
-    return 0;
+  public String getSymbol() {
+    return symbol;
   }
 
   /**
-   * getStockQuantity()
-   *
-   * @return the stock quantity
+   * Getter for the quantity of the stock.
+   * @return The quantity of the stock.
    */
-  @Override
-  public int getStockQuantity() {
-    return this.stockQuantity;
+  public int getQuantity() {
+    return quantity;
   }
 
   /**
-   * getStockName()
-   *
-   * @return the stock name
+   * Getter for the purchase price of the stock.
+   * @return The purchase price of the stock.
    */
-  @Override
-  public String getStockName() {
-    return this.stockName;
+  public BigDecimal getPurchasePrice() {
+    return purchasePrice;
   }
 
+  /**
+   * Getter for the purchase date of the stock.
+   * @return The purchase date of the stock.
+   */
+  public LocalDate getPurchaseDate() {
+    return purchaseDate;
+  }
+
+  // Setters, toString(), equals(), and hashCode() methods omitted for brevity
 }

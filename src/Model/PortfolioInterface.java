@@ -1,30 +1,27 @@
 package Model;
 
+import java.util.List;
 /**
- * class for portfolio interface.
- * addStock(Stock stock)
- * getPortfolioValue(Date date)
+ * Interface for the Portfolio class.
  */
 public interface PortfolioInterface {
 
   /**
-   * addStock(Stock stock)
-   * @param stock the stock
+   * Adds a stock to the portfolio.
+   *
+   * @param stock The stock to add.
    */
   void addStock(Stock stock);
 
   /**
-   * getPortfolioValue(Date date)
-   * @param date the date
-   * @return the portfolio value
+   * getter for the stocks in the portfolio
    */
-  double getPortfolioValue(String date);
-
+  List<Stock> getStocks();
 
   /**
-   * getStocks()
-   * @return the stocks
+   * Getter for the name of the portfolio.
+   *
+   * @return The name of the portfolio.
    */
-  Stock[] getStocks();
-
+  String getName();
 }

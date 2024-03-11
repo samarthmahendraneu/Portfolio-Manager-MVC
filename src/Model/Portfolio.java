@@ -1,44 +1,50 @@
 package Model;
+
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to represent a portfolio of stocks.
+ */
 public class Portfolio implements PortfolioInterface {
-
-  // list of stocks
-  private List<Stock> stocks;
+  private final String name;
+  private List<Stock> stocks = new ArrayList<>();
 
   /**
-   * addStock(Stock stock)
+   * Constructor for the Portfolio class.
    *
-   * @param stock the stock
+   * @param name The name of the portfolio.
    */
-  @Override
+  public Portfolio(String name) {
+    this.name = name;
+  }
+  public Portfolio(String name, List<Stock> initialStocks) {
+    this.name = name;
+    this.stocks = new ArrayList<>(initialStocks);
+  }
+
+  /**
+   * Adds a stock to the portfolio.
+   *
+   * @param stock The stock to add.
+   */
   public void addStock(Stock stock) {
-    this.stocks.add(stock);
+    stocks.add(stock);
   }
 
   /**
-   * getPortfolioValue(Date date)
-   *
-   * @param date the date
-   * @return the portfolio value
+   * getter for the stocks in the portfolio
    */
-  @Override
-  public double getPortfolioValue(String date) {
-    float sum = 0;
-    for (Stock stock : this.stocks) {
-      sum += stock.getStockPrice(date);
-    }
-    return sum;
-
+  public List<Stock> getStocks() {
+    return new ArrayList<>(stocks); // Return a copy to protect internal list
   }
 
   /**
-   * getStocks()
+   * Getter for the name of the portfolio.
    *
-   * @return the stocks
+   * @return The name of the portfolio.
    */
-  @Override
-  public Stock[] getStocks() {
-    return (Stock[]) this.stocks.toArray();
+  public String getName() {
+    return name;
   }
 }
