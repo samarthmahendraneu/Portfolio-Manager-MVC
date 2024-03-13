@@ -18,14 +18,14 @@ public interface PortfolioServiceInterface {
    *
    * @param name The name of the new portfolio.
    */
-  void createNewPortfolio(String name);
+  PortfolioInterface createNewPortfolio(String name);
 
   /**
    * Adds a portfolio to the list of portfolios.
    *
    * @param portfolio The portfolio to add.
    */
-  void addPortfolio(Portfolio portfolio);
+  void addPortfolio(PortfolioInterface portfolio);
 
   /**
    * Adds a stock to the given portfolio with the given symbol, quantity, and date.

@@ -3,6 +3,7 @@ package controller;
 import model.PortfolioInterface;
 import model.service.PortfolioService;
 import model.service.PortfolioServiceInterface;
+import model.service.StockService;
 import model.service.StockServiceInterface;
 import java.time.LocalDate;
 
@@ -41,11 +42,10 @@ public class PortfolioController implements PortfolioControllerInterface {
    */
   public Payload createNewPortfolio(String name) {
     try {
-      this.portfolioService.createNewPortfolio(name);
+      return new Payload(this.portfolioService.createNewPortfolio(name),"");
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
-    return new Payload(null, "");
   }
 
   /**
