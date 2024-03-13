@@ -1,8 +1,4 @@
-package View;
-
-import Controller.Payload;
-import Controller.PortfolioController;
-import Controller.PortfolioControllerInterface;
+package Controller;
 import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -14,12 +10,12 @@ import java.util.Scanner;
 /**
  * Class to represent the view for the portfolio.
  */
-public class PortfolioView implements PortfolioViewInterface {
+public class PortfolioMenuController implements PortfolioMenuControllerInterface {
 
   private static final Scanner scanner = new Scanner(System.in);
   private final PortfolioControllerInterface portfolioController;
 
-  public PortfolioView(PortfolioControllerInterface portfolioController) {
+  public PortfolioMenuController(PortfolioControllerInterface portfolioController) {
     this.portfolioController = portfolioController;
   }
 

@@ -1,11 +1,9 @@
-package View;
-
-import Controller.Payload;
+package Controller;
 
 /**
  * Interface to represent the view for the portfolio.
  */
-public interface PortfolioViewInterface {
+public interface PortfolioMenuControllerInterface {
 
   /**
    * Display the main menu.
