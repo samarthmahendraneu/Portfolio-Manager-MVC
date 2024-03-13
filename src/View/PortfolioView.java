@@ -2,6 +2,7 @@ package View;
 
 import Controller.Payload;
 import Controller.PortfolioController;
+import Controller.PortfolioControllerInterface;
 import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -16,9 +17,9 @@ import java.util.Scanner;
 public class PortfolioView implements PortfolioViewInterface {
 
   private static final Scanner scanner = new Scanner(System.in);
-  private final PortfolioController portfolioController;
+  private final PortfolioControllerInterface portfolioController;
 
-  public PortfolioView(PortfolioController portfolioController) {
+  public PortfolioView(PortfolioControllerInterface portfolioController) {
     this.portfolioController = portfolioController;
   }
 

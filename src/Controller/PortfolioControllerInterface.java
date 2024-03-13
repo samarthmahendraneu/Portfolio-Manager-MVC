@@ -3,9 +3,8 @@ package Controller;
 
 import Model.Portfolio;
 
-import java.math.BigDecimal;
+import Model.Service.PortfolioServiceInterface;
 import java.time.LocalDate;
-import java.util.Optional;
 
 /**
  * Interface for the Portfolio Management System Controller.
@@ -55,4 +54,9 @@ public interface PortfolioControllerInterface {
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
   Payload loadPortfolio(String filePath) throws IllegalArgumentException;
+
+  /**
+   * get Portfolio Service
+   */
+  PortfolioServiceInterface getPortfolioService();
 }

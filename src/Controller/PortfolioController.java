@@ -1,10 +1,10 @@
 package Controller;
 
 import Model.Service.PortfolioService;
-import Model.Service.StockService;
+import Model.Service.PortfolioServiceInterface;
 import Model.Portfolio;
+import Model.Service.StockServiceInterface;
 import java.time.LocalDate;
-import java.util.Optional;
 
 /**
  * Controller class for the Portfolio Management System. This class provides basic functionality for
@@ -13,14 +13,14 @@ import java.util.Optional;
  */
 public class PortfolioController implements PortfolioControllerInterface {
 
-  private final PortfolioService portfolioService;
+  private final PortfolioServiceInterface portfolioService;
 
   /**
    * Constructor for the PortfolioControllerBasic class.
    *
    * @param stockService The StockService model object to be used by the controller.
    */
-  public PortfolioController(StockService stockService) {
+  public PortfolioController(StockServiceInterface stockService) {
     this.portfolioService = new PortfolioService(stockService);
   }
 
@@ -29,7 +29,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    *
    * @return The PortfolioService object used by the controller.
    */
-  public PortfolioService getPortfolioService() {
+  public PortfolioServiceInterface getPortfolioService() {
     return portfolioService;
   }
 
@@ -75,7 +75,12 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
   public Payload savePortfolio(String filePath) throws IllegalArgumentException {
-    return new Payload(null, this.portfolioService.savePortfoliosToCSV(filePath));
+    try {
+      this.portfolioService.savePortfoliosToCSV(filePath);
+      return new Payload(null, "");
+    } catch (Exception e) {
+      return new Payload(null, e.getMessage());
+    }
   }
 
   /**

@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 public class PortfolioService implements PortfolioServiceInterface {
 
   private final List<Portfolio> portfolios = new ArrayList<>();
-  private final StockService stockService;
+  private final StockServiceInterface stockService;
 
   /**
    * Constructor for the PortfolioService class.
    *
    * @param stockService The StockService model object to be used by the service.
    */
-  public PortfolioService(StockService stockService) {
+  public PortfolioService(StockServiceInterface stockService) {
     this.stockService = stockService;
   }
 

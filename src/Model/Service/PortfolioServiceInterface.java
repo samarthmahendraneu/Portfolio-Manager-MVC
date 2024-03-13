@@ -14,6 +14,14 @@ import java.util.Optional;
 public interface PortfolioServiceInterface {
 
   /**
+   * Creates a new portfolio with the given name.
+   *
+   * @param name The name of the new portfolio.
+   * @return The newly created Portfolio object.
+   */
+  Payload createNewPortfolio(String name);
+
+  /**
    * Adds a portfolio to the list of portfolios.
    *
    * @param portfolio The portfolio to add.
@@ -77,4 +85,10 @@ public interface PortfolioServiceInterface {
    * @return True if a portfolio with the given name exists, false otherwise.
    */
   boolean portfolioExists(String portfolioName);
+
+  /**
+   * get Number of Portfolios
+   * @return number of portfolios
+   */
+  int getNumberOfPortfolios();
 }
