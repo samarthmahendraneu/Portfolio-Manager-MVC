@@ -1,5 +1,6 @@
 package Model.Service;
 
+import Controller.Payload;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,7 +16,7 @@ public interface StockServiceInterface {
    * @param date   The date for which the price is to be fetched.
    * @return The price of the stock on the given date.
    */
-  BigDecimal fetchPriceOnDate(String symbol, LocalDate date);
+  Payload fetchPriceOnDate(String symbol, LocalDate date);
 
 
   /**
@@ -25,5 +26,5 @@ public interface StockServiceInterface {
    * @param date   The date for which to fetch the previous close price.
    * @return The closing price of the stock on the previous trading day.
    */
-  BigDecimal fetchPreviousClosePrice(String symbol, LocalDate date);
+  Payload fetchPreviousClosePrice(String symbol, LocalDate date);
 }

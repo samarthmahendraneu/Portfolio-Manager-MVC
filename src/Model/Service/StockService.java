@@ -1,5 +1,6 @@
 package Model.Service;
 
+import Controller.Payload;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -10,6 +11,10 @@ import java.util.Scanner;
 
 import Model.Utilities.StockDataCache;
 import Model.Utilities.StockInfo;
+
+import java.util.Optional;
+
+
 
 /**
  * Service class for fetching stock data and calculating stock prices.
@@ -36,12 +41,16 @@ public class StockService implements StockServiceInterface {
    * @param date   The date for which to fetch the stock price.
    * @return The closing price of the stock on the given date.
    */
-  public BigDecimal fetchPriceOnDate(String symbol, LocalDate date) {
+  public Payload fetchPriceOnDate(String symbol, LocalDate date) {
+    String message = "";
     if (!cache.hasStockData(symbol, date)) {
-      fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
+      message = fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
+      if (message != null) {
+        return new Payload(null, message);
+      }
     }
     StockInfo info = cache.getStockData(symbol, date);
-    return info != null ? info.getClose() : BigDecimal.ZERO;
+    return info != null ? new Payload(info.getClose(), "") : new Payload(BigDecimal.ZERO, "");
   }
 
   /**
@@ -51,11 +60,12 @@ public class StockService implements StockServiceInterface {
    * @param date   The date for which to fetch the previous close price.
    * @return The closing price of the stock on the previous trading day.
    */
-  public BigDecimal fetchPreviousClosePrice(String symbol, LocalDate date) {
-    BigDecimal previousClosePrice = this.fetchPriceOnDate(symbol, date);
+  public Payload fetchPreviousClosePrice(String symbol, LocalDate date) {
+    // BigDecimal previousClosePrice = this.fetchPriceOnDate(symbol, date);
+    Payload previousClosePrice = this.fetchPriceOnDate(symbol, date);
     int traversecount = 0;
     // traverse 4 days back to get the previous close price
-    while (previousClosePrice.equals(BigDecimal.ZERO) && traversecount < 4) {
+    while (previousClosePrice.getData().equals(BigDecimal.ZERO) && traversecount < 4) {
       date = date.minusDays(1);
       previousClosePrice = this.fetchPriceOnDate(symbol, date);
       traversecount++;
@@ -68,10 +78,13 @@ public class StockService implements StockServiceInterface {
    *
    * @param symbol The symbol of the stock to fetch.
    */
-  private void fetchAndCacheStockData(String symbol) {
+  private <Optional>String fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
-    //
+    if (csvData.contains("Invalid stock symbol")) {
+      return "Invalid stock symbol";
+    }
     parseAndCacheCsvData(csvData, symbol);
+    return null;
   }
 
   /**

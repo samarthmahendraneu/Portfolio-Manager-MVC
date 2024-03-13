@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -45,6 +46,12 @@ public class PortfolioView {
       while (true) {
         System.out.println("Enter the purchase date (YYYY-MM-DD):");
         String dateString = scanner.nextLine().trim();
+        try {
+          date = LocalDate.parse(dateString);
+        } catch (Exception e) {
+          System.out.println("Invalid date format. Please try again.");
+          continue;
+        }
          date = LocalDate.parse(dateString);
         if (!date.isBefore(LocalDate.now())) {
           System.out.println("Date must be before today. Please try again.");
@@ -107,7 +114,7 @@ public class PortfolioView {
       if (this.printIfError(payload)){
         return;
       }
-      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": " + payload.getData());
+      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": " + ((Optional<BigDecimal>) payload.getData()).get());
     } catch (Exception e) {
       System.out.println("Error calculating portfolio value: " + e.getMessage());
     }
@@ -120,8 +127,8 @@ public class PortfolioView {
     System.out.println("Enter the file path to save the portfolio:");
     String filePath = scanner.nextLine().trim();
     Object payload = portfolioController.savePortfolio(filePath);
-    if (Objects.nonNull(payload) && ((Payload) payload).isError()){
-      System.out.println("Error: " + payload);
+    if (((Optional<Payload>) payload).isPresent() && ((Optional<Payload>) payload).get().isError()){
+      System.out.println("Error: " + ((Optional<Payload>) payload).get().getMessage());
       return;
     }
     System.out.println("Portfolios have been saved successfully to " + filePath);

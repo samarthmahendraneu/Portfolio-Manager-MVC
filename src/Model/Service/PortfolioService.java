@@ -75,8 +75,13 @@ public class PortfolioService implements PortfolioServiceInterface {
       message = "Date cannot be in the future: " + date;
     }
     else {
-      BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
-      Stock stock = new Stock(symbol, quantity, price, date);
+      Payload price = stockService.fetchPriceOnDate(symbol, date);
+      if (price.isError()){
+        message = (String) price.getMessage();
+        return message;
+      }
+      Stock stock = new Stock(symbol, quantity, (BigDecimal) price.getData()
+          , date);
       portfolio.addStock(stock);
     }
     return message;
@@ -119,13 +124,13 @@ public class PortfolioService implements PortfolioServiceInterface {
       BigDecimal totalValue = BigDecimal.ZERO;
       for (Stock stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
-          BigDecimal priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
-          BigDecimal value = priceOnDate.multiply(new BigDecimal(stock.getQuantity()));
+          Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
+          BigDecimal value = ((BigDecimal) priceOnDate.getData()).multiply(new BigDecimal(stock.getQuantity()));
           totalValue = totalValue.add(value);
         }
       }
       return totalValue;
-    }));
+    }), "");
   }
 
   /**
@@ -218,9 +223,9 @@ public class PortfolioService implements PortfolioServiceInterface {
       BigDecimal totalProfitAndLoss = BigDecimal.ZERO;
       for (Stock stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
-          BigDecimal priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
+          Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
           BigDecimal purchasePrice = stock.getPurchasePrice();
-          BigDecimal profitAndLoss = priceOnDate.subtract(purchasePrice)
+          BigDecimal profitAndLoss = ((BigDecimal) priceOnDate.getData()).subtract(purchasePrice)
               .multiply(new BigDecimal(stock.getQuantity()));
           totalProfitAndLoss = totalProfitAndLoss.add(profitAndLoss);
         }
