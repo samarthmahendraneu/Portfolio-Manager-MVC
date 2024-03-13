@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Service.StockService;
+import View.View;
 
 
 /**
@@ -16,7 +17,8 @@ public class Main {
   public static void main(String[] args) {
     PortfolioControllerInterface portfolioController = new PortfolioController(
         new StockService("W0M1JOKC82EZEQA8"));
-    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController);
+    View view = new View();
+    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
     // interaction with the user
     // [Main] -> [PortfolioView] -> [PortfolioController] -> [PortfolioService] -> [Model]
     controller.displayMainMenu();
