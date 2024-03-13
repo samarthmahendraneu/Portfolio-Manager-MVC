@@ -7,7 +7,7 @@ import java.time.LocalDate;
 /**
  * Class to represent a stock in a portfolio.
  */
-public class Stock implements Serializable {
+public class Stock implements Tradable {
 
   private final String symbol;
   private final int quantity;

@@ -3,6 +3,7 @@ package Model.Service;
 import Controller.Payload;
 import Model.Portfolio;
 import Model.Stock;
+import Model.Tradable;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -101,7 +102,7 @@ public class PortfolioService implements PortfolioServiceInterface {
         message = (String) price.getMessage();
         return message;
       }
-      Stock stock = new Stock(symbol, quantity, (BigDecimal) price.getData()
+      Tradable stock = new Stock(symbol, quantity, (BigDecimal) price.getData()
           , date);
       portfolio.addStock(stock);
     }
@@ -143,7 +144,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
     return new Payload(getPortfolioByName(portfolioName).map(portfolio -> {
       BigDecimal totalValue = BigDecimal.ZERO;
-      for (Stock stock : portfolio.getStocks()) {
+      for (Tradable stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
           Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
           BigDecimal value = ((BigDecimal) priceOnDate.getData()).multiply(
@@ -183,7 +184,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     try (FileWriter writer = new FileWriter(filePath)) {
       writer.append("Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date\n");
       for (Portfolio portfolio : portfolios) {
-        for (Stock stock : portfolio.getStocks()) {
+        for (Tradable stock : portfolio.getStocks()) {
           writer.append(String.join(",", portfolio.getName(), stock.getSymbol(),
               String.valueOf(stock.getQuantity()), stock.getPurchasePrice().toString(),
               stock.getPurchaseDate().toString())).append("\n");
@@ -248,7 +249,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     // calculate profit for each stock and then sum them up
     return getPortfolioByName(portfolioName).map(portfolio -> {
       BigDecimal totalProfitAndLoss = BigDecimal.ZERO;
-      for (Stock stock : portfolio.getStocks()) {
+      for (Tradable stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
           Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
           BigDecimal purchasePrice = stock.getPurchasePrice();

@@ -9,7 +9,7 @@ import java.util.List;
 public class Portfolio implements PortfolioInterface {
 
   private final String name;
-  private List<Stock> stocks = new ArrayList<>();
+  private List<Tradable> stocks = new ArrayList<>();
 
   /**
    * Constructor for the Portfolio class.
@@ -30,14 +30,14 @@ public class Portfolio implements PortfolioInterface {
    *
    * @param stock The stock to add.
    */
-  public void addStock(Stock stock) {
+  public void addStock(Tradable stock) {
     stocks.add(stock);
   }
 
   /**
    * getter for the stocks in the portfolio
    */
-  public List<Stock> getStocks() {
+  public List<Tradable> getStocks() {
     return new ArrayList<>(stocks); // Return a copy to protect internal list
   }
 

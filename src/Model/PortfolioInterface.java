@@ -12,12 +12,12 @@ public interface PortfolioInterface {
    *
    * @param stock The stock to add.
    */
-  void addStock(Stock stock);
+  void addStock(Tradable stock);
 
   /**
    * getter for the stocks in the portfolio
    */
-  List<Stock> getStocks();
+  List<Tradable> getStocks();
 
   /**
    * Getter for the name of the portfolio.
