@@ -58,25 +58,26 @@ public class PortfolioService implements PortfolioServiceInterface {
     // check if stock already exists in portfolio
     if (portfolio.getStocks().stream().anyMatch(
         s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
-      throw new IllegalArgumentException(
+      System.out.println(
           "Stock already exists in portfolio: " + symbol + " on " + date);
     }
 
     // check if quantity is positive
-    if (quantity <= 0) {
-      throw new IllegalArgumentException("Quantity must be positive: " + quantity);
+    else if (quantity <= 0) {
+      System.out.println("Quantity must be positive: " + quantity);
     }
 
     // check if quantity is whole number
 
     // check if date is in the future
-    if (date.isAfter(LocalDate.now())) {
-      throw new IllegalArgumentException("Date cannot be in the future: " + date);
+    else if (date.isAfter(LocalDate.now())) {
+      System.out.println("Date cannot be in the future: " + date);
     }
-
-    BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
-    Stock stock = new Stock(symbol, quantity, price, date);
-    portfolio.addStock(stock);
+    else {
+      BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
+      Stock stock = new Stock(symbol, quantity, price, date);
+      portfolio.addStock(stock);
+    }
   }
 
   /**

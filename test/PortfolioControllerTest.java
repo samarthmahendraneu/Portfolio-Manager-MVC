@@ -54,7 +54,7 @@ public class PortfolioControllerTest {
   }
 
   // add invalid date test
-  @Test(expected = Exception.class)
+  @Test
   public void testAddStockToPortfolio_InvalidDate() {
     Portfolio portfolio = portfolioController.createNewPortfolio("Test Portfolio");
     Stock stock = new Stock("AAPL", 10, new BigDecimal("100.00"), LocalDate.now().plusDays(1));
@@ -63,7 +63,7 @@ public class PortfolioControllerTest {
   }
 
   // quantity less than 1 test
-  @Test(expected = Exception.class)
+  @Test
   public void testAddStockToPortfolio_InvalidQuantity() {
     Portfolio portfolio = portfolioController.createNewPortfolio("Test Portfolio");
     Stock stock = new Stock("AAPL", 0, new BigDecimal("100.00"), LocalDate.now());

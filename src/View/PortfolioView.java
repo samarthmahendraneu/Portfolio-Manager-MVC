@@ -3,6 +3,7 @@ package View;
 import Controller.PortfolioController;
 import Model.Portfolio;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -25,20 +26,39 @@ public class PortfolioView {
     System.out.println("Enter new portfolio name:");
     String name = scanner.nextLine().trim();
     Portfolio newPortfolio = portfolioController.createNewPortfolio(name);
+    boolean flag = true;
+    System.out.println("Enter the stocks you want to add to the portfolio");
 
-    System.out.println("Enter the number of stocks you want to add to the portfolio:");
-    int numberOfStocks = scanner.nextInt();
-    scanner.nextLine(); // Consume newline
-    for (int i = 0; i < numberOfStocks; i++) {
+    while (flag) {
       System.out.println("Enter the stock symbol:");
       String symbol = scanner.nextLine().trim();
       System.out.println("Enter the quantity of the stock:");
       int quantity = scanner.nextInt();
       scanner.nextLine(); // Consume newline
-      System.out.println("Enter the purchase date (YYYY-MM-DD):");
-      String dateString = scanner.nextLine().trim();
-      LocalDate date = LocalDate.parse(dateString);
+      LocalDate date;
+      while (true) {
+        System.out.println("Enter the purchase date (YYYY-MM-DD):");
+        String dateString = scanner.nextLine().trim();
+         date = LocalDate.parse(dateString);
+        if (!date.isBefore(LocalDate.now())) {
+          System.out.println("Date must be before today. Please try again.");
+          continue;
+        }
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+          System.out.println("Date must be on a weekday. Please try again.");
+          continue;
+        }
+        break;
+      }
       portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
+      System.out.println("Press q to exit, Press n to go on");
+      String exitChar = scanner.nextLine().trim();
+      if(exitChar.equals("q"))
+      {
+        flag = false;
+      }
+
     }
     System.out.println("Portfolio '" + name + "' has been created and populated.");
   }
