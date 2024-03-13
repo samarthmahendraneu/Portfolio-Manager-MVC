@@ -8,6 +8,7 @@ import java.time.LocalDate;
  * Class to represent a stock in a portfolio.
  */
 public class Stock implements Serializable {
+
   private final String symbol;
   private final int quantity;
   private final BigDecimal purchasePrice;
@@ -15,10 +16,11 @@ public class Stock implements Serializable {
 
   /**
    * Constructor for the Stock class.
-   * @param symbol The symbol of the stock.
-   * @param quantity The quantity of the stock.
+   *
+   * @param symbol        The symbol of the stock.
+   * @param quantity      The quantity of the stock.
    * @param purchasePrice The purchase price of the stock.
-   * @param purchaseDate The date on which the stock was purchased.
+   * @param purchaseDate  The date on which the stock was purchased.
    */
   public Stock(String symbol, int quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
     this.symbol = symbol;
@@ -29,6 +31,7 @@ public class Stock implements Serializable {
 
   /**
    * Getter for the symbol of the stock.
+   *
    * @return The symbol of the stock.
    */
   public String getSymbol() {
@@ -37,6 +40,7 @@ public class Stock implements Serializable {
 
   /**
    * Getter for the quantity of the stock.
+   *
    * @return The quantity of the stock.
    */
   public int getQuantity() {
@@ -45,6 +49,7 @@ public class Stock implements Serializable {
 
   /**
    * Getter for the purchase price of the stock.
+   *
    * @return The purchase price of the stock.
    */
   public BigDecimal getPurchasePrice() {
@@ -53,6 +58,7 @@ public class Stock implements Serializable {
 
   /**
    * Getter for the purchase date of the stock.
+   *
    * @return The purchase date of the stock.
    */
   public LocalDate getPurchaseDate() {

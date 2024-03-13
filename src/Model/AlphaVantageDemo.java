@@ -6,7 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class AlphaVantageDemo {
-  public static void main(String []args) {
+
+  public static void main(String[] args) {
     //the API key needed to use this web service.
     //Please get your own free API key here: https://www.alphavantage.co/
     //Please look at documentation here: https://www.alphavantage.co/documentation/
@@ -23,14 +24,13 @@ public class AlphaVantageDemo {
       which you are welcome to use.
        */
       url = new URL("https://www.alphavantage"
-              + ".co/query?function=TIME_SERIES_DAILY"
-              + "&outputsize=full"
-              + "&symbol"
-              + "=" + stockSymbol + "&apikey="+apiKey+"&datatype=csv");
-    }
-    catch (MalformedURLException e) {
+          + ".co/query?function=TIME_SERIES_DAILY"
+          + "&outputsize=full"
+          + "&symbol"
+          + "=" + stockSymbol + "&apikey=" + apiKey + "&datatype=csv");
+    } catch (MalformedURLException e) {
       throw new RuntimeException("the alphavantage API has either changed or "
-              + "no longer works");
+          + "no longer works");
     }
 
     InputStream in = null;
@@ -49,12 +49,11 @@ public class AlphaVantageDemo {
       in = url.openStream();
       int b;
 
-      while ((b=in.read())!=-1) {
-        output.append((char)b);
+      while ((b = in.read()) != -1) {
+        output.append((char) b);
       }
-    }
-    catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for "+stockSymbol);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
     System.out.println("Return value: ");
     System.out.println(output.toString());

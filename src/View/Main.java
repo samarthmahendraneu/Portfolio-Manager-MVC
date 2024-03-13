@@ -18,7 +18,8 @@ public class Main {
    */
   public static void main(String[] args) {
     boolean running = true;
-    PortfolioController portfolioController = new PortfolioController(new StockService("W0M1JOKC82EZEQA8"));
+    PortfolioController portfolioController = new PortfolioController(
+        new StockService("W0M1JOKC82EZEQA8"));
     PortfolioView view = new PortfolioView(portfolioController);
 
     while (running) {

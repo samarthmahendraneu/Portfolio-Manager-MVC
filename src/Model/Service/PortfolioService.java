@@ -28,6 +28,28 @@ public class PortfolioService implements PortfolioServiceInterface {
     this.stockService = stockService;
   }
 
+
+  /**
+   * Creates a new portfolio with the given name.
+   *
+   * @param name The name of the new portfolio.
+   * @return The newly created Portfolio object.
+   */
+  public Payload createNewPortfolio(String name) {
+    String message = "";
+    if (portfolioExists(name)) {
+      message = "Portfolio already exists: " + name;
+      return new Payload(null, message);
+    }
+    if (name.isEmpty()) {
+      message = "Portfolio name cannot be empty";
+      return new Payload(null, message);
+    }
+    Portfolio portfolio = new Portfolio(name);
+    this.addPortfolio(portfolio);
+    return new Payload(portfolio);
+  }
+
   /**
    * Adds a portfolio to the list of portfolios.
    *
@@ -73,10 +95,9 @@ public class PortfolioService implements PortfolioServiceInterface {
     // check if date is in the future
     else if (date.isAfter(LocalDate.now())) {
       message = "Date cannot be in the future: " + date;
-    }
-    else {
+    } else {
       Payload price = stockService.fetchPriceOnDate(symbol, date);
-      if (price.isError()){
+      if (price.isError()) {
         message = (String) price.getMessage();
         return message;
       }
@@ -125,7 +146,8 @@ public class PortfolioService implements PortfolioServiceInterface {
       for (Stock stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
           Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
-          BigDecimal value = ((BigDecimal) priceOnDate.getData()).multiply(new BigDecimal(stock.getQuantity()));
+          BigDecimal value = ((BigDecimal) priceOnDate.getData()).multiply(
+              new BigDecimal(stock.getQuantity()));
           totalValue = totalValue.add(value);
         }
       }
@@ -135,6 +157,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Returns number of portfolios.
+   *
    * @return number of portfolios.
    */
   public int getNumberOfPortfolios() {
@@ -156,7 +179,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param filePath The file path to which the portfolios will be saved.
    * @throws IOException If an error occurs while writing to the file.
    */
-  public void savePortfoliosToCSV(String filePath) throws IOException {
+  public String savePortfoliosToCSV(String filePath) {
     try (FileWriter writer = new FileWriter(filePath)) {
       writer.append("Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date\n");
       for (Portfolio portfolio : portfolios) {
@@ -166,7 +189,10 @@ public class PortfolioService implements PortfolioServiceInterface {
               stock.getPurchaseDate().toString())).append("\n");
         }
       }
+    } catch (IOException e) {
+      return "Error saving portfolio to file: " + e.getMessage();
     }
+    return "";
   }
 
   /**
@@ -175,10 +201,10 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IOException If an error occurs while reading from the file.
    */
-  public void loadPortfoliosFromCSV(String filePath) throws IOException {
+  public String loadPortfoliosFromCSV(String filePath) throws IOException {
     File file = new File(filePath);
     if (!file.exists()) {
-      throw new IOException("File not found: " + filePath);
+      return "File not found: " + filePath;
     }
     List<Portfolio> loadedPortfolios;
     try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
@@ -195,6 +221,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
     portfolios.clear();
     portfolios.addAll(loadedPortfolios);
+    return "";
   }
 
   /**

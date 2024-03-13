@@ -3,8 +3,6 @@ package Controller;
 import Model.Service.PortfolioService;
 import Model.Service.StockService;
 import Model.Portfolio;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -42,21 +40,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @return The newly created Portfolio object.
    */
   public Payload createNewPortfolio(String name) {
-    String message = "";
-    if (this.portfolioService.portfolioExists(name)) {
-      message = "Portfolio already exists: " + name;
-      return new Payload(null, message);
-
-    }
-
-    // empty portfolio name
-    if (name.isEmpty()) {
-      message = "Portfolio name cannot be empty";
-      return new Payload(null, message);
-    }
-    Portfolio portfolio = new Portfolio(name);
-    this.portfolioService.addPortfolio(portfolio);
-    return new Payload(portfolio);
+    return this.portfolioService.createNewPortfolio(name);
   }
 
   /**
@@ -69,7 +53,8 @@ public class PortfolioController implements PortfolioControllerInterface {
    */
   public Payload addStockToPortfolio(Portfolio portfolio, String symbol, int quantity,
       LocalDate date) {
-    return new Payload(null, this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date));
+    return new Payload(null,
+        this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date));
   }
 
   /**
@@ -89,13 +74,8 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path where the portfolios will be saved.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
-  public Optional<Payload> savePortfolio(String filePath) throws IllegalArgumentException {
-    try {
-      this.portfolioService.savePortfoliosToCSV(filePath);
-    } catch (Exception e) {
-      return Optional.of(new Payload(null, "Error saving portfolio to file: " + e.getMessage()));
-    }
-    return Optional.empty();
+  public Payload savePortfolio(String filePath) throws IllegalArgumentException {
+    return new Payload(null, this.portfolioService.savePortfoliosToCSV(filePath));
   }
 
   /**
@@ -104,16 +84,18 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
-  public Optional<Payload> loadPortfolio(String filePath) throws IllegalArgumentException {
+  public Payload loadPortfolio(String filePath) throws IllegalArgumentException {
     try {
-      this.portfolioService.loadPortfoliosFromCSV(filePath);
+      Payload payload = new Payload(null, this.portfolioService.loadPortfoliosFromCSV(filePath));
+      return payload;
     } catch (Exception e) {
-      return Optional.of(new Payload(null, "Error loading portfolio from file: " + e.getMessage()));
+      return new Payload(null, e.getMessage());
     }
-    return Optional.empty();
   }
 
-  /** get number of portfolios */
+  /**
+   * get number of portfolios
+   */
   public int getNumPortfolios() {
     return this.portfolioService.getNumberOfPortfolios();
   }

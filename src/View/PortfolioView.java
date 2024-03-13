@@ -13,7 +13,7 @@ import java.util.Scanner;
 /**
  * Class to represent the view for the portfolio.
  */
-public class PortfolioView {
+public class PortfolioView implements PortfolioViewInterface {
 
   private static final Scanner scanner = new Scanner(System.in);
   private final PortfolioController portfolioController;
@@ -29,7 +29,7 @@ public class PortfolioView {
     System.out.println("Enter new portfolio name:");
     String name = scanner.nextLine().trim();
     Payload payload = portfolioController.createNewPortfolio(name);
-    if (this.printIfError(payload)){
+    if (this.printIfError(payload)) {
       return;
     }
     Portfolio newPortfolio = (Portfolio) payload.getData();
@@ -52,7 +52,7 @@ public class PortfolioView {
           System.out.println("Invalid date format. Please try again.");
           continue;
         }
-         date = LocalDate.parse(dateString);
+        date = LocalDate.parse(dateString);
         if (!date.isBefore(LocalDate.now())) {
           System.out.println("Date must be before today. Please try again.");
           continue;
@@ -65,13 +65,12 @@ public class PortfolioView {
         break;
       }
       payload = portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
-      if (this.printIfError(payload)){
+      if (this.printIfError(payload)) {
         return;
       }
       System.out.println("Press q to exit, Press n to go on");
       String exitChar = scanner.nextLine().trim();
-      if(exitChar.equals("q"))
-      {
+      if (exitChar.equals("q")) {
         flag = false;
       }
 
@@ -110,11 +109,13 @@ public class PortfolioView {
     System.out.println("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
     String dateInput = scanner.nextLine().trim();
     try {
-      Payload payload = portfolioController.calculatePortfolioValue(name, LocalDate.parse(dateInput));
-      if (this.printIfError(payload)){
+      Payload payload = portfolioController.calculatePortfolioValue(name,
+          LocalDate.parse(dateInput));
+      if (this.printIfError(payload)) {
         return;
       }
-      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": " + ((Optional<BigDecimal>) payload.getData()).get());
+      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": "
+          + ((Optional<BigDecimal>) payload.getData()).get());
     } catch (Exception e) {
       System.out.println("Error calculating portfolio value: " + e.getMessage());
     }
@@ -127,7 +128,8 @@ public class PortfolioView {
     System.out.println("Enter the file path to save the portfolio:");
     String filePath = scanner.nextLine().trim();
     Object payload = portfolioController.savePortfolio(filePath);
-    if (((Optional<Payload>) payload).isPresent() && ((Optional<Payload>) payload).get().isError()){
+    if (((Optional<Payload>) payload).isPresent() && ((Optional<Payload>) payload).get()
+        .isError()) {
       System.out.println("Error: " + ((Optional<Payload>) payload).get().getMessage());
       return;
     }
@@ -141,7 +143,7 @@ public class PortfolioView {
     System.out.println("Enter the file path to load portfolios from:");
     String filePath = scanner.nextLine().trim();
     Object payload = portfolioController.loadPortfolio(filePath);
-    if (Objects.nonNull(payload) && ((Payload) payload).isError()){
+    if (Objects.nonNull(payload) && ((Payload) payload).isError()) {
       System.out.println("Error: " + payload);
       return;
     }

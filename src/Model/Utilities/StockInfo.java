@@ -7,6 +7,7 @@ import java.time.LocalDate;
  * Class to represent stock information, including date, open, high, low, close, and volume.
  */
 public class StockInfo {
+
   private final LocalDate date;
   private final BigDecimal open;
   private final BigDecimal high;
@@ -24,7 +25,8 @@ public class StockInfo {
    * @param close  The closing price of the stock.
    * @param volume The volume of the stock.
    */
-  public StockInfo(LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, long volume) {
+  public StockInfo(LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low,
+      BigDecimal close, long volume) {
     this.date = date;
     this.open = open;
     this.high = high;
@@ -38,39 +40,54 @@ public class StockInfo {
    *
    * @return The date of the stock information.
    */
-  public LocalDate getDate() { return date; }
+  public LocalDate getDate() {
+    return date;
+  }
 
   /**
    * Getter for the opening price of the stock.
    *
    * @return The opening price of the stock.
    */
-  public BigDecimal getOpen() { return open; }
+  public BigDecimal getOpen() {
+    return open;
+  }
 
   /**
    * Getter for the highest price of the stock.
    *
    * @return The highest price of the stock.
    */
-  public BigDecimal getHigh() { return high; }
+  public BigDecimal getHigh() {
+    return high;
+  }
 
   /**
    * Getter for the lowest price of the stock.
+   *
    * @return The lowest price of the stock.
    */
-  public BigDecimal getLow() { return low; }
+  public BigDecimal getLow() {
+    return low;
+  }
 
   /**
    * Getter for the closing price of the stock.
+   *
    * @return The closing price of the stock.
    */
-  public BigDecimal getClose() { return close; }
+  public BigDecimal getClose() {
+    return close;
+  }
 
   /**
    * Getter for the volume of the stock.
+   *
    * @return The volume of the stock.
    */
-  public long getVolume() { return volume; }
+  public long getVolume() {
+    return volume;
+  }
 
   /**
    * Returns a string representation of the stock information for debugging purposes.
@@ -80,6 +97,6 @@ public class StockInfo {
   @Override
   public String toString() {
     return String.format("Date: %s, Open: %s, High: %s, Low: %s, Close: %s, Volume: %d",
-            date, open, high, low, close, volume);
+        date, open, high, low, close, volume);
   }
 }

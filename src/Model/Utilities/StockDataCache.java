@@ -1,13 +1,15 @@
 package Model.Utilities;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A class to cache stock data.
- * This class is used to store stock data in memory to avoid making repeated API calls to fetch the same data.
+ * A class to cache stock data. This class is used to store stock data in memory to avoid making
+ * repeated API calls to fetch the same data.
  */
 public class StockDataCache {
+
   private final Map<String, Map<LocalDate, StockInfo>> stockDataCache = new HashMap<>();
 
   /**
@@ -23,8 +25,9 @@ public class StockDataCache {
 
   /**
    * Fetches stock data from the cache.
+   *
    * @param symbol symbol of the stock.
-   * @param date date for which the stock data is to be fetched.
+   * @param date   date for which the stock data is to be fetched.
    * @return stock data for the given symbol and date.
    */
   public StockInfo getStockData(String symbol, LocalDate date) {

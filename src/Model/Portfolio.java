@@ -7,6 +7,7 @@ import java.util.List;
  * Class to represent a portfolio of stocks.
  */
 public class Portfolio implements PortfolioInterface {
+
   private final String name;
   private List<Stock> stocks = new ArrayList<>();
 
@@ -18,6 +19,7 @@ public class Portfolio implements PortfolioInterface {
   public Portfolio(String name) {
     this.name = name;
   }
+
   public Portfolio(String name, List<Stock> initialStocks) {
     this.name = name;
     this.stocks = new ArrayList<>(initialStocks);

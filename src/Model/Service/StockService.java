@@ -15,7 +15,6 @@ import Model.Utilities.StockInfo;
 import java.util.Optional;
 
 
-
 /**
  * Service class for fetching stock data and calculating stock prices.
  */
@@ -44,7 +43,8 @@ public class StockService implements StockServiceInterface {
   public Payload fetchPriceOnDate(String symbol, LocalDate date) {
     String message = "";
     if (!cache.hasStockData(symbol, date)) {
-      message = fetchAndCacheStockData(symbol); // Fetch all available data for the symbol and cache it
+      message = fetchAndCacheStockData(
+          symbol); // Fetch all available data for the symbol and cache it
       if (message != null) {
         return new Payload(null, message);
       }
@@ -78,7 +78,7 @@ public class StockService implements StockServiceInterface {
    *
    * @param symbol The symbol of the stock to fetch.
    */
-  private <Optional>String fetchAndCacheStockData(String symbol) {
+  private <Optional> String fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
     if (csvData.contains("Invalid stock symbol")) {
       return "Invalid stock symbol";

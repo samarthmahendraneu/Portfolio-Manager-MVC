@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.List;
+
 /**
  * Interface for the Portfolio class.
  */

@@ -46,7 +46,7 @@ public interface PortfolioControllerInterface {
    * @param filePath The file path where the portfolios will be saved.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
-  Optional<Payload> savePortfolio(String filePath) throws IllegalArgumentException;
+  Payload savePortfolio(String filePath) throws IllegalArgumentException;
 
   /**
    * Loads portfolios from a CSV file at the given file path.
@@ -54,5 +54,5 @@ public interface PortfolioControllerInterface {
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
-  Optional<Payload> loadPortfolio(String filePath) throws IllegalArgumentException;
+  Payload loadPortfolio(String filePath) throws IllegalArgumentException;
 }
