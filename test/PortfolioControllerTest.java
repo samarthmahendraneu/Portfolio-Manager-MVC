@@ -25,6 +25,7 @@ public class PortfolioControllerTest {
     portfolioController = new PortfolioController(stockService);
   }
 
+  //Portfolio Creation
   @Test
   public void testCreateNewPortfolio() {
     Portfolio portfolio = portfolioController.createNewPortfolio("Test Portfolio");
@@ -44,6 +45,7 @@ public class PortfolioControllerTest {
     Portfolio portfolio2 = portfolioController.createNewPortfolio("Test Portfolio");
   }
 
+  // //Create a portfolio with a valid set of stocks and shares.
   @Test
   public void testAddStockToPortfolio() {
     Portfolio portfolio = portfolioController.createNewPortfolio("Test Portfolio");
@@ -146,4 +148,39 @@ public class PortfolioControllerTest {
     value = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-11"));
     assertEquals(total, value);
   }
+
+
+  //Attempt to create a portfolio with invalid or non-existent stock tickers.
+  @Test
+  public void testAddInvalidStockToPortfolio() {
+    Portfolio portfolio = portfolioController.createNewPortfolio("Test Portfolio");
+    portfolioController.addStockToPortfolio(portfolio, "INVALID", 10, LocalDate.now());
+    // prints "Invalid stock symbol: INVALID"
+
+
+  }
+
 }
+
+
+
+// Functional Test Cases
+
+//Attempt to create a portfolio with negative or zero shares.
+//Create multiple portfolios with different sets of stocks and shares.
+//Portfolio Composition Examination
+//Examine the composition of a newly created portfolio.
+//Examine the composition of a portfolio after the market has closed.
+//Examine the composition of an empty portfolio (if allowed by the program).
+//Portfolio Value Determination
+//Determine the total value of a portfolio on a current date with market data available.
+//Determine the total value of a portfolio on a past date with historical market data.
+//Determine the total value of a portfolio on a future date (should not be possible or should return an error).
+//Portfolio Persistence
+//Save a portfolio to a file and ensure the data is correctly written in human-readable format.
+//Load a portfolio from a file and ensure the data is correctly read and the portfolio is accurately reconstructed.
+//Attempt to load a portfolio from a corrupted or incorrectly formatted file.
+//User Interface/Interactivity
+//Interact with the program using valid commands and inputs.
+//Test the program's response to invalid commands or inputs (e.g., typos, incorrect data types).
+//Ensure that the program does not crash upon receiving unexpected input.

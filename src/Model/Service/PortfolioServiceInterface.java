@@ -1,5 +1,6 @@
 package Model.Service;
 
+import Controller.Payload;
 import Model.Portfolio;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -27,7 +28,7 @@ public interface PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
    */
-  void addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
+  String addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
 
   /**
    * Fetches a portfolio by its name.
@@ -44,7 +45,7 @@ public interface PortfolioServiceInterface {
    * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
    */
-  BigDecimal calculatePortfolioValue(String portfolioName, LocalDate onDate);
+  Payload calculatePortfolioValue(String portfolioName, LocalDate onDate);
 
   /**
    * Returns a list of all portfolio names.

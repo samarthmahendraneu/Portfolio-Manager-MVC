@@ -1,5 +1,6 @@
 package Model.Service;
 
+import Controller.Payload;
 import Model.Portfolio;
 import Model.Stock;
 import java.io.*;
@@ -50,34 +51,35 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
    */
-  public void addStockToPortfolio(String portfolioName, String symbol, int quantity,
+  public String addStockToPortfolio(String portfolioName, String symbol, int quantity,
       LocalDate date) {
+    String message = "";
     Portfolio portfolio = getPortfolioByName(portfolioName).orElseThrow(
         () -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
 
     // check if stock already exists in portfolio
     if (portfolio.getStocks().stream().anyMatch(
         s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
-      System.out.println(
-          "Stock already exists in portfolio: " + symbol + " on " + date);
+      message = "Stock already exists in portfolio: " + symbol + " on " + date;
     }
 
     // check if quantity is positive
     else if (quantity <= 0) {
-      System.out.println("Quantity must be positive: " + quantity);
+      message = "Quantity must be positive: " + quantity;
     }
 
     // check if quantity is whole number
 
     // check if date is in the future
     else if (date.isAfter(LocalDate.now())) {
-      System.out.println("Date cannot be in the future: " + date);
+      message = "Date cannot be in the future: " + date;
     }
     else {
       BigDecimal price = stockService.fetchPriceOnDate(symbol, date);
       Stock stock = new Stock(symbol, quantity, price, date);
       portfolio.addStock(stock);
     }
+    return message;
   }
 
   /**
@@ -99,13 +101,21 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
    */
-  public BigDecimal calculatePortfolioValue(String portfolioName, LocalDate onDate) {
+  public Payload calculatePortfolioValue(String portfolioName, LocalDate onDate) {
+    String message = "";
     // check if date is in the future
     if (onDate.isAfter(LocalDate.now())) {
-      throw new IllegalArgumentException("Date cannot be in the future: " + onDate);
+      message = "Date cannot be in the future: " + onDate;
+      return new Payload(null, message);
     }
 
-    return getPortfolioByName(portfolioName).map(portfolio -> {
+    // check if portfolio exists
+    if (!portfolioExists(portfolioName)) {
+      message = "Portfolio not found: " + portfolioName;
+      return new Payload(null, message);
+    }
+
+    return new Payload(getPortfolioByName(portfolioName).map(portfolio -> {
       BigDecimal totalValue = BigDecimal.ZERO;
       for (Stock stock : portfolio.getStocks()) {
         if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
@@ -115,7 +125,7 @@ public class PortfolioService implements PortfolioServiceInterface {
         }
       }
       return totalValue;
-    }).orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+    }));
   }
 
   /**

@@ -6,6 +6,7 @@ import Model.Portfolio;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Controller class for the Portfolio Management System. This class provides basic functionality for
@@ -40,18 +41,22 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param name The name of the new portfolio.
    * @return The newly created Portfolio object.
    */
-  public Portfolio createNewPortfolio(String name) {
+  public Payload createNewPortfolio(String name) {
+    String message = "";
     if (this.portfolioService.portfolioExists(name)) {
-      throw new IllegalArgumentException("Portfolio already exists: " + name);
+      message = "Portfolio already exists: " + name;
+      return new Payload(null, message);
+
     }
 
     // empty portfolio name
     if (name.isEmpty()) {
-      throw new IllegalArgumentException("Portfolio name cannot be empty");
+      message = "Portfolio name cannot be empty";
+      return new Payload(null, message);
     }
     Portfolio portfolio = new Portfolio(name);
     this.portfolioService.addPortfolio(portfolio);
-    return portfolio;
+    return new Payload(portfolio);
   }
 
   /**
@@ -62,9 +67,9 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param quantity  The quantity of the stock to be added.
    * @param date      The date on which the stock was purchased.
    */
-  public void addStockToPortfolio(Portfolio portfolio, String symbol, int quantity,
+  public Payload addStockToPortfolio(Portfolio portfolio, String symbol, int quantity,
       LocalDate date) {
-    this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date);
+    return new Payload(null, this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date));
   }
 
   /**
@@ -74,7 +79,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param onDate The date on which the value of the portfolio will be calculated.
    * @return The value of the portfolio on the given date.
    */
-  public BigDecimal calculatePortfolioValue(String name, LocalDate onDate) {
+  public Payload calculatePortfolioValue(String name, LocalDate onDate) {
     return this.portfolioService.calculatePortfolioValue(name, onDate);
   }
 
@@ -84,12 +89,13 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path where the portfolios will be saved.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
-  public void savePortfolio(String filePath) throws IllegalArgumentException {
+  public Optional<Payload> savePortfolio(String filePath) throws IllegalArgumentException {
     try {
       this.portfolioService.savePortfoliosToCSV(filePath);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Error saving portfolio to file: " + e.getMessage());
+      return Optional.of(new Payload(null, "Error saving portfolio to file: " + e.getMessage()));
     }
+    return Optional.empty();
   }
 
   /**
@@ -98,12 +104,13 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
-  public void loadPortfolio(String filePath) throws IllegalArgumentException {
+  public Optional<Payload> loadPortfolio(String filePath) throws IllegalArgumentException {
     try {
       this.portfolioService.loadPortfoliosFromCSV(filePath);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Error loading portfolio from file: " + e.getMessage());
+      return Optional.of(new Payload(null, "Error loading portfolio from file: " + e.getMessage()));
     }
+    return Optional.empty();
   }
 
   /** get number of portfolios */

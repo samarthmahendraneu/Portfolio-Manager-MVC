@@ -70,6 +70,7 @@ public class StockService implements StockServiceInterface {
    */
   private void fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
+    //
     parseAndCacheCsvData(csvData, symbol);
   }
 
@@ -103,6 +104,7 @@ public class StockService implements StockServiceInterface {
    * @param symbol The symbol of the stock to fetch.
    * @return The response from the API as a string.
    */
+
   private String makeApiRequest(String symbol) {
     StringBuilder response = new StringBuilder();
     try {
@@ -120,6 +122,13 @@ public class StockService implements StockServiceInterface {
         response.append(line).append("\n");
       }
       reader.close();
+
+      // Check if the response contains an error message
+      if (response.toString().contains("Error Message")) {
+        System.out.println("Invalid stock symbol: " + symbol);
+        return "Invalid stock symbol: " + symbol;
+      }
+
     } catch (Exception e) {
       System.out.println("An error occurred while fetching stock data: " + e.getMessage());
     }
