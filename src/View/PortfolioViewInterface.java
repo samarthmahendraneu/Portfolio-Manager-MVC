@@ -8,6 +8,11 @@ import Controller.Payload;
 public interface PortfolioViewInterface {
 
   /**
+   * Display the main menu.
+   */
+  void displayMainMenu();
+
+  /**
    * Create a new portfolio.
    */
   void createNewPortfolio();
