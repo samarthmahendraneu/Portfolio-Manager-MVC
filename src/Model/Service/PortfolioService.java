@@ -11,13 +11,14 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import Model.PortfolioInterface;
 
 /**
  * Service class for managing portfolios.
  */
 public class PortfolioService implements PortfolioServiceInterface {
 
-  private final List<Portfolio> portfolios = new ArrayList<>();
+  private final List<PortfolioInterface> portfolios = new ArrayList<>();
   private final StockServiceInterface stockService;
 
   /**
@@ -77,7 +78,7 @@ public class PortfolioService implements PortfolioServiceInterface {
   public String addStockToPortfolio(String portfolioName, String symbol, int quantity,
       LocalDate date) {
     String message = "";
-    Portfolio portfolio = getPortfolioByName(portfolioName).orElseThrow(
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName).orElseThrow(
         () -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
 
     // check if stock already exists in portfolio
@@ -115,7 +116,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param name The name of the portfolio to fetch.
    * @return An Optional containing the portfolio if found, or an empty Optional otherwise.
    */
-  public Optional<Portfolio> getPortfolioByName(String name) {
+  public Optional<PortfolioInterface> getPortfolioByName(String name) {
     return portfolios.stream()
         .filter(p -> p.getName().equalsIgnoreCase(name))
         .findFirst();
@@ -171,7 +172,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @return A list of all portfolio names.
    */
   public List<String> listPortfolioNames() {
-    return portfolios.stream().map(Portfolio::getName).collect(Collectors.toList());
+    return portfolios.stream().map(PortfolioInterface::getName).collect(Collectors.toList());
   }
 
   /**
@@ -183,7 +184,7 @@ public class PortfolioService implements PortfolioServiceInterface {
   public String savePortfoliosToCSV(String filePath) {
     try (FileWriter writer = new FileWriter(filePath)) {
       writer.append("Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date\n");
-      for (Portfolio portfolio : portfolios) {
+      for (PortfolioInterface portfolio : portfolios) {
         for (Tradable stock : portfolio.getStocks()) {
           writer.append(String.join(",", portfolio.getName(), stock.getSymbol(),
               String.valueOf(stock.getQuantity()), stock.getPurchasePrice().toString(),

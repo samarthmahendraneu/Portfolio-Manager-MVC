@@ -2,6 +2,7 @@ package Model.Service;
 
 import Controller.Payload;
 import Model.Portfolio;
+import Model.PortfolioInterface;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -43,7 +44,7 @@ public interface PortfolioServiceInterface {
    * @param name The name of the portfolio to fetch.
    * @return An Optional containing the portfolio if found, or an empty Optional otherwise.
    */
-  Optional<Portfolio> getPortfolioByName(String name);
+  Optional<PortfolioInterface> getPortfolioByName(String name);
 
   /**
    * Calculates the total value of a portfolio on a given date.
