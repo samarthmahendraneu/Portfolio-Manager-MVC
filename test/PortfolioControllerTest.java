@@ -1,4 +1,5 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 import controller.Payload;
@@ -35,7 +36,6 @@ public class PortfolioControllerTest {
   @Test
   public void testCreateNewPortfolio() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
-    // convertv to payload
     Portfolio portfolio = (Portfolio) payload.getData();
     assertEquals("Test Portfolio", portfolio.getName());
   }
@@ -237,6 +237,156 @@ public class PortfolioControllerTest {
     portfolioController.loadPortfolio("test.csv");
     assertEquals(2, portfolioController.getNumPortfolios());
   }
+
+  /**
+   * Tests creating portfolios with valid names and verifies they are correctly listed.
+   */
+  @Test
+  public void testListPortfolioNames() {
+    portfolioController.createNewPortfolio("FirstPortfolio");
+    portfolioController.createNewPortfolio("SecondPortfolio");
+
+    int numberOfPortfolios = portfolioController.getNumPortfolios();
+    assertEquals(2, numberOfPortfolios);
+  }
+
+  /**
+   * Verifies that attempting to calculate the portfolio value on a future date results in an error.
+   */
+  @Test
+  public void testCalculatePortfolioValueOnFutureDate() {
+    String portfolioName = "InvestmentPortfolio";
+    portfolioController.createNewPortfolio(portfolioName);
+    LocalDate futureDate = LocalDate.now().plusDays(10);
+    Payload result = portfolioController.calculatePortfolioValue(portfolioName, futureDate);
+
+    assertTrue(result.isError());
+    assertEquals("Date cannot be in the future: " + futureDate, result.getMessage());
+  }
+
+  /**
+   * Tests that adding a stock with a negative quantity results in an appropriate error message.
+   */
+  @Test
+  public void testAddStockWithNegativeQuantity() {
+    String portfolioName = "MyPortfolio";
+    portfolioController.createNewPortfolio(portfolioName);
+    Payload result = portfolioController.addStockToPortfolio(
+            new Portfolio(portfolioName), "AAPL", -10, LocalDate.now());
+
+    assertTrue(result.isError());
+    assertEquals("Quantity must be positive: -10", result.getMessage());
+  }
+
+  /**
+   * Checks that adding a stock with a future purchase date results in an error message.
+   */
+  @Test
+  public void testAddStockWithFutureDate() {
+    String portfolioName = "FutureDatePortfolio";
+    portfolioController.createNewPortfolio(portfolioName);
+    LocalDate futureDate = LocalDate.now().plusDays(1);
+    Payload result = portfolioController.addStockToPortfolio(
+            new Portfolio(portfolioName), "AAPL", 10, futureDate);
+
+    assertTrue(result.isError());
+    assertEquals("Date cannot be in the future: " + futureDate, result.getMessage());
+  }
+
+  /**
+   * Validates that creating a portfolio with an empty name results in an error.
+   */
+  @Test
+  public void testCreatePortfolioWithEmptyName() {
+    Payload result = portfolioController.createNewPortfolio("");
+    assertTrue(result.isError());
+    assertEquals("Portfolio name cannot be empty", result.getMessage());
+  }
+
+  /**
+   * Confirms creating portfolios with duplicate names is not allowed and results in an error.
+   */
+  @Test
+  public void testCreatePortfolioWithDuplicateName() {
+    String portfolioName = "DuplicateName";
+    portfolioController.createNewPortfolio(portfolioName);
+    Payload resultDuplicate = portfolioController.createNewPortfolio(portfolioName);
+    assertTrue(resultDuplicate.isError());
+    assertEquals("Portfolio already exists: " + portfolioName, resultDuplicate.getMessage());
+  }
+
+  /**
+   * Tests creating and listing 25 unique portfolios, verifying all are correctly listed.
+   */
+  @Test
+  public void testCreatingAndListing25Portfolios() {
+    int numberOfPortfolios = 25;
+    for (int i = 1; i <= numberOfPortfolios; i++) {
+      String portfolioName = "Portfolio" + i;
+      portfolioController.createNewPortfolio(portfolioName);
+    }
+
+    assertEquals(" portfolios does not match", numberOfPortfolios,
+            portfolioController.getNumPortfolios());
+  }
+
+  /**
+   * Test to AddStockWithInvalidSymbol.
+   */
+  @Test
+  public void testAddStockWithInvalidSymbol() {
+    String portfolioName = "MyPortfolio";
+    portfolioController.createNewPortfolio(portfolioName);
+    LocalDate validDate = LocalDate.now().minusDays(1); // Assuming this is a valid past date
+    Payload result = portfolioController.addStockToPortfolio(new Portfolio(portfolioName), "INVALID", 5, validDate);
+
+    assertTrue(result.isError());
+    assertTrue(result.getMessage().contains("Invalid stock symbol"));
+  }
+
+/**
+ * Test to calculate empty portfolio value.
+ */
+@Test
+public void testCalculateEmptyPortfolioValue() {
+  String portfolioName = "EmptyPortfolio";
+  portfolioController.createNewPortfolio(portfolioName);
+  LocalDate validDate = LocalDate.now();
+  Payload result = portfolioController.calculatePortfolioValue(portfolioName, validDate);
+
+  assertTrue(result.getData() instanceof Optional);
+  assertEquals(BigDecimal.ZERO,
+          ((Optional<BigDecimal>) result.getData()).orElse(BigDecimal.valueOf(-1)));
+}
+
+/**
+ * Adding a stock which already exists.
+ */
+@Test
+public void testAddDuplicateStockForSameDate() {
+  String portfolioName = "DupStockPortfolio";
+  portfolioController.createNewPortfolio(portfolioName);
+  LocalDate purchaseDate = LocalDate.now().minusDays(5);
+  portfolioController.addStockToPortfolio(new Portfolio(portfolioName), "GOOGL", 5, purchaseDate);
+  Payload result = portfolioController.addStockToPortfolio(
+          new Portfolio(portfolioName), "GOOGL", 5, purchaseDate);
+
+  assertTrue(result.isError());
+  assertTrue(result.getMessage().contains("Stock already exists"));
+}
+
+/**
+ * Test reading from a non existent file.
+ */
+@Test
+public void testLoadPortfolioFromNonexistentFile() {
+  String filePath = "nonexistent_file.csv";
+  Payload result = portfolioController.loadPortfolio(filePath);
+
+  assertTrue(result.isError());
+  assertTrue(result.getMessage().contains("File not found"));
+}
+
 }
 
 //Determine the total value of a portfolio on a future date (should not be possible or should

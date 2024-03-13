@@ -92,9 +92,24 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       while (flag) {
         System.out.println("Enter the stock symbol:");
         String symbol = scanner.nextLine().trim();
-        System.out.println("Enter the quantity of the stock:");
-        int quantity = scanner.nextInt();
+        int quantity =0 ;
         scanner.nextLine(); // Consume newline
+        while (true) {
+          System.out.println("Enter the quantity of the stock:");
+
+          if (scanner.hasNextInt()) {
+            quantity = scanner.nextInt();
+            scanner.nextLine();
+            if (quantity > 0) {
+              break;
+            } else {
+              System.out.println("Quantity must be greater than 0");
+            }
+          } else {
+            System.out.println("Cannot purchase Fractional Shares");
+            scanner.nextLine();
+          }
+        }
         LocalDate date;
         while (true) {
           System.out.println("Enter the purchase date (YYYY-MM-DD):");
