@@ -1,6 +1,5 @@
 package model.service;
 
-import model.Portfolio;
 import model.PortfolioInterface;
 import java.io.IOException;
 import java.math.BigDecimal;
