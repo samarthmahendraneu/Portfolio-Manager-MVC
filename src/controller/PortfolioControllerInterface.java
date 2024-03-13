@@ -1,9 +1,8 @@
-package Controller;
+package controller;
 
 
-import Model.Portfolio;
-
-import Model.Service.PortfolioServiceInterface;
+import model.PortfolioInterface;
+import model.service.PortfolioServiceInterface;
 import java.time.LocalDate;
 
 /**
@@ -28,7 +27,8 @@ public interface PortfolioControllerInterface {
    * @param quantity  The quantity of the stock to be added.
    * @param date      The date on which the stock was purchased.
    */
-  Payload addStockToPortfolio(Portfolio portfolio, String symbol, int quantity, LocalDate date);
+  Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
+      LocalDate date);
 
   /**
    * Calculates the value of the portfolio with the given name on the given date.
@@ -56,7 +56,12 @@ public interface PortfolioControllerInterface {
   Payload loadPortfolio(String filePath) throws IllegalArgumentException;
 
   /**
-   * get Portfolio Service
+   * get Portfolio Service.
    */
   PortfolioServiceInterface getPortfolioService();
+
+  /**
+   * getNumPortfolios.
+   */
+  int getNumPortfolios();
 }

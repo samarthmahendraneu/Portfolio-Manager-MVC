@@ -1,7 +1,6 @@
-package Model.Service;
+package model.service;
 
-import Controller.Payload;
-import java.math.BigDecimal;
+import controller.Payload;
 import java.time.LocalDate;
 
 /**

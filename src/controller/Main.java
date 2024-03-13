@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 
-import Model.Service.StockService;
-import View.View;
+import model.service.StockService;
+import view.View;
 
 
 /**
@@ -18,9 +18,10 @@ public class Main {
     PortfolioControllerInterface portfolioController = new PortfolioController(
         new StockService("W0M1JOKC82EZEQA8"));
     View view = new View();
-    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
+    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController,
+        view);
     // interaction with the user
-    // [Main] -> [PortfolioView] -> [PortfolioController] -> [PortfolioService] -> [Model]
+    // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [Model]
     controller.displayMainMenu();
   }
 }

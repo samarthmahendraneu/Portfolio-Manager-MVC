@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class Portfolio implements PortfolioInterface {
   }
 
   /**
-   * getter for the stocks in the portfolio
+   * getter for the stocks in the portfolio.
    */
   public List<Tradable> getStocks() {
     return new ArrayList<>(stocks); // Return a copy to protect internal list

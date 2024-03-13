@@ -1,12 +1,13 @@
-package View;
+package view;
 
 
-import Model.Tradable;
+import model.Tradable;
 import java.io.IOException;
 import java.util.List;
-import Model.Portfolio;
-import Model.Tradable;
 
+/**
+ * View class for the Portfolio Management System.
+ */
 public class View {
 
   /**

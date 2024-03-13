@@ -1,6 +1,6 @@
-package Model.Service;
+package model.service;
 
-import Controller.Payload;
+import controller.Payload;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -9,10 +9,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-import Model.Utilities.StockDataCache;
-import Model.Utilities.StockInfo;
-
-import java.util.Optional;
+import model.utilities.StockDataCache;
+import model.utilities.StockInfo;
 
 
 /**

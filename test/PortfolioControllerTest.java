@@ -1,62 +1,65 @@
 import static org.junit.Assert.assertEquals;
 
 
-import Controller.Payload;
-import Model.Service.PortfolioService;
+import controller.Payload;
+import controller.PortfolioControllerInterface;
+import model.PortfolioInterface;
+import model.service.StockServiceInterface;
+import model.Tradable;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import Controller.PortfolioController;
-import Model.Service.StockService;
-import Model.Portfolio;
-import Model.Stock;
+import controller.PortfolioController;
+import model.service.StockService;
+import model.Portfolio;
+import model.Stock;
 
+/**
+ * Test class for the PortfolioController class.
+ */
 public class PortfolioControllerTest {
 
-  private PortfolioService portfolioService;
-  private StockService stockService;
-  private PortfolioController portfolioController;
+  private StockServiceInterface stockService;
+  private PortfolioControllerInterface portfolioController;
 
   @Before
   public void setUp() {
     stockService = new StockService("W0M1JOKC82EZEQA8");
-    portfolioService = new PortfolioService(stockService);
     portfolioController = new PortfolioController(stockService);
   }
 
   //Portfolio Creation
   @Test
   public void testCreateNewPortfolio() {
-    Object payload  = portfolioController.createNewPortfolio("Test Portfolio");
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     // convertv to payload
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    Portfolio portfolio = (Portfolio) payload.getData();
     assertEquals("Test Portfolio", portfolio.getName());
   }
 
   // empty portfolio name test
   @Test
   public void testCreateNewPortfolio_EmptyName() {
-    Object payload = portfolioController.createNewPortfolio("");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
-    assertEquals("Portfolio name cannot be empty", ((Payload) payload).getMessage());
+    Payload payload = portfolioController.createNewPortfolio("");
+    assertEquals("Portfolio name cannot be empty", payload.getMessage());
   }
 
   // duplicate portfolio name test
   @Test
   public void testCreateNewPortfolio_DuplicateName() {
     Object payload1 = portfolioController.createNewPortfolio("Test Portfolio");
-    Object payload2 = portfolioController.createNewPortfolio("Test Portfolio");
-    assertEquals("Portfolio already exists: Test Portfolio", ((Payload) payload2).getMessage());
+    Payload payload2 = portfolioController.createNewPortfolio("Test Portfolio");
+    assertEquals("Portfolio already exists: Test Portfolio", payload2.getMessage());
   }
 
   // //Create a portfolio with a valid set of stocks and shares.
   @Test
   public void testAddStockToPortfolio() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
 
     Stock stock = new Stock("AAPL", 10, new BigDecimal("100.00"), LocalDate.now());
     portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), stock.getQuantity(),
@@ -64,84 +67,110 @@ public class PortfolioControllerTest {
     assertEquals(1, portfolio.getStocks().size());
   }
 
-  // add invalid date test
-  @Test
-  public void testAddStockToPortfolio_InvalidDate() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
-    Stock stock = new Stock("AAPL", 10, new BigDecimal("100.00"), LocalDate.now().plusDays(1));
-    portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), stock.getQuantity(),
-        stock.getPurchaseDate());
-  }
 
-  // quantity less than 1 test
+  // zero quantity test
   @Test
   public void testAddStockToPortfolio_InvalidQuantity() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
-    Stock stock = new Stock("AAPL", 0, new BigDecimal("100.00"), LocalDate.now());
-    portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), stock.getQuantity(),
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    PortfolioInterface portfolio = (Portfolio) payload.getData();
+    Tradable stock = new Stock("AAPL", 0, new BigDecimal("100.00"), LocalDate.now());
+    payload = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
+        stock.getQuantity(),
         stock.getPurchaseDate());
+    assertEquals("Quantity must be positive: 0", payload.getMessage());
+
   }
 
-  // create multiple portfolios and add stocks to them
+  // negative quantity test
+  @Test
+  public void testAddStockToPortfolio_NegativeQuantity() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    Tradable stock = new Stock("AAPL", -10, new BigDecimal("100.00"), LocalDate.now());
+    Payload paylpad = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
+        stock.getQuantity(),
+        stock.getPurchaseDate());
+    assertEquals("Quantity must be positive: -10", paylpad.getMessage());
+  }
+
+  ////Create multiple portfolios with different sets of stocks and shares.
   @Test
   public void testCreateMultiplePortfoliosAndAddStocks() {
-    Object payload1 = portfolioController.createNewPortfolio("Test Portfolio 1");
-    Portfolio portfolio1 = (Portfolio) ((Payload) payload1).getData();
-    Object payload2 = portfolioController.createNewPortfolio("Test Portfolio 2");
-    Portfolio portfolio2 = (Portfolio) ((Payload) payload2).getData();
+    Payload payload1 = portfolioController.createNewPortfolio("Test Portfolio 1");
+    Portfolio portfolio1 = (Portfolio) payload1.getData();
+    Payload payload2 = portfolioController.createNewPortfolio("Test Portfolio 2");
+    Portfolio portfolio2 = (Portfolio) payload2.getData();
     portfolioController.addStockToPortfolio(portfolio1, "AAPL", 10, LocalDate.now());
     portfolioController.addStockToPortfolio(portfolio1, "GOOGL", 5, LocalDate.now());
     portfolioController.addStockToPortfolio(portfolio2, "AAPL", 10, LocalDate.now());
     assertEquals(2, portfolioController.getNumPortfolios());
-    Portfolio portfolio3 = portfolioController.getPortfolioService().getPortfolioByName("Test Portfolio 1").get();
+    PortfolioInterface portfolio3 = portfolioController.getPortfolioService()
+        .getPortfolioByName("Test Portfolio 1").get();
     assertEquals(2, portfolio3.getStocks().size());
-    Portfolio portfolio4 = portfolioController.getPortfolioService().getPortfolioByName("Test Portfolio 2").get();
+    PortfolioInterface portfolio4 = portfolioController.getPortfolioService()
+        .getPortfolioByName("Test Portfolio 2").get();
     assertEquals(1, portfolio4.getStocks().size());
   }
 
   // calculate portfolio value test on same day
   @Test
   public void testCalculatePortfolioValue() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
     portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-06"));
     Payload stock_price_1 = stockService.fetchPriceOnDate("AAPL", LocalDate.parse("2024-02-06"));
     portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-06"));
     Payload stock_price_2 = stockService.fetchPriceOnDate("GOOGL", LocalDate.parse("2024-02-06"));
-    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10)).add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-06"));
-    assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
+    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
+        .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-06"));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // //Portfolio Value Determination for past date
+  @Test
+  public void testCalculatePortfolioValue_PastDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-06"));
+    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-06"));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-02"));
+    assertEquals(BigDecimal.ZERO, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
   // calculate portfolio value test on future date
   @Test
   public void testCalculatePortfolioValue_FutureDate() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
     portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-06"));
     portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-06"));
     Payload stock_price_1 = stockService.fetchPriceOnDate("AAPL", LocalDate.parse("2024-02-07"));
     Payload stock_price_2 = stockService.fetchPriceOnDate("GOOGL", LocalDate.parse("2024-02-07"));
-    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10)).add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-07"));
+    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
+        .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-07"));
 
-    assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
   // examine value on sunday February 4 should be same as February 2
   @Test
   public void testCalculatePortfolioValue_Sunday() {
-    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
-    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
     portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-04"));
     portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-04"));
     Payload stock_price_1 = stockService.fetchPriceOnDate("AAPL", LocalDate.parse("2024-02-02"));
     Payload stock_price_2 = stockService.fetchPriceOnDate("GOOGL", LocalDate.parse("2024-02-02"));
-    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10)).add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-04"));
-    assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
+    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
+        .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-04"));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
   // examine, add 3 stocks and examine portfolio and examine before buying the last stock
@@ -156,14 +185,18 @@ public class PortfolioControllerTest {
     // total value as of February 9
     Payload stock_price_1 = stockService.fetchPriceOnDate("AAPL", LocalDate.parse("2024-02-09"));
     Payload stock_price_2 = stockService.fetchPriceOnDate("GOOGL", LocalDate.parse("2024-02-09"));
-    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10)).add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-09"));
+    BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
+        .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-09"));
     assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
 
     // value as of February 11
-    Payload stock_price_3 = stockService.fetchPreviousClosePrice("MSFT", LocalDate.parse("2024-02-11"));
+    Payload stock_price_3 = stockService.fetchPreviousClosePrice("MSFT",
+        LocalDate.parse("2024-02-11"));
     total = total.add(((BigDecimal) stock_price_3.getData()).multiply(new BigDecimal(5)));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.parse("2024-02-11"));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio",
+        LocalDate.parse("2024-02-11"));
     assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
   }
 
@@ -176,32 +209,42 @@ public class PortfolioControllerTest {
     Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
     payload = portfolioController.addStockToPortfolio(portfolio, "INVALID", 10, LocalDate.now());
     assertEquals("Invalid stock symbol", ((Payload) payload).getMessage());
-
-
   }
 
+  // save and load portfolio
+  @Test
+  public void testSaveAndLoadPortfolio() {
+    Object payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
+    portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-06"));
+    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-06"));
+    portfolioController.savePortfolio("test.csv");
+    portfolioController.loadPortfolio("test.csv");
+    assertEquals(1, portfolioController.getNumPortfolios());
+  }
+
+  // save and load multiple portfolios
+  @Test
+  public void testSaveAndLoadMultiplePortfolios() {
+    Object payload1 = portfolioController.createNewPortfolio("Test Portfolio 1");
+    Portfolio portfolio1 = (Portfolio) ((Payload) payload1).getData();
+    Object payload2 = portfolioController.createNewPortfolio("Test Portfolio 2");
+    Portfolio portfolio2 = (Portfolio) ((Payload) payload2).getData();
+    portfolioController.addStockToPortfolio(portfolio1, "AAPL", 10, LocalDate.parse("2024-02-06"));
+    portfolioController.addStockToPortfolio(portfolio1, "GOOGL", 5, LocalDate.parse("2024-02-06"));
+    portfolioController.addStockToPortfolio(portfolio2, "AAPL", 10, LocalDate.parse("2024-02-06"));
+    portfolioController.savePortfolio("test.csv");
+    portfolioController.loadPortfolio("test.csv");
+    assertEquals(2, portfolioController.getNumPortfolios());
+  }
 }
 
-
-
-// Functional Test Cases
-
-//Attempt to create a portfolio with negative or zero shares.
-//Create multiple portfolios with different sets of stocks and shares.
-//Portfolio Composition Examination
-//Examine the composition of a newly created portfolio.
-//Examine the composition of a portfolio after the market has closed.
-//Examine the composition of an empty portfolio (if allowed by the program).
-//Portfolio Value Determination
-//Determine the total value of a portfolio on a current date with market data available.
-//Determine the total value of a portfolio on a past date with historical market data.
-
-
-
-//Determine the total value of a portfolio on a future date (should not be possible or should return an error).
+//Determine the total value of a portfolio on a future date (should not be possible or should
+// return an error).
 //Portfolio Persistence
 //Save a portfolio to a file and ensure the data is correctly written in human-readable format.
-//Load a portfolio from a file and ensure the data is correctly read and the portfolio is accurately reconstructed.
+//Load a portfolio from a file and ensure the data is correctly read and the portfolio is
+// accurately reconstructed.
 //Attempt to load a portfolio from a corrupted or incorrectly formatted file.
 //User Interface/Interactivity
 //Interact with the program using valid commands and inputs.

@@ -1,9 +1,9 @@
-package Model.Service;
+package model.service;
 
-import Controller.Payload;
-import Model.Portfolio;
-import Model.PortfolioInterface;
+import model.Portfolio;
+import model.PortfolioInterface;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +17,8 @@ public interface PortfolioServiceInterface {
    * Creates a new portfolio with the given name.
    *
    * @param name The name of the new portfolio.
-   * @return The newly created Portfolio object.
    */
-  Payload createNewPortfolio(String name);
+  void createNewPortfolio(String name);
 
   /**
    * Adds a portfolio to the list of portfolios.
@@ -36,7 +35,7 @@ public interface PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
    */
-  String addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
+  void addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
 
   /**
    * Fetches a portfolio by its name.
@@ -53,7 +52,7 @@ public interface PortfolioServiceInterface {
    * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
    */
-  Payload calculatePortfolioValue(String portfolioName, LocalDate onDate);
+  Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate);
 
   /**
    * Returns a list of all portfolio names.
@@ -87,8 +86,9 @@ public interface PortfolioServiceInterface {
   boolean portfolioExists(String portfolioName);
 
   /**
-   * get Number of Portfolios
-   * @return number of portfolios
+   * get Number of Portfolios.
+   *
+   * @return number of portfolios.
    */
   int getNumberOfPortfolios();
 }

@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface PortfolioInterface {
   void addStock(Tradable stock);
 
   /**
-   * getter for the stocks in the portfolio
+   * getter for the stocks in the portfolio.
    */
   List<Tradable> getStocks();
 

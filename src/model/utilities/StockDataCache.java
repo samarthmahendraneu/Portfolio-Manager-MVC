@@ -1,4 +1,4 @@
-package Model.Utilities;
+package model.utilities;
 
 import java.time.LocalDate;
 import java.util.HashMap;

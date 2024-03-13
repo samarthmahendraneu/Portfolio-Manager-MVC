@@ -1,8 +1,11 @@
-package Model;
+package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Interface for the Tradable class.
+ */
 public interface Tradable {
 
   /**
