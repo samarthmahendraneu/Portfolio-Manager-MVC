@@ -44,7 +44,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    *
    * @param name The name of the new portfolio.
    */
-  public void createNewPortfolio(String name) throws IllegalArgumentException {
+  public PortfolioInterface createNewPortfolio(String name) throws IllegalArgumentException {
     String message;
     if (portfolioExists(name)) {
       message = "Portfolio already exists: " + name;
@@ -54,8 +54,9 @@ public class PortfolioService implements PortfolioServiceInterface {
       message = "Portfolio name cannot be empty";
       throw new IllegalArgumentException(message);
     }
-    Portfolio portfolio = new Portfolio(name);
+    PortfolioInterface portfolio = new Portfolio(name);
     this.addPortfolio(portfolio);
+    return portfolio;
   }
 
   /**
@@ -63,7 +64,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    *
    * @param portfolio The portfolio to add.
    */
-  public void addPortfolio(Portfolio portfolio) {
+  public void addPortfolio(PortfolioInterface portfolio) {
     Objects.requireNonNull(portfolio, "Portfolio cannot be null");
     if (portfolios.stream().anyMatch(p -> p.getName().equalsIgnoreCase(portfolio.getName()))) {
       throw new IllegalArgumentException(
