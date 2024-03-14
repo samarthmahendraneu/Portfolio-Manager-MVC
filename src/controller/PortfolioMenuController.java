@@ -92,7 +92,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       while (flag) {
         System.out.println("Enter the stock symbol:");
         String symbol = scanner.nextLine().trim();
-        int quantity =0 ;
+        int quantity;
         scanner.nextLine(); // Consume newline
         while (true) {
           System.out.println("Enter the quantity of the stock:");

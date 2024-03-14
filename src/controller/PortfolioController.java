@@ -3,7 +3,6 @@ package controller;
 import model.PortfolioInterface;
 import model.service.PortfolioService;
 import model.service.PortfolioServiceInterface;
-import model.service.StockService;
 import model.service.StockServiceInterface;
 import java.time.LocalDate;
 
@@ -59,7 +58,8 @@ public class PortfolioController implements PortfolioControllerInterface {
   public Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
       LocalDate date) {
     try {
-      return new Payload(this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date), "");
+      return new Payload(this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol,
+          quantity, date), "");
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }

@@ -34,7 +34,8 @@ public interface PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
    */
-  PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
+  PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity,
+      LocalDate date);
 
   /**
    * Fetches a portfolio by its name.
