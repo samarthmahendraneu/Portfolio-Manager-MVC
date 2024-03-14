@@ -1,39 +1,38 @@
-# README Documentation for Portfolio Management System
+# Portfolio Management System Documentation
 
-## Overview
-The Portfolio Management System is a Java-based application designed to manage stock portfolios. 
-It allows users to create new portfolios, add stocks to them, examine portfolio details, calculate portfolio values, and save or load portfolios from files. 
-This Program was built on the Model-View-Controller (MVC) architecture, ensuring a clear separation of functionalities
+## Introduction
+Welcome to the Portfolio Management System, a Java-based tool crafted for the seamless management of stock portfolios. This application empowers users to craft new portfolios, incorporate stocks, delve into portfolio specifics, evaluate portfolio worth, and preserve or retrieve portfolios from files. Developed with the Model-View-Controller (MVC) architecture at its core, it guarantees a neat delineation of roles and functionalities.
 
 ## Getting Started
-### Prerequisites
-- Java Development Kit (JDK) 8 or higher
-- An IDE that supports Java.
-- Internet connection for stock data retrieval via Alpha Vantage API
 
-### Installation
-1. Clone the repository or download the source code.
-2. Open the project in your preferred Java IDE.
-3. Ensure that the JDK is correctly set up in your project settings.
-4. Obtain a free API key from Alpha Vantage for stock data retrieval.
-5. Insert your API key into the designated place in the code (if applicable).
+### Before You Begin
+- You'll need the Java Development Kit (JDK), version 8 or above.
+- A Java-compatible Integrated Development Environment (IDE).
+- An active internet connection for fetching stock data through the Alpha Vantage API.
 
-### Running the Application
-- Compile the Java files in the project.
-- Run the `Main` class to start the application.
-- Follow the on-screen prompts to interact with the system.
+### Setting Up
+1. Either clone the repository or download the source files.
+2. Launch your chosen Java IDE and open the project.
+3. Confirm that your project settings are correctly aligned with the JDK setup.
+4. Secure a complimentary API key from Alpha Vantage for stock data access.
+5. Embed your API key in the specified location within the code (if required).
 
-## Features
-- **Create New Portfolio:** Users can create new portfolios by providing a unique name. Stocks can then be added to the portfolio by specifying the stock symbol, quantity, and purchase date.
-- **Examine Portfolio:** Users can view the details of a specific portfolio, including the stocks it contains, their quantities, purchase prices, and dates.
-- **Calculate Portfolio Value:** The system can calculate the total value of a portfolio on a given date, taking into account the current market prices of the stocks.
-- **Save Portfolio:** Portfolios can be saved to a specified file path, allowing for persistence and retrieval.
-- **Load Portfolio:** Previously saved portfolios can be loaded from a file path.
+### Launching the Application
+- Compile the Java files within the project.
+- Execute the `Main` class to initiate the application.
+- Navigate the system via the on-screen instructions to interact with it.
 
-## Design Considerations
-- **Model-View-Controller (MVC):** This architecture was chosen to separate the application logic (model), the user interface (view), and the control flow (controller), facilitating maintainability and scalability.
-- **Error Handling:** The system is designed to gracefully handle errors, such as invalid user inputs or issues with stock data retrieval, without crashing.
-- **Stock Data Retrieval:** The application integrates with the Alpha Vantage API to retrieve stock data. A mechanism is in place to handle API rate limits and ensure the application remains functional even without an internet connection, by using cached or user-provided data.
+## Key Features
+- **Portfolio Creation:** Furnish a distinctive name to birth a new portfolio. Augment this portfolio by adding stocks, detailing the stock symbol, quantity, and acquisition date.
+- **Portfolio Exploration:** Peruse the intricacies of a chosen portfolio, including its stock components, quantities, acquisition prices, and dates.
+- **Value Assessment:** Ascertain the aggregate value of a portfolio for a specified date, reflecting the prevailing market prices of the included stocks.
+- **Portfolio Preservation:** Portfolios can be earmarked to a chosen file path for enduring storage and future access.
+- **Portfolio Retrieval:** Revisit and load portfolios previously stored at a file path.
 
-## Testing
-Comprehensive testing has been conducted to ensure the reliability of the system. This includes unit tests for individual components and integration tests for the overall application. Users are encouraged to report any bugs or issues for continuous improvement.
+## Design Insights
+- **Model-View-Controller (MVC) Approach:** This structural design was selected to segregate the application logic (model), the user interface (view), and the flow control (controller), promoting ease of maintenance and expandability.
+- **Error Management:** The framework is engineered to elegantly tackle errors, such as inaccurate user inputs or complications in stock data fetching, ensuring the application's stability.
+- **Stock Data Fetching:** Integration with the Alpha Vantage API facilitates stock data acquisition. A strategy is in place to manage API rate limits and guarantee operational continuity even in the absence of an internet connection, by leaning on cached or manually inputted data.
+
+## Assurance and Support
+Thorough testing underpins the system's dependability, encompassing both component-specific unit tests and comprehensive integration tests for the entire application. We welcome users to report any anomalies or concerns, aiding us in perpetually enhancing the system.
