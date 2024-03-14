@@ -26,6 +26,9 @@ public class PortfolioControllerTest {
   private StockServiceInterface stockService;
   private PortfolioControllerInterface portfolioController;
 
+  /**
+   * Sets up the test environment by creating a new StockService and PortfolioController.
+   */
   @Before
   public void setUp() {
     stockService = new StockService("W0M1JOKC82EZEQA8");

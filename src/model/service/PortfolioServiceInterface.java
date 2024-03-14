@@ -16,6 +16,8 @@ public interface PortfolioServiceInterface {
    * Creates a new portfolio with the given name.
    *
    * @param name The name of the new portfolio.
+   *
+   * @return The newly created Portfolio object.
    */
   PortfolioInterface createNewPortfolio(String name);
 
@@ -33,6 +35,8 @@ public interface PortfolioServiceInterface {
    * @param symbol        The symbol of the stock to be added.
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
+   *
+   * @return The updated portfolio.
    */
   PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity,
       LocalDate date);
@@ -66,6 +70,8 @@ public interface PortfolioServiceInterface {
    *
    * @param filePath The file path to which the portfolios will be saved.
    * @throws IOException If an error occurs while writing to the file.
+   *
+   * @return The file path where the portfolios were saved.
    */
   String savePortfoliosToCSV(String filePath) throws IOException;
 
@@ -74,6 +80,8 @@ public interface PortfolioServiceInterface {
    *
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IOException If an error occurs while reading from the file.
+   *
+   * @return The file path from which the portfolios were loaded.
    */
   String loadPortfoliosFromCSV(String filePath) throws IOException;
 

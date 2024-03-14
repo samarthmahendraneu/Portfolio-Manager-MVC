@@ -16,6 +16,8 @@ public interface PortfolioInterface {
 
   /**
    * getter for the stocks in the portfolio.
+   *
+   * @return The stocks in the portfolio.
    */
   List<Tradable> getStocks();
 

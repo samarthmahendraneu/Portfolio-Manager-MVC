@@ -40,6 +40,7 @@ public class Payload {
 
   /**
    * isError method checks if the message is empty or not.
+   * @return - type boolean.
    */
   public boolean isError() {
     return !message.isEmpty();
@@ -47,6 +48,7 @@ public class Payload {
 
   /**
    * isSuccessful method checks if the message is empty or not.
+   * @return - type boolean.
    */
   public boolean isSuccess() {
     return message.isEmpty();

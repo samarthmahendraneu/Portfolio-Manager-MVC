@@ -20,6 +20,12 @@ public class Portfolio implements PortfolioInterface {
     this.name = name;
   }
 
+  /**
+   * Constructor for the Portfolio class.
+   *
+   * @param name The name of the portfolio.
+   * @param initialStocks The initial stocks in the portfolio.
+   */
   public Portfolio(String name, List<Stock> initialStocks) {
     this.name = name;
     this.stocks = new ArrayList<>(initialStocks);

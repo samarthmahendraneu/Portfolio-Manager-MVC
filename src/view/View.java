@@ -12,6 +12,9 @@ public class View {
 
   /**
    * Display the main menu options.
+   *
+   * @param out The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayMainMenu(Appendable out) throws IOException {
     out.append("\nPortfolio Management System:\n");
@@ -26,6 +29,10 @@ public class View {
 
   /**
    * Display available portfolios.
+   *
+   * @param portfolioNames The names of the available portfolios.
+   * @param out            The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayAvailablePortfolios(List<String> portfolioNames, Appendable out)
       throws IOException {
@@ -37,6 +44,11 @@ public class View {
 
   /**
    * Display portfolio details.
+   *
+   * @param name   The name of the portfolio.
+   * @param stocks The stocks in the portfolio.
+   * @param out    The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayPortfolioDetails(String name, List<Tradable> stocks, Appendable out)
       throws IOException {
@@ -51,6 +63,12 @@ public class View {
 
   /**
    * Display portfolio value.
+   *
+   * @param name  The name of the portfolio.
+   * @param date  The date for which the value is to be calculated.
+   * @param value The value of the portfolio.
+   * @param out   The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayPortfolioValue(String name, String date, String value, Appendable out)
       throws IOException {
@@ -60,6 +78,10 @@ public class View {
 
   /**
    * Display a success message for saving portfolios.
+   *
+   * @param filePath The file path where the portfolios were saved.
+   * @param out      The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displaySaveSuccess(String filePath, Appendable out) throws IOException {
     out.append("Portfolios have been saved successfully to ").append(filePath).append("\n");
@@ -67,6 +89,9 @@ public class View {
 
   /**
    * Display a success message for loading portfolios.
+   *
+   * @param out The output to write to.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayLoadSuccess(Appendable out) throws IOException {
     out.append("Portfolios have been loaded successfully.\n");
@@ -74,6 +99,10 @@ public class View {
 
   /**
    * Display an error message.
+   *
+   * @param out          The output to write to.
+   * @param errorMessage The error message to display.
+   * @throws IOException If an error occurs while writing to the output.
    */
   public void displayError(String errorMessage, Appendable out) throws IOException {
     out.append("Error: ").append(errorMessage).append("\n");
