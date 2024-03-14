@@ -44,4 +44,11 @@ public class Payload {
   public boolean isError() {
     return !message.isEmpty();
   }
+
+  /**
+   * isSuccessful method checks if the message is empty or not.
+   */
+  public boolean isSuccess() {
+    return message.isEmpty();
+  }
 }

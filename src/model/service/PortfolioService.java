@@ -82,7 +82,7 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
    */
-  public void addStockToPortfolio(String portfolioName, String symbol, int quantity,
+  public PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity,
       LocalDate date) throws IllegalArgumentException {
     String message;
     PortfolioInterface portfolio = getPortfolioByName(portfolioName).orElseThrow(
@@ -117,6 +117,7 @@ public class PortfolioService implements PortfolioServiceInterface {
           date);
       portfolio.addStock(stock);
     }
+    return portfolio;
   }
 
   /**

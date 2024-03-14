@@ -59,11 +59,10 @@ public class PortfolioController implements PortfolioControllerInterface {
   public Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
       LocalDate date) {
     try {
-      this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date);
+      return new Payload(this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date), "");
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
-    return new Payload(null, "");
   }
 
   /**
