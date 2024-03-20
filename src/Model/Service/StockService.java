@@ -128,7 +128,7 @@ public class StockService implements StockServiceInterface {
     StringBuilder response = new StringBuilder();
     try {
       String urlString = String.format(
-          "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&datatype=csv&apikey=%s",
+          "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&datatype=csv&apikey=%s&outputsize=full",
           symbol, this.apiKey);
       URL url = new URL(urlString);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
