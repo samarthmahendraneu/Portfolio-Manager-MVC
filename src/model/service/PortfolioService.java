@@ -1,24 +1,16 @@
 package model.service;
-
 import controller.Payload;
+import controller.fileio.CsvFileIO;
+import controller.fileio.FileIO;
 import java.io.IOException;
-import java.io.FileWriter;
-import java.io.File;
-import java.io.BufferedReader;
-import model.Portfolio;
-import model.Stock;
-import model.Tradable;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
+import model.Portfolio;
 import model.PortfolioInterface;
 
 /**
@@ -38,41 +30,42 @@ public class PortfolioService implements PortfolioServiceInterface {
     this.stockService = stockService;
   }
 
-
   /**
    * Creates a new portfolio with the given name.
    *
    * @param name The name of the new portfolio.
+   * @return The newly created portfolio.
+   * @throws IllegalArgumentException If the portfolio name already exists or is empty.
    */
-  public PortfolioInterface createNewPortfolio(String name) throws IllegalArgumentException {
-    String message;
+  public PortfolioInterface createNewPortfolio(String name) {
+    validatePortfolioName(name);
+    PortfolioInterface portfolio = new Portfolio(name);
+    addPortfolio(portfolio);
+    return portfolio;
+  }
+
+  private void validatePortfolioName(String name) {
     if (portfolioExists(name)) {
-      message = "Portfolio already exists: " + name;
-      throw new IllegalArgumentException(message);
+      throw new IllegalArgumentException("Portfolio already exists: " + name);
     }
     if (name.isEmpty()) {
-      message = "Portfolio name cannot be empty";
-      throw new IllegalArgumentException(message);
+      throw new IllegalArgumentException("Portfolio name cannot be empty");
     }
-    PortfolioInterface portfolio = new Portfolio(name);
-    this.addPortfolio(portfolio);
-    return portfolio;
   }
 
   /**
    * Adds a portfolio to the list of portfolios.
    *
    * @param portfolio The portfolio to add.
+   * @throws IllegalArgumentException If the portfolio name already exists.
    */
   public void addPortfolio(PortfolioInterface portfolio) {
     Objects.requireNonNull(portfolio, "Portfolio cannot be null");
-    if (portfolios.stream().anyMatch(p -> p.getName().equalsIgnoreCase(portfolio.getName()))) {
-      throw new IllegalArgumentException(
-          "A portfolio with the name '" + portfolio.getName() + "' already exists.");
+    if (portfolioExists(portfolio.getName())) {
+      throw new IllegalArgumentException("A portfolio with the name '" + portfolio.getName() + "' already exists.");
     }
     portfolios.add(portfolio);
   }
-
 
   /**
    * Adds a stock to the given portfolio with the given symbol, quantity, and date.
@@ -81,43 +74,50 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param symbol        The symbol of the stock to be added.
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
+   * @return The updated portfolio.
+   * @throws IllegalArgumentException If stock already exists, quantity is not positive, or date is in the future.
    */
   public PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity,
-      LocalDate date) throws IllegalArgumentException {
-    String message;
-    PortfolioInterface portfolio = getPortfolioByName(portfolioName).orElseThrow(
-        () -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+      LocalDate date) {
+    validateStockInput(portfolioName, symbol, quantity, date);
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName)
+        .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+    Payload price = stockService.fetchPriceOnDate(symbol, date);
+    if (price.isError()) {
+      throw new IllegalArgumentException(price.getMessage());
+    }
+    portfolio.addStock(symbol, quantity, (BigDecimal) price.getData(), date);
+    return portfolio;
+  }
 
-    // check if stock already exists in portfolio
+  private void validateStockInput(String portfolioName, String symbol, int quantity, LocalDate date) {
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName)
+        .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+
     if (portfolio.getStocks().stream().anyMatch(
         s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
-      message = "Stock already exists in portfolio: " + symbol + " on " + date;
-      throw new IllegalArgumentException(message);
+      throw new IllegalArgumentException("Stock already exists in portfolio: " + symbol + " on " + date);
+    } else if (quantity <= 0) {
+      throw new IllegalArgumentException("Quantity must be positive: " + quantity);
+    } else if (date.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Date cannot be in the future: " + date);
     }
+  }
 
-    // check if quantity is positive
-    else if (quantity <= 0) {
-      message = "Quantity must be positive: " + quantity;
-      throw new IllegalArgumentException(message);
-    }
-
-    // check if quantity is whole number
-
-    // check if date is in the future
-    else if (date.isAfter(LocalDate.now())) {
-      message = "Date cannot be in the future: " + date;
-      throw new IllegalArgumentException(message);
-    } else {
-      Payload price = stockService.fetchPriceOnDate(symbol, date);
-      if (price.isError()) {
-        message = price.getMessage();
-        throw new IllegalArgumentException(message);
-      }
-      Tradable stock = new Stock(symbol, quantity, (BigDecimal) price.getData(),
-          date);
-      portfolio.addStock(stock);
-    }
-    return portfolio;
+  /**
+   * Sell a stock from the portfolio.
+   *
+   * @param portfolioName The name of the portfolio from which to sell the stock.
+   * @param stockSymbol   The symbol of the stock to sell.
+   * @param quantity      The quantity of the stock to sell.
+   * @param date          The date of the sale.
+   */
+  public void sellStockFromPortfolio(String portfolioName, String stockSymbol, int quantity,
+      LocalDate date) {
+    getPortfolioByName(portfolioName).ifPresent(portfolio -> {
+      portfolio.sellStock(stockSymbol, quantity, date,
+          (BigDecimal) stockService.fetchPriceOnDate(stockSymbol, date).getData());
+    });
   }
 
   /**
@@ -138,34 +138,20 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param portfolioName The name of the portfolio.
    * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
+   * @throws IllegalArgumentException If date is in the future or portfolio not found.
    */
-  public Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate)
-      throws IllegalArgumentException {
-    String message;
-    // check if date is in the future
+  public Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate) {
+    validatePortfolioValueInput(portfolioName, onDate);
+    return getPortfolioByName(portfolioName).map(p -> p.calculateValue(this.stockService, onDate));
+  }
+
+  private void validatePortfolioValueInput(String portfolioName, LocalDate onDate) {
     if (onDate.isAfter(LocalDate.now())) {
-      message = "Date cannot be in the future: " + onDate;
-      throw new IllegalArgumentException(message);
+      throw new IllegalArgumentException("Date cannot be in the future: " + onDate);
     }
-
-    // check if portfolio exists
     if (!portfolioExists(portfolioName)) {
-      message = "Portfolio not found: " + portfolioName;
-      throw new IllegalArgumentException(message);
+      throw new IllegalArgumentException("Portfolio not found: " + portfolioName);
     }
-
-    return getPortfolioByName(portfolioName).map(portfolio -> {
-      BigDecimal totalValue = BigDecimal.ZERO;
-      for (Tradable stock : portfolio.getStocks()) {
-        if (stock.getPurchaseDate().isBefore(onDate) || stock.getPurchaseDate().isEqual(onDate)) {
-          Payload priceOnDate = stockService.fetchPreviousClosePrice(stock.getSymbol(), onDate);
-          BigDecimal value = ((BigDecimal) priceOnDate.getData()).multiply(
-              new BigDecimal(stock.getQuantity()));
-          totalValue = totalValue.add(value);
-        }
-      }
-      return totalValue;
-    });
   }
 
   /**
@@ -190,47 +176,27 @@ public class PortfolioService implements PortfolioServiceInterface {
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path to which the portfolios will be saved.
+   * @return Empty string if successful, error message if failed.
    */
-  public String savePortfoliosToCSV(String filePath) {
-    try (FileWriter writer = new FileWriter(filePath)) {
-      writer.append("Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date\n");
-      for (PortfolioInterface portfolio : portfolios) {
-        for (Tradable stock : portfolio.getStocks()) {
-          writer.append(String.join(",", portfolio.getName(), stock.getSymbol(),
-              String.valueOf(stock.getQuantity()), stock.getPurchasePrice().toString(),
-              stock.getPurchaseDate().toString())).append("\n");
-        }
-      }
+  public void savePortfoliosToCSV(String filePath) {
+    FileIO fileio = new CsvFileIO();
+    try {
+      fileio.writeFile(portfolios, filePath);
     } catch (IOException e) {
-      return "Error saving portfolio to file: " + e.getMessage();
+      throw new IllegalArgumentException("Error saving portfolios to file: " + e.getMessage());
     }
-    return "";
   }
 
   /**
    * Loads portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
+   * @return Empty string if successful, error message if failed.
    * @throws IOException If an error occurs while reading from the file.
    */
   public String loadPortfoliosFromCSV(String filePath) throws IOException {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return "File not found: " + filePath;
-    }
-    List<Portfolio> loadedPortfolios;
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
-      reader.readLine(); // Skip header
-      Map<String, Portfolio> portfolioMap = new HashMap<>();
-      reader.lines().forEach(line -> {
-        String[] data = line.split(",");
-        Portfolio portfolio = portfolioMap.computeIfAbsent(data[0], Portfolio::new);
-        Stock stock = new Stock(data[1], Integer.parseInt(data[2]), new BigDecimal(data[3]),
-            LocalDate.parse(data[4]));
-        portfolio.addStock(stock);
-      });
-      loadedPortfolios = new ArrayList<>(portfolioMap.values());
-    }
+    FileIO fileio = new CsvFileIO();
+    List<PortfolioInterface> loadedPortfolios = fileio.readFile(filePath);
     portfolios.clear();
     portfolios.addAll(loadedPortfolios);
     return "";

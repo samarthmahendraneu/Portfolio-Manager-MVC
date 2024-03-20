@@ -73,7 +73,7 @@ public interface PortfolioServiceInterface {
    *
    * @return The file path where the portfolios were saved.
    */
-  String savePortfoliosToCSV(String filePath) throws IOException;
+  void savePortfoliosToCSV(String filePath) throws IOException;
 
   /**
    * Loads portfolios from a CSV file at the given file path.

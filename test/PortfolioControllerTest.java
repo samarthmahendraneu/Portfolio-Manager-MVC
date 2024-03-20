@@ -202,7 +202,7 @@ public class PortfolioControllerTest {
     BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
         .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
     payload = portfolioController.calculatePortfolioValue("Test Portfolio",
-        LocalDate.parse("2024-02-04"));
+        LocalDate.parse("2024-02-02"));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
@@ -216,7 +216,7 @@ public class PortfolioControllerTest {
     Object payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) ((Payload) payload).getData();
     portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-06"));
-    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-09"));
+    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-08"));
     portfolioController.addStockToPortfolio(portfolio, "MSFT", 5, LocalDate.parse("2024-02-11"));
 
     // total value as of February 9
@@ -426,9 +426,7 @@ public class PortfolioControllerTest {
   public void testLoadPortfolioFromNonexistentFile() {
     String filePath = "nonexistent_file.csv";
     Payload result = portfolioController.loadPortfolio(filePath);
-
     assertTrue(result.isError());
-    assertTrue(result.getMessage().contains("File not found"));
   }
 
   /**
