@@ -14,7 +14,7 @@ public interface PortfolioControllerInterface {
   /**
    * Creates a new portfolio with the given name.
    *
-   * @param name The name of the new portfolio.
+   * @param name The  ` name of the new portfolio.
    * @return The newly created Portfolio object.
    * @throws IllegalArgumentException if the portfolio already exists.
    */
@@ -59,4 +59,6 @@ public interface PortfolioControllerInterface {
    * get Portfolio Service
    */
   PortfolioServiceInterface getPortfolioService();
+
+   void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 }

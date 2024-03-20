@@ -104,4 +104,14 @@ public class PortfolioController implements PortfolioControllerInterface {
   public int getNumPortfolios() {
     return this.portfolioService.getNumberOfPortfolios();
   }
+
+
+  public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate) throws IllegalArgumentException {
+    try {
+      this.portfolioService.plotPerformanceChart(identifier,startDate,endDate);
+    } catch (Exception e) {
+
+      System.out.println(e.getMessage());   }
+  }
+
 }

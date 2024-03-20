@@ -6,9 +6,12 @@ import Model.Stock;
 import Model.Tradable;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -261,4 +264,65 @@ public class PortfolioService implements PortfolioServiceInterface {
       return totalProfitAndLoss;
     }).orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
   }
+
+
+
+
+  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
+    Map<LocalDate, BigDecimal> values = fetchValuesForPeriod(identifier, startDate, endDate);
+
+    BigDecimal minValue = values.values().stream().min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+    BigDecimal maxValue = values.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+
+    // Assume a fixed scale for simplicity; could be dynamic based on minValue and maxValue
+    BigDecimal scale = calculateScale(minValue, maxValue);
+    int maxAsterisks = 50; // Maximum asterisks per line
+
+    System.out.println("Performance of portfolio " + identifier + " from " + startDate + " to " + endDate + "\n");
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+    values.forEach((date, value) -> {
+      int asterisks = value.divide(scale, RoundingMode.HALF_UP).intValue();
+      System.out.println(formatter.format(date) + ": " + "*".repeat(Math.max(0, asterisks)));
+    });
+
+    System.out.println("\nScale: * = " + scale + " dollars");
+  }
+
+
+  public SortedMap<LocalDate, BigDecimal> fetchValuesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
+    YearMonth startMonth = YearMonth.from(startDate);
+    YearMonth endMonth = YearMonth.from(endDate);
+    SortedMap<LocalDate, BigDecimal> monthlyValues = new TreeMap<>();
+
+    // Directly use fetchMonthlyClosingPricesForPeriod from StockService.
+    SortedMap<LocalDate, BigDecimal> fetchedData = stockService.fetchMonthlyClosingPricesForPeriod
+            (symbol, startMonth, endMonth);
+
+    // Assuming fetchedData is correctly populated, it can be directly used for plotting.
+    monthlyValues.putAll(fetchedData);
+
+    return monthlyValues;
+  }
+
+  private BigDecimal calculateScale(BigDecimal minValue, BigDecimal maxValue) {
+    // Calculate the range of values
+    BigDecimal range = maxValue.subtract(minValue);
+
+    // Determine the maximum number of asterisks we want to display
+    int maxAsterisks = 50;
+
+    // Calculate the scale: divide the range by the maximum number of asterisks to find out
+    // what value each asterisk represents. We use the ceiling of the division to ensure that
+    // we do not exceed 50 asterisks even after rounding.
+    BigDecimal scale = range.divide(BigDecimal.valueOf(maxAsterisks), RoundingMode.CEILING);
+
+    // Ensure the scale is at least 1 to avoid a scale of 0 when minValue equals maxValue
+    if (scale.compareTo(BigDecimal.ZERO) == 0) {
+      scale = BigDecimal.ONE;
+    }
+
+    return scale;
+  }
+
 }

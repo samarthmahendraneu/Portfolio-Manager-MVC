@@ -3,8 +3,10 @@ package Model.Service;
 import Controller.Payload;
 import Model.Portfolio;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -90,4 +92,9 @@ public interface PortfolioServiceInterface {
    * @return number of portfolios
    */
   int getNumberOfPortfolios();
+
+  public Map<LocalDate, BigDecimal> fetchValuesForPeriod
+          (String identifier, LocalDate startDate, LocalDate endDate);
+
+  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
 }

@@ -57,12 +57,31 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
           System.out.println("Exiting...");
           running = false;
           break;
+        case 7:
+          this.CalculateGraph();
         default:
           System.out.println("Invalid option. Please try again.");
       }
     }
   }
 
+  public void CalculateGraph()
+  {
+    LocalDate date,date2;
+
+    System.out.println("Enter new Stock name:");
+    String name = scanner.nextLine().trim();
+    System.out.println("Enter date1");
+
+    String dateString = scanner.nextLine().trim();
+    date = LocalDate.parse(dateString);
+    System.out.println("Enter date2");
+
+    String dateString2 = scanner.nextLine().trim();
+    date2 = LocalDate.parse(dateString2);
+
+    portfolioController.GenGraph(name,date,date2);
+  }
   /**
    * Create a new portfolio.
    */
