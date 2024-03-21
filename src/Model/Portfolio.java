@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import Model.service.StockServiceInterface;
+import Model.Service.StockServiceInterface;
 
 /**
  * Class to represent a portfolio of stocks.

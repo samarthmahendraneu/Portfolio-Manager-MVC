@@ -24,6 +24,8 @@ public class View {
     out.append("4. Save portfolio\n");
     out.append("5. Load portfolio\n");
     out.append("6. Exit\n");
+    out.append("6. Graph\n");
+    out.append("6. Sell stocks from \n");
     out.append("Select an option: ");
   }
 

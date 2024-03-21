@@ -46,24 +46,26 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
         switch (choice) {
           case 1:
-            createNewPortfolio();
+            this.createNewPortfolio();
             break;
           case 2:
-            examinePortfolio();
+            this.examinePortfolio();
             break;
           case 3:
-            calculatePortfolioValue();
+            this.calculatePortfolioValue();
             break;
           case 4:
-            savePortfolio();
+            this.savePortfolio();
             break;
           case 5:
-            loadPortfolio();
+            this.loadPortfolio();
             break;
           case 6:
             System.out.println("Exiting...");
             running = false;
             break;
+          case 7:
+            this.CalculateGraph();
           default:
             System.out.println("Invalid option. Please try again.");
         }
@@ -74,78 +76,91 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  public void CalculateGraph() {
+    LocalDate date, date2;
+
+    System.out.println("Enter new Stock name:");
+    String name = scanner.nextLine().trim();
+    System.out.println("Enter date1");
+
+    String dateString = scanner.nextLine().trim();
+    date = LocalDate.parse(dateString);
+    System.out.println("Enter date2");
+
+    String dateString2 = scanner.nextLine().trim();
+    date2 = LocalDate.parse(dateString2);
+
+    portfolioController.GenGraph(name, date, date2);
+  }
+
+
   /**
-   * Creates a new portfolio by prompting the user for input and adding stocks to it.
+   * Create a new portfolio.
    */
   public void createNewPortfolio() {
-    try {
-      System.out.println("Enter new portfolio name:");
-      String name = scanner.nextLine().trim();
-      Payload payload = portfolioController.createNewPortfolio(name);
+    System.out.println("Enter new portfolio name:");
+    String name = scanner.nextLine().trim();
+    Payload payload = portfolioController.createNewPortfolio(name);
+    if (this.printIfError(payload)) {
+      return;
+    }
+    Portfolio newPortfolio = (Portfolio) payload.getData();
+    boolean flag = true;
+    System.out.println("Enter the stocks you want to add to the portfolio");
+    int quantity = 0;
+    while (flag) {
+      System.out.println("Enter the stock symbol:");
+      String symbol = scanner.nextLine().trim();
+      while (true) {
+        System.out.println("Enter the quantity of the stock:");
+
+        if (scanner.hasNextInt()) {
+          quantity = scanner.nextInt();
+          scanner.nextLine();
+          if (quantity > 0) {
+            break;
+          } else {
+            System.out.println("Quantity must be greater than 0");
+          }
+        } else {
+          System.out.println("Cannot purchase Fractional Shares");
+          scanner.nextLine();
+        }
+      }
+      LocalDate date;
+      while (true) {
+        System.out.println("Enter the purchase date (YYYY-MM-DD):");
+        String dateString = scanner.nextLine().trim();
+        try {
+          date = LocalDate.parse(dateString);
+        } catch (Exception e) {
+          System.out.println("Invalid date format. Please try again.");
+          continue;
+        }
+        date = LocalDate.parse(dateString);
+        if (!date.isBefore(LocalDate.now())) {
+          System.out.println("Date must be before today. Please try again.");
+          continue;
+        }
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+          System.out.println("Date must be on a weekday. Please try again.");
+          continue;
+        }
+        break;
+      }
+      payload = portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
       if (this.printIfError(payload)) {
         return;
       }
-      Portfolio newPortfolio = (Portfolio) payload.getData();
-      boolean flag = true;
-      System.out.println("Enter the stocks you want to add to the portfolio");
-
-      while (flag) {
-        System.out.println("Enter the stock symbol:");
-        String symbol = scanner.nextLine().trim();
-        int quantity;
-        scanner.nextLine(); // Consume newline
-        while (true) {
-          System.out.println("Enter the quantity of the stock:");
-
-          if (scanner.hasNextInt()) {
-            quantity = scanner.nextInt();
-            scanner.nextLine();
-            if (quantity > 0) {
-              break;
-            } else {
-              System.out.println("Quantity must be greater than 0");
-            }
-          } else {
-            System.out.println("Cannot purchase Fractional Shares");
-            scanner.nextLine();
-          }
-        }
-        LocalDate date;
-        while (true) {
-          System.out.println("Enter the purchase date (YYYY-MM-DD):");
-          String dateString = scanner.nextLine().trim();
-          try {
-            date = LocalDate.parse(dateString);
-          } catch (Exception e) {
-            System.out.println("Invalid date format. Please try again.");
-            continue;
-          }
-          if (!date.isBefore(LocalDate.now())) {
-            System.out.println("Date must be before today. Please try again.");
-            continue;
-          }
-          DayOfWeek dayOfWeek = date.getDayOfWeek();
-          if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-            System.out.println("Date must be on a weekday. Please try again.");
-            continue;
-          }
-          break;
-        }
-        payload = portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
-        if (this.printIfError(payload)) {
-          return;
-        }
-        System.out.println("Press q to exit, Press n to go on");
-        String exitChar = scanner.nextLine().trim();
-        if (exitChar.equals("q")) {
-          flag = false;
-        }
+      System.out.println("Press q to exit, Press n to go on");
+      String exitChar = scanner.nextLine().trim();
+      if (exitChar.equals("q")) {
+        flag = false;
       }
-      System.out.println("Portfolio '" + name + "' has been created and populated.");
-    } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+
     }
+    System.out.println("Portfolio '" + name + "' has been created and populated.");
   }
 
   /**

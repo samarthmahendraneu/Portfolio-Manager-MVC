@@ -2,7 +2,7 @@ package Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import Model.service.StockServiceInterface;
+import Model.Service.StockServiceInterface;
 
 /**
  * Interface for the Tradable class.

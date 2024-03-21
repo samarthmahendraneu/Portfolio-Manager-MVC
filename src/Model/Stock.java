@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import Model.service.StockServiceInterface;
+import Model.Service.StockServiceInterface;
 
 /**
  * Class to represent a stock in a portfolio.
@@ -119,7 +119,7 @@ public class Stock implements Tradable {
    */
   @Override
   public BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date) {
-    return ((BigDecimal) stockService.fetchPreviousClosePrice(this.symbol, date).getData()).multiply(new BigDecimal(this.quantity));
+    return ((BigDecimal) stockService.fetchPriceOnDate(this.symbol, date).getData()).multiply(new BigDecimal(this.quantity));
   }
 
   // Setters, toString(), equals(), and hashCode() methods omitted for brevity

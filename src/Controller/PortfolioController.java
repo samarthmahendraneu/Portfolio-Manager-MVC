@@ -1,9 +1,9 @@
 package Controller;
 
 import Model.PortfolioInterface;
-import Model.service.PortfolioService;
-import Model.service.PortfolioServiceInterface;
-import Model.service.StockServiceInterface;
+import Model.Service.PortfolioService;
+import Model.Service.PortfolioServiceInterface;
+import Model.Service.StockServiceInterface;
 import java.time.LocalDate;
 
 /**
@@ -116,4 +116,14 @@ public class PortfolioController implements PortfolioControllerInterface {
   public int getNumPortfolios() {
     return this.portfolioService.getNumberOfPortfolios();
   }
+
+
+  public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate) throws IllegalArgumentException {
+    try {
+      this.portfolioService.plotPerformanceChart(identifier,startDate,endDate);
+    } catch (Exception e) {
+
+      System.out.println(e.getMessage());   }
+  }
+
 }

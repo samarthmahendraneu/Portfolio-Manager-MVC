@@ -1,10 +1,11 @@
-package Model.service;
+package Model.Service;
 
 import Model.PortfolioInterface;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -99,4 +100,9 @@ public interface PortfolioServiceInterface {
    * @return number of portfolios.
    */
   int getNumberOfPortfolios();
+
+  Map<LocalDate, BigDecimal> fetchValuesForPeriod
+          (String identifier, LocalDate startDate, LocalDate endDate);
+
+  void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
 }

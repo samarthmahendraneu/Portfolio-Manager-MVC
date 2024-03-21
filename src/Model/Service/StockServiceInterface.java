@@ -1,7 +1,10 @@
-package Model.service;
+package Model.Service;
 
 import Controller.Payload;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.SortedMap;
+import java.math.BigDecimal;
 
 /**
  * Interface for the StockService class.
@@ -18,12 +21,7 @@ public interface StockServiceInterface {
   Payload fetchPriceOnDate(String symbol, LocalDate date);
 
 
-  /**
-   * Fetches the closing price of the stock with the given symbol on the previous trading day.
-   *
-   * @param symbol The symbol of the stock to fetch.
-   * @param date   The date for which to fetch the previous close price.
-   * @return The closing price of the stock on the previous trading day.
-   */
-  Payload fetchPreviousClosePrice(String symbol, LocalDate date);
+
+   SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
+          (String symbol, YearMonth startMonth, YearMonth endMonth);
 }

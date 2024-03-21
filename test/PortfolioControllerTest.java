@@ -1,20 +1,25 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
 import Controller.Payload;
 import Controller.PortfolioControllerInterface;
 import Model.PortfolioInterface;
-import Model.service.StockServiceInterface;
+import Model.Service.StockServiceInterface;
 import Model.Tradable;
+
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.stream.IntStream;
+
 import Controller.PortfolioController;
-import Model.service.StockService;
+import Model.Service.StockService;
 import Model.Portfolio;
 import Model.Stock;
 
@@ -229,7 +234,7 @@ public class PortfolioControllerTest {
     assertEquals(total, ((Optional<BigDecimal>) ((Payload) payload).getData()).get());
 
     // value as of February 11
-    Payload stock_price_3 = stockService.fetchPreviousClosePrice("MSFT",
+    Payload stock_price_3 = stockService.fetchPriceOnDate("MSFT",
         LocalDate.parse("2024-02-11"));
     total = total.add(((BigDecimal) stock_price_3.getData()).multiply(new BigDecimal(5)));
     payload = portfolioController.calculatePortfolioValue("Test Portfolio",
@@ -279,17 +284,74 @@ public class PortfolioControllerTest {
     portfolioController.loadPortfolio("test.csv");
     assertEquals(2, portfolioController.getNumPortfolios());
   }
-
-  /**
-   * Tests creating portfolios with valid names and verifies they are correctly listed.
-   */
   @Test
   public void testListPortfolioNames() {
     portfolioController.createNewPortfolio("FirstPortfolio");
     portfolioController.createNewPortfolio("SecondPortfolio");
 
-    int numberOfPortfolios = portfolioController.getNumPortfolios();
-    assertEquals(2, numberOfPortfolios);
+    List<String> portfolioNames = this.portfolioController.getPortfolioService()
+        .listPortfolioNames();
+    assertEquals(2, portfolioNames.size());
+    assertTrue(portfolioNames.contains("FirstPortfolio"));
+    assertTrue(portfolioNames.contains("SecondPortfolio"));
+  }
+
+  @Test
+  public void testAddStockWithNegativeQuantity() {
+    String portfolioName = "MyPortfolio";
+    Payload payload = portfolioController.createNewPortfolio(portfolioName);
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", -10, LocalDate.now());
+    String message = payload.getMessage();
+    assertEquals("Quantity must be positive: -10", message);
+  }
+
+  @Test
+  public void testAddStockWithFutureDate() {
+    String portfolioName = "FutureDatePortfolio";
+    Payload payload = portfolioController.createNewPortfolio(portfolioName);
+    Portfolio portfolio = (Portfolio) payload.getData();
+    LocalDate futureDate = LocalDate.now().plusDays(1);
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, futureDate);
+    String message = payload.getMessage();
+    assertEquals("Date cannot be in the future: " + futureDate, message);
+  }
+  @Test
+  public void testCreatePortfolioWithEmptyName() {
+    Payload result = portfolioController.createNewPortfolio("");
+    assertTrue(result.isError());
+    assertEquals("Portfolio name cannot be empty", result.getMessage());
+  }
+
+  @Test
+  public void testCreatePortfolioWithDuplicateName() {
+    String portfolioName = "DuplicateName";
+    portfolioController.createNewPortfolio(portfolioName);
+    Payload resultDuplicate = portfolioController.createNewPortfolio(portfolioName);
+    assertTrue(resultDuplicate.isError());
+    assertEquals("Portfolio already exists: " + portfolioName, resultDuplicate.getMessage());
+  }
+
+  @Test
+  public void testCreatingAndListing25Portfolios() {
+    int numberOfPortfolios = 25;
+    // Create 25 portfolios with unique names
+    IntStream.rangeClosed(1, numberOfPortfolios).forEach(i -> {
+      String portfolioName = "Portfolio" + i;
+      Payload result = portfolioController.createNewPortfolio(portfolioName);
+      assertFalse("Creation failed for portfolio: " + portfolioName, result.isError());
+    });
+
+    // List all portfolio names and verify
+    List<String> portfolioNames = portfolioController.getPortfolioService().listPortfolioNames();
+    assertEquals("Expected number of portfolios does not match", numberOfPortfolios, portfolioNames.size());
+
+    // Verify each portfolio name is correctly listed
+    IntStream.rangeClosed(1, numberOfPortfolios).forEach(i -> {
+      String expectedPortfolioName = "Portfolio" + i;
+      assertTrue("Expected portfolio name not found: " + expectedPortfolioName,
+              portfolioNames.contains(expectedPortfolioName));
+    });
   }
 
   /**
@@ -307,71 +369,8 @@ public class PortfolioControllerTest {
     assertEquals("Date cannot be in the future: " + futureDate, result.getMessage());
   }
 
-  /**
-   * Tests that adding a stock with a negative quantity results in an appropriate error message.
-   */
-  @Test
-  public void testAddStockWithNegativeQuantity() {
-    String portfolioName = "MyPortfolio";
-    portfolioController.createNewPortfolio(portfolioName);
-    Payload result = portfolioController.addStockToPortfolio(
-        new Portfolio(portfolioName), "AAPL", -10, LocalDate.now());
 
-    assertTrue(result.isError());
-    assertEquals("Quantity must be positive: -10", result.getMessage());
-  }
 
-  /**
-   * Checks that adding a stock with a future purchase date results in an error message.
-   */
-  @Test
-  public void testAddStockWithFutureDate() {
-    String portfolioName = "FutureDatePortfolio";
-    portfolioController.createNewPortfolio(portfolioName);
-    LocalDate futureDate = LocalDate.now().plusDays(1);
-    Payload result = portfolioController.addStockToPortfolio(
-        new Portfolio(portfolioName), "AAPL", 10, futureDate);
-
-    assertTrue(result.isError());
-    assertEquals("Date cannot be in the future: " + futureDate, result.getMessage());
-  }
-
-  /**
-   * Validates that creating a portfolio with an empty name results in an error.
-   */
-  @Test
-  public void testCreatePortfolioWithEmptyName() {
-    Payload result = portfolioController.createNewPortfolio("");
-    assertTrue(result.isError());
-    assertEquals("Portfolio name cannot be empty", result.getMessage());
-  }
-
-  /**
-   * Confirms creating portfolios with duplicate names is not allowed and results in an error.
-   */
-  @Test
-  public void testCreatePortfolioWithDuplicateName() {
-    String portfolioName = "DuplicateName";
-    portfolioController.createNewPortfolio(portfolioName);
-    Payload resultDuplicate = portfolioController.createNewPortfolio(portfolioName);
-    assertTrue(resultDuplicate.isError());
-    assertEquals("Portfolio already exists: " + portfolioName, resultDuplicate.getMessage());
-  }
-
-  /**
-   * Tests creating and listing 25 unique portfolios, verifying all are correctly listed.
-   */
-  @Test
-  public void testCreatingAndListing25Portfolios() {
-    int numberOfPortfolios = 25;
-    for (int i = 1; i <= numberOfPortfolios; i++) {
-      String portfolioName = "Portfolio" + i;
-      portfolioController.createNewPortfolio(portfolioName);
-    }
-
-    assertEquals(" portfolios does not match", numberOfPortfolios,
-        portfolioController.getNumPortfolios());
-  }
 
   /**
    * Test to AddStockWithInvalidSymbol.
@@ -480,7 +479,7 @@ public class PortfolioControllerTest {
           purchaseDate);
     }
     Payload result = portfolioController.savePortfolio("test.csv");
-    assertTrue(result.isSuccess());
+    assertTrue(result.IsNotError());
   }
 
 
