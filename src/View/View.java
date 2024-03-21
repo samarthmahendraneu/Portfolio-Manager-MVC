@@ -1,7 +1,7 @@
-package view;
+package View;
 
 
-import model.Tradable;
+import Model.Tradable;
 import java.io.IOException;
 import java.util.List;
 

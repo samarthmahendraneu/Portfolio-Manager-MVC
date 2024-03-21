@@ -1,8 +1,7 @@
-package controller;
+package Controller;
 
-import model.service.StockService;
-import view.View;
-
+import Model.service.StockService;
+import View.View;
 
 /**
  * Main class for the Portfolio Management System.

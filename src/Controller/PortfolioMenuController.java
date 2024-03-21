@@ -1,14 +1,14 @@
-package controller;
+package Controller;
 
-import model.Portfolio;
+import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
-import model.PortfolioInterface;
-import view.View;
+import Model.PortfolioInterface;
+import View.View;
 
 
 /**

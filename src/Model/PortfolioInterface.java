@@ -1,9 +1,9 @@
-package model;
+package Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import model.service.StockServiceInterface;
+import Model.service.StockServiceInterface;
 
 /**
  * Interface for the Portfolio class.

@@ -1,4 +1,4 @@
-package controller;
+package Controller;
 
 /**
  * this class has two variables acts as a payload data - type class of any type message - type.

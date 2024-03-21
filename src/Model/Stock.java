@@ -1,10 +1,10 @@
-package model;
+package Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import model.service.StockServiceInterface;
+import Model.service.StockServiceInterface;
 
 /**
  * Class to represent a stock in a portfolio.

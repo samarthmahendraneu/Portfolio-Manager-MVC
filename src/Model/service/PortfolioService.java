@@ -1,7 +1,7 @@
-package model.service;
-import controller.Payload;
-import controller.fileio.CsvFileIO;
-import controller.fileio.FileIO;
+package Model.service;
+import Controller.Payload;
+import Controller.fileio.CsvFileIO;
+import Controller.fileio.FileIO;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import model.Portfolio;
-import model.PortfolioInterface;
+import Model.Portfolio;
+import Model.PortfolioInterface;
 
 /**
  * Service class for managing portfolios.

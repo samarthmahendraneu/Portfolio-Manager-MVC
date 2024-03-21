@@ -1,8 +1,8 @@
-package controller.fileio;
+package Controller.fileio;
 
 import java.io.IOException;
 import java.util.List;
-import model.PortfolioInterface;
+import Model.PortfolioInterface;
 
 public interface FileIO {
 

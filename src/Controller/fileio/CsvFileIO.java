@@ -1,4 +1,4 @@
-package controller.fileio;
+package Controller.fileio;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,10 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Portfolio;
-import model.PortfolioInterface;
-import model.Stock;
-import model.Tradable;
+import Model.Portfolio;
+import Model.PortfolioInterface;
+import Model.Tradable;
 
 public class CsvFileIO implements FileIO{
 

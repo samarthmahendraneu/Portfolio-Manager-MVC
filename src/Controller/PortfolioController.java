@@ -1,9 +1,9 @@
-package controller;
+package Controller;
 
-import model.PortfolioInterface;
-import model.service.PortfolioService;
-import model.service.PortfolioServiceInterface;
-import model.service.StockServiceInterface;
+import Model.PortfolioInterface;
+import Model.service.PortfolioService;
+import Model.service.PortfolioServiceInterface;
+import Model.service.StockServiceInterface;
 import java.time.LocalDate;
 
 /**

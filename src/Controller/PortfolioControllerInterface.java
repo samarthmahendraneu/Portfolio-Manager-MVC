@@ -1,8 +1,8 @@
-package controller;
+package Controller;
 
 
-import model.PortfolioInterface;
-import model.service.PortfolioServiceInterface;
+import Model.PortfolioInterface;
+import Model.service.PortfolioServiceInterface;
 import java.time.LocalDate;
 
 /**

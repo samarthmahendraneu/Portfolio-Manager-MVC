@@ -2,21 +2,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-import controller.Payload;
-import controller.PortfolioControllerInterface;
-import model.PortfolioInterface;
-import model.service.StockServiceInterface;
-import model.Tradable;
+import Controller.Payload;
+import Controller.PortfolioControllerInterface;
+import Model.PortfolioInterface;
+import Model.service.StockServiceInterface;
+import Model.Tradable;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import controller.PortfolioController;
-import model.service.StockService;
-import model.Portfolio;
-import model.Stock;
+import Controller.PortfolioController;
+import Model.service.StockService;
+import Model.Portfolio;
+import Model.Stock;
 
 /**
  * Test class for the PortfolioController class.

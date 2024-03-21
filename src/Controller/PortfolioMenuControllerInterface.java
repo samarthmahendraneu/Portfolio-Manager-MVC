@@ -1,4 +1,4 @@
-package controller;
+package Controller;
 
 /**
  * Interface to represent the view for the portfolio.
