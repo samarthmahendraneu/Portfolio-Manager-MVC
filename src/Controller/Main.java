@@ -15,7 +15,7 @@ public class Main {
    */
   public static void main(String[] args) {
     PortfolioControllerInterface portfolioController = new PortfolioController(
-        new StockService("W0M1JOKC82EZEQA8"));
+        new StockService("FIR1DN0VB7SQ4SGD"));
     PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController);
     // interaction with the user
     // [Main] -> [PortfolioView] -> [PortfolioController] -> [PortfolioService] -> [Model]

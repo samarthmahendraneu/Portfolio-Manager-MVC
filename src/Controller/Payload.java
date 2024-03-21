@@ -50,4 +50,11 @@ public class Payload {
   public boolean isError() {
     return !message.isEmpty();
   }
+  public boolean IsNotError() {
+    return !message.contains("Error");
+  }
+
+  //Complete this interface
+
+
 }
