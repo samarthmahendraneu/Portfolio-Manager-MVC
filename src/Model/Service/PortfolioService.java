@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import Model.Portfolio;
 import Model.PortfolioInterface;
@@ -177,7 +178,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
     // Directly use fetchMonthlyClosingPricesForPeriod from StockService.
     SortedMap<LocalDate, BigDecimal> fetchedData = stockService.fetchMonthlyClosingPricesForPeriod
-        (symbol, startMonth, endMonth);
+        (symbol, startDate, endDate);
 
     // Assuming fetchedData is correctly populated, it can be directly used for plotting.
     monthlyValues.putAll(fetchedData);
@@ -241,37 +242,54 @@ public class PortfolioService implements PortfolioServiceInterface {
     BigDecimal maxValue = values.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
 
     // Assume a fixed scale for simplicity; could be dynamic based on minValue and maxValue
-    BigDecimal scale = calculateScale(minValue, maxValue);
+    AtomicReference<String> scaleType = new AtomicReference<>("absolute");
+    BigDecimal scale = calculateScale(minValue, maxValue, scaleType);
     int maxAsterisks = 50; // Maximum asterisks per line
 
     System.out.println("Performance of portfolio " + identifier + " from " + startDate + " to " + endDate + "\n");
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM uuu");
     values.forEach((date, value) -> {
       int asterisks = value.divide(scale, RoundingMode.HALF_UP).intValue();
       System.out.println(formatter.format(date) + ": " + "*".repeat(Math.max(0, asterisks)));
     });
 
-    System.out.println("\nScale: * = " + scale + " dollars");
+    System.out.println("\nScale: * = " + scale + " dollars (" + scaleType.get() + ")");
   }
 
-  private BigDecimal calculateScale(BigDecimal minValue, BigDecimal maxValue) {
+  private BigDecimal calculateScale(BigDecimal minValue, BigDecimal maxValue, AtomicReference<String> scaleType) {
     // Calculate the range of values
     BigDecimal range = maxValue.subtract(minValue);
+    BigDecimal scale;
 
     // Determine the maximum number of asterisks we want to display
     int maxAsterisks = 50;
 
-    // Calculate the scale: divide the range by the maximum number of asterisks to find out
-    // what value each asterisk represents. We use the ceiling of the division to ensure that
-    // we do not exceed 50 asterisks even after rounding.
-    BigDecimal scale = range.divide(BigDecimal.valueOf(maxAsterisks), RoundingMode.CEILING);
+    if (range.compareTo(BigDecimal.ZERO) == 0) {
+      return BigDecimal.ONE; // Avoid division by zero
+    }
 
-    // Ensure the scale is at least 1 to avoid a scale of 0 when minValue equals maxValue
-    if (scale.compareTo(BigDecimal.ZERO) == 0) {
-      scale = BigDecimal.ONE;
+    // Dynamic scaling based on the range magnitude
+    if (range.compareTo(new BigDecimal("500")) > 0) {
+      // For large ranges, make each asterisk represent a larger value (e.g., $1000 or more)
+      scale = new BigDecimal("1000");
+      scaleType.set("absolute");
+    } else if (range.compareTo(new BigDecimal("50")) > 0) {
+      // For moderate ranges, adjust the scale to have meaningful but not overwhelming representation
+      scale = range.divide(BigDecimal.valueOf(maxAsterisks / 2), RoundingMode.UP);
+      scaleType.set("absolute");
+    } else {
+      // For smaller ranges, use a finer scale to highlight differences
+      scale = range.divide(BigDecimal.valueOf(maxAsterisks), RoundingMode.UP);
+      scaleType.set("relative");
+    }
+
+    // Adjust the scale to ensure it's practical and avoids producing overly long bars
+    while (maxValue.divide(scale, RoundingMode.HALF_UP).intValue() > maxAsterisks) {
+      scale = scale.multiply(BigDecimal.valueOf(2)); // Double the scale to reduce the number of asterisks
     }
 
     return scale;
   }
+
 }

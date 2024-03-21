@@ -23,5 +23,5 @@ public interface StockServiceInterface {
 
 
    SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
-          (String symbol, YearMonth startMonth, YearMonth endMonth);
+          (String symbol, LocalDate startMonth, LocalDate endMonth);
 }

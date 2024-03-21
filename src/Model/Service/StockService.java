@@ -10,11 +10,14 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import Model.utilities.DateUtils;
 import Model.utilities.StockDataCache;
 import Model.utilities.StockInfo;
-import Model.utilities.MonthlyStockDataCache;
 
 /**
  * Service class for fetching stock data and calculating stock prices.
@@ -22,7 +25,6 @@ import Model.utilities.MonthlyStockDataCache;
 public class StockService implements StockServiceInterface {
 
   private final StockDataCache cache = new StockDataCache(); // Instance of your caching class
-  private final MonthlyStockDataCache monthlyCache = new MonthlyStockDataCache(); // Instance of your caching class
 
   private final String apiKey;
 
@@ -141,26 +143,6 @@ public class StockService implements StockServiceInterface {
     return response.toString();
   }
 
-  public Payload fetchPriceOnMonth(String symbol, YearMonth date) {
-    String message;
-    if (!monthlyCache.hasMonthlyStockData(symbol, date)) {
-      message = fetchAndCacheMonthlyData(symbol);
-      if (message != null) {
-        return new Payload(null, message);
-      }
-    }
-    StockInfo info = monthlyCache.getMonthlyStockData(symbol, date);
-    return info != null ? new Payload(info, "") : new Payload(null, "");
-  }
-
-  public String fetchAndCacheMonthlyData(String symbol) {
-    String csvData = makeApiRequestMonthly(symbol);
-    if (csvData.contains("Invalid stock symbol")) {
-      return "Invalid stock symbol:";
-    }
-    parseAndStoreMonthlyData(csvData, symbol);
-    return null;
-  }
 
   private String makeApiRequestMonthly(String symbol) {
     StringBuilder response = new StringBuilder();
@@ -186,46 +168,99 @@ public class StockService implements StockServiceInterface {
     return response.toString();
   }
 
-  public void parseAndStoreMonthlyData(String csvData, String symbol) {
-    // Assuming the first line is a header and skipping it
-    String[] lines = csvData.split("\n");
 
-    for (int i = 1; i < lines.length; i++) {
-      String[] data = lines[i].split(",");
-      LocalDate date = LocalDate.parse(data[0], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-      BigDecimal open = new BigDecimal(data[1]);
-      BigDecimal high = new BigDecimal(data[2]);
-      BigDecimal low = new BigDecimal(data[3]);
-      BigDecimal close = new BigDecimal(data[4]);
-      long volume = Long.parseLong(data[5]);
 
-      // Create a StockInfo object
-      StockInfo stockInfo = new StockInfo(date, open, high, low, close, volume);
+  private boolean isDataAvailableInCache(String symbol, LocalDate startDate, LocalDate endDate) {
+    // Check if the cache contains data for all days in the requested range.
+    LocalDate currentDate = startDate;
+    while (!currentDate.isAfter(endDate)) {
+      if (!cache.hasStockData(symbol, currentDate)) {
+        return false;
+      }
+      currentDate = currentDate.plusDays(1);
+    }
+    return true;
+  }
 
-      // Extract YearMonth from the date
-      YearMonth yearMonth = YearMonth.from(date);
+  private void updateCacheWithApiData(String symbol) {
+    String apiResponse = makeApiRequest(symbol); // Your method to fetch data
+    parseAndCacheCsvData(apiResponse, symbol);   // Assuming this method parses the CSV and updates the cache
+  }
 
-      // Add to the monthly cache
-      monthlyCache.addMonthlyStockData(symbol, yearMonth, stockInfo);
+  public SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
+    // Determine resolution based on the period
+    String resolution = determineResolution(startDate, endDate);
+
+    SortedMap<LocalDate, BigDecimal> values = new TreeMap<>();
+    LocalDate currentDate = startDate;
+
+    while (!currentDate.isAfter(endDate)) {
+      LocalDate targetDate = getTargetDateBasedOnResolution(currentDate, resolution, endDate);
+
+      if (targetDate != null) {
+        boolean isDataFullyAvailable = isDataAvailableInCache(symbol, startDate, endDate);
+
+        if (!isDataFullyAvailable) {
+          // Step 2: Fetch from API and update cache
+          updateCacheWithApiData(symbol);
+        }
+
+        StockInfo stockInfo = cache.getStockData(symbol, targetDate);
+        if (stockInfo != null) {
+          values.put(targetDate, stockInfo.getClose());
+        }
+      }
+
+      // Move to next period based on resolution
+      currentDate = incrementDateByResolution(currentDate, resolution);
+    }
+
+    return values;
+  }
+
+  private String determineResolution(LocalDate startDate, LocalDate endDate) {
+    long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+    if (daysBetween <= 30) {
+      return "daily";
+    } else if (daysBetween <= 540) { // Up to 18 months
+      return "monthly";
+    } else if (daysBetween <= 1825) { // Up to 5 years
+      return "every 3 months";
+    } else {
+      return "yearly";
     }
   }
 
-  public SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
-      (String symbol, YearMonth startMonth, YearMonth endMonth) {
-    SortedMap<LocalDate, BigDecimal> monthlyClosingPrices = new TreeMap<>();
-
-    YearMonth currentMonth = startMonth;
-    while (!currentMonth.isAfter(endMonth)) {
-      Payload info = fetchPriceOnMonth(symbol, currentMonth);
-      if (info != null) {
-        StockInfo stockInfo = (StockInfo) info.getData();
-        // Assuming the date in StockInfo is the last trading day of the month
-        monthlyClosingPrices.put(stockInfo.getDate(), stockInfo.getClose());
-      }
-      currentMonth = currentMonth.plusMonths(1);
+  private LocalDate getTargetDateBasedOnResolution(LocalDate date, String resolution, LocalDate endDate) {
+    switch (resolution) {
+      case "daily":
+        return date;
+      case "monthly":
+        return DateUtils.getLastWorkingDayOfMonth(date);
+      case "every 3 months":
+        LocalDate endOfQuarter = date.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
+        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate) ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
+      case "yearly":
+        LocalDate endOfYear = date.with(TemporalAdjusters.lastDayOfYear());
+        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate) ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
+      default:
+        throw new IllegalArgumentException("Unknown resolution: " + resolution);
     }
+  }
 
-    return monthlyClosingPrices;
+  private LocalDate incrementDateByResolution(LocalDate date, String resolution) {
+    switch (resolution) {
+      case "daily":
+        return date.plusDays(1);
+      case "monthly":
+        return date.plusMonths(1);
+      case "every 3 months":
+        return date.plusMonths(3);
+      case "yearly":
+        return date.plusYears(1);
+      default:
+        throw new IllegalArgumentException("Unknown resolution: " + resolution);
+    }
   }
 
 }
