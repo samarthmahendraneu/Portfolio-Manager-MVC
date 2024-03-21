@@ -1,7 +1,7 @@
 package Controller;
 
 /**
- * this class has two variables acts as a payload data - type class of any type message - type
+ * this class has two variables acts as a payload data - type class of any type message - type.
  * string
  */
 public class Payload {
@@ -10,7 +10,7 @@ public class Payload {
   private String message;
 
   /**
-   * constructor for the Payload class
+   * constructor for the Payload class.
    *
    * @param data    - type class of any type
    * @param message - type string
@@ -21,22 +21,16 @@ public class Payload {
   }
 
   /**
-   * getter for the data variable
+   * getter for the data variable.
    *
-   * @return - type class of any type
+   * @return data
    */
-
-  public Payload(Object data) {
-    this(data, "");
-  }
-
-
   public Object getData() {
     return data;
   }
 
   /**
-   * getter for the message variable
+   * getter for the message variable.
    *
    * @return - type string
    */
@@ -45,16 +39,17 @@ public class Payload {
   }
 
   /**
-   * isError method checks if the message is empty or not
+   * isError method checks if the message is empty or not.
+   * @return - type boolean.
    */
   public boolean isError() {
     return !message.isEmpty();
   }
+
   public boolean IsNotError() {
     return !message.contains("Error");
   }
 
   //Complete this interface
-
 
 }

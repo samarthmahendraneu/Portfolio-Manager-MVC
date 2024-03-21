@@ -1,8 +1,8 @@
 package Controller;
 
+import Model.PortfolioInterface;
 import Model.Service.PortfolioService;
 import Model.Service.PortfolioServiceInterface;
-import Model.Portfolio;
 import Model.Service.StockServiceInterface;
 import java.time.LocalDate;
 
@@ -40,7 +40,11 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @return The newly created Portfolio object.
    */
   public Payload createNewPortfolio(String name) {
-    return this.portfolioService.createNewPortfolio(name);
+    try {
+      return new Payload(this.portfolioService.createNewPortfolio(name),"");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
   }
 
   /**
@@ -51,10 +55,14 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param quantity  The quantity of the stock to be added.
    * @param date      The date on which the stock was purchased.
    */
-  public Payload addStockToPortfolio(Portfolio portfolio, String symbol, int quantity,
+  public Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
       LocalDate date) {
-    return new Payload(null,
-        this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol, quantity, date));
+    try {
+      return new Payload(this.portfolioService.addStockToPortfolio(portfolio.getName(), symbol,
+          quantity, date), "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
   }
 
   /**
@@ -65,7 +73,11 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @return The value of the portfolio on the given date.
    */
   public Payload calculatePortfolioValue(String name, LocalDate onDate) {
-    return this.portfolioService.calculatePortfolioValue(name, onDate);
+    try {
+      return new Payload(this.portfolioService.calculatePortfolioValue(name, onDate), "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
   }
 
   /**
@@ -91,15 +103,15 @@ public class PortfolioController implements PortfolioControllerInterface {
    */
   public Payload loadPortfolio(String filePath) throws IllegalArgumentException {
     try {
-      Payload payload = new Payload(null, this.portfolioService.loadPortfoliosFromCSV(filePath));
-      return payload;
+      return new Payload(null, this.portfolioService.loadPortfoliosFromCSV(filePath));
     } catch (Exception e) {
       return new Payload(null, e.getMessage());
     }
   }
 
   /**
-   * get number of portfolios
+   * get number of portfolios.
+   * @return number of portfolios
    */
   public int getNumPortfolios() {
     return this.portfolioService.getNumberOfPortfolios();

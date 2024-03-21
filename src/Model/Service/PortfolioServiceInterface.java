@@ -1,7 +1,6 @@
 package Model.Service;
 
-import Controller.Payload;
-import Model.Portfolio;
+import Model.PortfolioInterface;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,16 +17,17 @@ public interface PortfolioServiceInterface {
    * Creates a new portfolio with the given name.
    *
    * @param name The name of the new portfolio.
+   *
    * @return The newly created Portfolio object.
    */
-  Payload createNewPortfolio(String name);
+  PortfolioInterface createNewPortfolio(String name);
 
   /**
    * Adds a portfolio to the list of portfolios.
    *
    * @param portfolio The portfolio to add.
    */
-  void addPortfolio(Portfolio portfolio);
+  void addPortfolio(PortfolioInterface portfolio);
 
   /**
    * Adds a stock to the given portfolio with the given symbol, quantity, and date.
@@ -36,8 +36,11 @@ public interface PortfolioServiceInterface {
    * @param symbol        The symbol of the stock to be added.
    * @param quantity      The quantity of the stock to be added.
    * @param date          The date on which the stock was purchased.
+   *
+   * @return The updated portfolio.
    */
-  String addStockToPortfolio(String portfolioName, String symbol, int quantity, LocalDate date);
+  PortfolioInterface addStockToPortfolio(String portfolioName, String symbol, int quantity,
+      LocalDate date);
 
   /**
    * Fetches a portfolio by its name.
@@ -45,7 +48,7 @@ public interface PortfolioServiceInterface {
    * @param name The name of the portfolio to fetch.
    * @return An Optional containing the portfolio if found, or an empty Optional otherwise.
    */
-  Optional<Portfolio> getPortfolioByName(String name);
+  Optional<PortfolioInterface> getPortfolioByName(String name);
 
   /**
    * Calculates the total value of a portfolio on a given date.
@@ -54,7 +57,7 @@ public interface PortfolioServiceInterface {
    * @param onDate        The date for which the value is to be calculated.
    * @return The total value of the portfolio on the given date.
    */
-  Payload calculatePortfolioValue(String portfolioName, LocalDate onDate);
+  Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate);
 
   /**
    * Returns a list of all portfolio names.
@@ -68,14 +71,18 @@ public interface PortfolioServiceInterface {
    *
    * @param filePath The file path to which the portfolios will be saved.
    * @throws IOException If an error occurs while writing to the file.
+   *
+   * @return The file path where the portfolios were saved.
    */
-  String savePortfoliosToCSV(String filePath) throws IOException;
+  void savePortfoliosToCSV(String filePath) throws IOException;
 
   /**
    * Loads portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IOException If an error occurs while reading from the file.
+   *
+   * @return The file path from which the portfolios were loaded.
    */
   String loadPortfoliosFromCSV(String filePath) throws IOException;
 
@@ -88,13 +95,14 @@ public interface PortfolioServiceInterface {
   boolean portfolioExists(String portfolioName);
 
   /**
-   * get Number of Portfolios
-   * @return number of portfolios
+   * get Number of Portfolios.
+   *
+   * @return number of portfolios.
    */
   int getNumberOfPortfolios();
 
-  public Map<LocalDate, BigDecimal> fetchValuesForPeriod
+  Map<LocalDate, BigDecimal> fetchValuesForPeriod
           (String identifier, LocalDate startDate, LocalDate endDate);
 
-  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
+  void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
 }

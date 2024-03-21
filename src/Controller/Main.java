@@ -1,7 +1,7 @@
 package Controller;
 
 import Model.Service.StockService;
-
+import View.View;
 
 /**
  * Main class for the Portfolio Management System.
@@ -16,9 +16,10 @@ public class Main {
   public static void main(String[] args) {
     PortfolioControllerInterface portfolioController = new PortfolioController(
         new StockService("FIR1DN0VB7SQ4SGD"));
-    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController);
+    View view = new View();
+    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
     // interaction with the user
-    // [Main] -> [PortfolioView] -> [PortfolioController] -> [PortfolioService] -> [Model]
+    // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [Model]
     controller.displayMainMenu();
   }
 }

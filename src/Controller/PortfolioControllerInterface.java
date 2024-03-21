@@ -1,8 +1,7 @@
 package Controller;
 
 
-import Model.Portfolio;
-
+import Model.PortfolioInterface;
 import Model.Service.PortfolioServiceInterface;
 import java.time.LocalDate;
 
@@ -27,8 +26,11 @@ public interface PortfolioControllerInterface {
    * @param symbol    The symbol of the stock to be added.
    * @param quantity  The quantity of the stock to be added.
    * @param date      The date on which the stock was purchased.
+   *
+   * @return The updated portfolio.
    */
-  Payload addStockToPortfolio(Portfolio portfolio, String symbol, int quantity, LocalDate date);
+  Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
+      LocalDate date);
 
   /**
    * Calculates the value of the portfolio with the given name on the given date.
@@ -44,6 +46,8 @@ public interface PortfolioControllerInterface {
    *
    * @param filePath The file path where the portfolios will be saved.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
+   *
+   * @return The payload containing the portfolios.
    */
   Payload savePortfolio(String filePath) throws IllegalArgumentException;
 
@@ -52,13 +56,24 @@ public interface PortfolioControllerInterface {
    *
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
+   *
+   * @return The payload containing the portfolios.
    */
   Payload loadPortfolio(String filePath) throws IllegalArgumentException;
 
   /**
-   * get Portfolio Service
+   * get Portfolio Service.
+   *
+   * @return PortfolioServiceInterface
    */
   PortfolioServiceInterface getPortfolioService();
+
+  /**
+   * getNumPortfolios.
+   *
+   * @return int
+   */
+  int getNumPortfolios();
 
    void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 }

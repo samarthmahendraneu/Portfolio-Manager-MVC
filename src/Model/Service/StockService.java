@@ -2,6 +2,7 @@ package Model.Service;
 
 import Controller.Payload;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -9,16 +10,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
-
-import Model.Utilities.MonthlyStockDataCache;
-import Model.Utilities.StockDataCache;
-import Model.Utilities.StockInfo;
-
-import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
+import Model.utilities.StockDataCache;
+import Model.utilities.StockInfo;
+import Model.utilities.MonthlyStockDataCache;
 
 /**
  * Service class for fetching stock data and calculating stock prices.
@@ -47,44 +43,36 @@ public class StockService implements StockServiceInterface {
    * @return The closing price of the stock on the given date.
    */
   public Payload fetchPriceOnDate(String symbol, LocalDate date) {
-    String message = "";
-    if (!cache.hasStockData(symbol, date)) {
-      message = fetchAndCacheStockData(
-          symbol); // Fetch all available data for the symbol and cache it
-      if (message != null) {
-        return new Payload(null, message);
+    int traverseCount = 0;
+    String message;
+
+    do {
+      if (!cache.hasStockData(symbol, date)) {
+        message = fetchAndCacheStockData(symbol);
+        if (message != null) {
+          return new Payload(null, message);
+        }
       }
-    }
-    StockInfo info = cache.getStockData(symbol, date);
-    return info != null ? new Payload(info.getClose(), "") : new Payload(BigDecimal.ZERO, "");
+
+      StockInfo info = cache.getStockData(symbol, date);
+      if (info != null) {
+        return new Payload(info.getClose(), "");
+      }
+
+      date = date.minusDays(1);
+      traverseCount++;
+    } while (traverseCount < 4);
+
+    return new Payload(BigDecimal.ZERO, "");
   }
 
-  /**
-   * Fetches the closing price of the stock with the given symbol on the previous trading day.
-   *
-   * @param symbol The symbol of the stock to fetch.
-   * @param date   The date for which to fetch the previous close price.
-   * @return The closing price of the stock on the previous trading day.
-   */
-  public Payload fetchPreviousClosePrice(String symbol, LocalDate date) {
-    // BigDecimal previousClosePrice = this.fetchPriceOnDate(symbol, date);
-    Payload previousClosePrice = this.fetchPriceOnDate(symbol, date);
-    int traversecount = 0;
-    // traverse 4 days back to get the previous close price
-    while (previousClosePrice.getData().equals(BigDecimal.ZERO) && traversecount < 4) {
-      date = date.minusDays(1);
-      previousClosePrice = this.fetchPriceOnDate(symbol, date);
-      traversecount++;
-    }
-    return previousClosePrice;
-  }
 
   /**
    * Fetches stock data for the given symbol from the API and caches it.
    *
    * @param symbol The symbol of the stock to fetch.
    */
-  private <Optional> String fetchAndCacheStockData(String symbol) {
+  private String fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
     if (csvData.contains("Invalid stock symbol")) {
       return "Invalid stock symbol";
@@ -100,20 +88,22 @@ public class StockService implements StockServiceInterface {
    * @param symbol  The symbol of the stock for which the data is being cached.
    */
   private void parseAndCacheCsvData(String csvData, String symbol) {
-    try (Scanner scanner = new Scanner(csvData)) {
-      scanner.nextLine(); // Skip header
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        String[] values = line.split(",");
-        LocalDate date = LocalDate.parse(values[0]);
-        BigDecimal open = new BigDecimal(values[1]);
-        BigDecimal high = new BigDecimal(values[2]);
-        BigDecimal low = new BigDecimal(values[3]);
-        BigDecimal close = new BigDecimal(values[4]);
-        long volume = Long.parseLong(values[5]);
-        StockInfo stockInfo = new StockInfo(date, open, high, low, close, volume);
-        cache.addStockData(symbol, date, stockInfo);
-      }
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(csvData.getBytes())))) {
+      reader.lines()
+          .skip(1) // Skip header
+          .map(line -> line.split(","))
+          .forEach(values -> {
+            LocalDate date = LocalDate.parse(values[0]);
+            BigDecimal open = new BigDecimal(values[1]);
+            BigDecimal high = new BigDecimal(values[2]);
+            BigDecimal low = new BigDecimal(values[3]);
+            BigDecimal close = new BigDecimal(values[4]);
+            long volume = Long.parseLong(values[5]);
+            StockInfo stockInfo = new StockInfo(date, open, high, low, close, volume);
+            cache.addStockData(symbol, date, stockInfo);
+          });
+    } catch (Exception e) {
+      System.out.println("An error occurred while parsing and caching CSV data: " + e.getMessage());
     }
   }
 
@@ -123,7 +113,6 @@ public class StockService implements StockServiceInterface {
    * @param symbol The symbol of the stock to fetch.
    * @return The response from the API as a string.
    */
-
   private String makeApiRequest(String symbol) {
     StringBuilder response = new StringBuilder();
     try {
@@ -134,15 +123,13 @@ public class StockService implements StockServiceInterface {
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
 
-      BufferedReader reader = new BufferedReader(
-          new InputStreamReader(connection.getInputStream()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        response.append(line).append("\n");
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          response.append(line).append("\n");
+        }
       }
-      reader.close();
 
-      // Check if the response contains an error message
       if (response.toString().contains("Error Message")) {
         System.out.println("Invalid stock symbol: " + symbol);
         return "Invalid stock symbol: " + symbol;
@@ -154,21 +141,19 @@ public class StockService implements StockServiceInterface {
     return response.toString();
   }
 
-
   public Payload fetchPriceOnMonth(String symbol, YearMonth date) {
-    String message = "";
+    String message;
     if (!monthlyCache.hasMonthlyStockData(symbol, date)) {
-      message = fetchAndCacheMonthlyData(
-              symbol); // Fetch all available data for the symbol and cache it
+      message = fetchAndCacheMonthlyData(symbol);
       if (message != null) {
         return new Payload(null, message);
       }
     }
     StockInfo info = monthlyCache.getMonthlyStockData(symbol, date);
-    return info != null ? new Payload(info, "") :
-            new Payload(null, "");
+    return info != null ? new Payload(info, "") : new Payload(null, "");
   }
-  public <Optional> String fetchAndCacheMonthlyData(String symbol) {
+
+  public String fetchAndCacheMonthlyData(String symbol) {
     String csvData = makeApiRequestMonthly(symbol);
     if (csvData.contains("Invalid stock symbol")) {
       return "Invalid stock symbol:";
@@ -178,31 +163,29 @@ public class StockService implements StockServiceInterface {
   }
 
   private String makeApiRequestMonthly(String symbol) {
-    // but fetching monthly data instead of daily.
-    // Assuming it returns CSV formatted data for the stock's monthly performance.
     StringBuilder response = new StringBuilder();
     try {
-      // Adjust the URL according to how the API provides monthly data
       String urlString = String.format(
-              "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=%s&datatype=csv&apikey=%s",
-              symbol, this.apiKey);
+          "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=%s&datatype=csv&apikey=%s",
+          symbol, this.apiKey);
       URL url = new URL(urlString);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
 
-      BufferedReader reader = new BufferedReader(
-              new InputStreamReader(connection.getInputStream()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        response.append(line).append("\n");
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          response.append(line).append("\n");
+        }
       }
-      reader.close();
+
     } catch (Exception e) {
       System.out.println("An error occurred while fetching monthly stock data: " + e.getMessage());
       return "Error";
     }
     return response.toString();
   }
+
   public void parseAndStoreMonthlyData(String csvData, String symbol) {
     // Assuming the first line is a header and skipping it
     String[] lines = csvData.split("\n");
@@ -228,7 +211,7 @@ public class StockService implements StockServiceInterface {
   }
 
   public SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
-          (String symbol, YearMonth startMonth, YearMonth endMonth) {
+      (String symbol, YearMonth startMonth, YearMonth endMonth) {
     SortedMap<LocalDate, BigDecimal> monthlyClosingPrices = new TreeMap<>();
 
     YearMonth currentMonth = startMonth;
@@ -244,4 +227,5 @@ public class StockService implements StockServiceInterface {
 
     return monthlyClosingPrices;
   }
+
 }

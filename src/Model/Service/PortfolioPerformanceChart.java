@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Controller.Payload;
+import java.util.Optional;
 
 public class PortfolioPerformanceChart {
 
@@ -48,18 +49,19 @@ public class PortfolioPerformanceChart {
     while (!currentDate.isAfter(endDate)) {
       // Assuming stockService has a method like fetchClosingPrice or fetchPortfolioValue
       // that returns a Payload containing the value of a stock or portfolio at the end of the day.
-      Payload payload;
+      Payload payload = null;
+      Optional<BigDecimal> value;
       if (identifier.equals("SOME_PORTFOLIO_IDENTIFIER")) {
-        payload = portfolioService.calculatePortfolioValue(identifier, currentDate);
+        value = portfolioService.calculatePortfolioValue(identifier, currentDate);
       } else {
         // Assuming fetchPreviousClosePrice for stocks
-        payload = stockService.fetchPreviousClosePrice(identifier, currentDate);
+        payload = stockService.fetchPriceOnDate(identifier, currentDate);
+        value = (Optional<BigDecimal>) payload.getData();
       }
 
       // Check if payload contains a valid value and is not an error
       if (!payload.isError() && payload.getData() instanceof BigDecimal) {
-        BigDecimal value = (BigDecimal) payload.getData();
-        values.put(currentDate, value);
+        values.put(currentDate, value.orElse(BigDecimal.ZERO));
       }
 
       // Increment currentDate by one day. Adjust this if you want monthly or yearly values.

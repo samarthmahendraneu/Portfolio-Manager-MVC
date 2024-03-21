@@ -1,4 +1,5 @@
 package Controller;
+
 import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -6,68 +7,77 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
+import Model.PortfolioInterface;
+import View.View;
+
 
 /**
- * Class to represent the view for the portfolio.
+ * Controller class for managing the interaction between user inputs and portfolio operations
+ * through a menu interface.
  */
 public class PortfolioMenuController implements PortfolioMenuControllerInterface {
 
   private static final Scanner scanner = new Scanner(System.in);
   private final PortfolioControllerInterface portfolioController;
+  private final View view;
 
-  public PortfolioMenuController(PortfolioControllerInterface portfolioController) {
+  /**
+   * Controller class for managing the interaction between user inputs and portfolio operations
+   * through a menu interface.
+   *
+   * @param portfolioController The portfolio controller to interact with.
+   * @param view                The view for displaying messages.
+   */
+  public PortfolioMenuController(PortfolioControllerInterface portfolioController, View view) {
     this.portfolioController = portfolioController;
+    this.view = view;
   }
 
   /**
-   * Display the main menu.
+   * Displays the main menu and handles user input for various portfolio operations.
    */
   public void displayMainMenu() {
     boolean running = true;
     while (running) {
-      System.out.println("\nPortfolio Management System:");
-      System.out.println("1. Create a new portfolio");
-      System.out.println("2. Examine a portfolio");
-      System.out.println("3. Calculate portfolio value");
-      System.out.println("4. Save portfolio");
-      System.out.println("5. Load portfolio");
-      System.out.println("6. Exit");
-      System.out.print("Select an option: ");
+      try {
+        view.displayMainMenu(System.out);
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
 
-      int choice = scanner.nextInt();
-      scanner.nextLine(); // Consume newline
-
-      switch (choice) {
-        case 1:
-          this.createNewPortfolio();
-          break;
-        case 2:
-          this.examinePortfolio();
-          break;
-        case 3:
-          this.calculatePortfolioValue();
-          break;
-        case 4:
-          this.savePortfolio();
-          break;
-        case 5:
-          this.loadPortfolio();
-          break;
-        case 6:
-          System.out.println("Exiting...");
-          running = false;
-          break;
-        case 7:
-          this.CalculateGraph();
-        default:
-          System.out.println("Invalid option. Please try again.");
+        switch (choice) {
+          case 1:
+            this.createNewPortfolio();
+            break;
+          case 2:
+            this.examinePortfolio();
+            break;
+          case 3:
+            this.calculatePortfolioValue();
+            break;
+          case 4:
+            this.savePortfolio();
+            break;
+          case 5:
+            this.loadPortfolio();
+            break;
+          case 6:
+            System.out.println("Exiting...");
+            running = false;
+            break;
+          case 7:
+            this.CalculateGraph();
+          default:
+            System.out.println("Invalid option. Please try again.");
+        }
+      } catch (Exception e) {
+        System.out.println("Error: " + e.getMessage());
+        scanner.nextLine(); // Consume newline
       }
     }
   }
 
-  public void CalculateGraph()
-  {
-    LocalDate date,date2;
+  public void CalculateGraph() {
+    LocalDate date, date2;
 
     System.out.println("Enter new Stock name:");
     String name = scanner.nextLine().trim();
@@ -80,8 +90,10 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     String dateString2 = scanner.nextLine().trim();
     date2 = LocalDate.parse(dateString2);
 
-    portfolioController.GenGraph(name,date,date2);
+    portfolioController.GenGraph(name, date, date2);
   }
+
+
   /**
    * Create a new portfolio.
    */
@@ -95,7 +107,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     Portfolio newPortfolio = (Portfolio) payload.getData();
     boolean flag = true;
     System.out.println("Enter the stocks you want to add to the portfolio");
-    int quantity =0 ;
+    int quantity = 0;
     while (flag) {
       System.out.println("Enter the stock symbol:");
       String symbol = scanner.nextLine().trim();
@@ -152,80 +164,109 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
   /**
-   * Examine a portfolio.
+   * Allows the user to examine details of a specific portfolio, such as its stocks and their
+   * quantities.
    */
   public void examinePortfolio() {
-    System.out.println("Available portfolios:");
-    portfolioController.getPortfolioService().listPortfolioNames().forEach(System.out::println);
+    try {
+      view.displayAvailablePortfolios(
+          portfolioController.getPortfolioService().listPortfolioNames(), System.out);
+      System.out.println("Enter the name of the portfolio to examine:");
+      String name = scanner.nextLine().trim();
+      PortfolioInterface portfolio = portfolioController.getPortfolioService()
+          .getPortfolioByName(name).orElse(null);
 
-    System.out.println("Enter the name of the portfolio to examine:");
-    String name = scanner.nextLine().trim();
-    portfolioController.getPortfolioService().getPortfolioByName(name)
-        .ifPresentOrElse(
-            portfolio -> {
-              System.out.println("Stocks in " + name + ":");
-              portfolio.getStocks().forEach(stock ->
-                  System.out.println(stock.getSymbol() + " - Quantity: " + stock.getQuantity()
-                      + ", Purchase Price: " + stock.getPurchasePrice() + ", Purchase Date: "
-                      + stock.getPurchaseDate()));
-            },
-            () -> System.out.println("Portfolio not found.")
-        );
+      if (portfolio != null) {
+        view.displayPortfolioDetails(name, portfolio.getStocks(), System.out);
+      } else {
+        System.out.println("Portfolio not found.");
+      }
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
   }
 
+
   /**
-   * Calculate the portfolio value.
+   * Calculates the total value of a portfolio at a given date and displays the result.
    */
   public void calculatePortfolioValue() {
-    System.out.println("Enter the name of the portfolio:");
-    String name = scanner.nextLine().trim();
-    System.out.println("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
-    String dateInput = scanner.nextLine().trim();
     try {
+      System.out.println("Enter the name of the portfolio:");
+      String name = scanner.nextLine().trim();
+      System.out.println("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
+      String dateInput = scanner.nextLine().trim();
       Payload payload = portfolioController.calculatePortfolioValue(name,
           LocalDate.parse(dateInput));
       if (this.printIfError(payload)) {
         return;
       }
-      System.out.println("Value of the portfolio '" + name + "' on " + dateInput + ": "
-          + ((Optional<BigDecimal>) payload.getData()).get());
+
+      Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
+      if (portfolioValue.isPresent()) {
+        BigDecimal value = portfolioValue.get();
+        view.displayPortfolioValue(name, dateInput, value.toString(), System.out);
+      } else {
+        System.out.println("No value found for the portfolio '" + name + "' on " + dateInput);
+      }
     } catch (Exception e) {
       System.out.println("Error calculating portfolio value: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
     }
   }
 
   /**
-   * Save the portfolio.
+   * Saves the portfolio to a specified file path.
    */
   public void savePortfolio() {
-    System.out.println("Enter the file path to save the portfolio:");
-    String filePath = scanner.nextLine().trim();
-    Object payload = portfolioController.savePortfolio(filePath);
-    if (((Optional<Payload>) payload).isPresent() && ((Optional<Payload>) payload).get()
-        .isError()) {
-      System.out.println("Error: " + ((Optional<Payload>) payload).get().getMessage());
-      return;
+    try {
+      System.out.println("Enter the file path to save the portfolio:");
+      String filePath = scanner.nextLine().trim();
+      Payload payload = portfolioController.savePortfolio(filePath);
+      if (payload.isError()) {
+        System.out.println("Error: " + payload.getMessage());
+        return;
+      }
+      view.displaySaveSuccess(filePath, System.out);
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
     }
-    System.out.println("Portfolios have been saved successfully to " + filePath);
   }
 
   /**
-   * Load the portfolio.
+   * Loads portfolios from a specified file path.
    */
   public void loadPortfolio() {
-    System.out.println("Enter the file path to load portfolios from:");
-    String filePath = scanner.nextLine().trim();
-    Object payload = portfolioController.loadPortfolio(filePath);
-    if (Objects.nonNull(payload) && ((Payload) payload).isError()) {
-      System.out.println("Error: " + payload);
-      return;
+    try {
+      System.out.println("Enter the file path to load portfolios from:");
+      String filePath = scanner.nextLine().trim();
+      Payload payload = portfolioController.loadPortfolio(filePath);
+      if (Objects.nonNull(payload) && payload.isError()) {
+        System.out.println("Error: " + payload);
+        return;
+      }
+      view.displayLoadSuccess(System.out);
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
     }
-    System.out.println("Portfolios have been loaded successfully.");
   }
 
-  private Boolean printIfError(Payload payload) {
+  /**
+   * prints error.
+   *
+   * @param payload takes message from payload.
+   * @return true or false.
+   */
+  public boolean printIfError(Payload payload) {
     if (payload.isError()) {
-      System.out.println("Error: " + payload.getMessage());
+      try {
+        view.displayError(payload.getMessage(), System.out);
+      } catch (Exception e) {
+        System.out.println("Error: " + e.getMessage());
+      }
       return true;
     }
     return false;
