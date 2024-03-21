@@ -1,12 +1,12 @@
-package Model;
+package Model.Transactions;
 import java.math.BigDecimal;
 
-public class PurchangeInfo {
+public class PurchangeInfo implements TranactionInfo {
 
   /**
    * The quantity of the stock. Purchase price of the stock.
    */
-  private int quantity;
+  private final int quantity;
   private final BigDecimal purchasePrice;
 
   /**
@@ -24,7 +24,7 @@ public class PurchangeInfo {
     return quantity;
   }
 
-  public BigDecimal getPurchasePrice() {
+  public BigDecimal getPrice() {
     return purchasePrice;
   }
 }

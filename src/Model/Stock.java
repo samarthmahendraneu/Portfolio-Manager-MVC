@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Transactions.PurchangeInfo;
+import Model.Transactions.SaleInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -105,7 +107,7 @@ public class Stock implements Tradable {
    * Get money invested in this stock from the purchase history.
    */
   public BigDecimal calculateInvestment() {
-    return purchaseHistory.values().stream().map(PurchangeInfo::getPurchasePrice)
+    return purchaseHistory.values().stream().map(PurchangeInfo::getPrice)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
