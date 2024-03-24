@@ -93,6 +93,34 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     portfolioController.GenGraph(name, date, date2);
   }
 
+  public void GraphPortfolio()
+  {
+    try {
+      LocalDate date, date2;
+
+      view.displayAvailablePortfolios(
+              portfolioController.getPortfolioService().listPortfolioNames(), System.out);
+      System.out.println("Enter the name of the portfolio to examine:");
+      String name = scanner.nextLine().trim();
+      PortfolioInterface portfolio = portfolioController.getPortfolioService()
+              .getPortfolioByName(name).orElse(null);
+
+      if (portfolio != null) {
+        System.out.println("Enter date1");
+
+        String dateString = scanner.nextLine().trim();
+        date = LocalDate.parse(dateString);
+        System.out.println("Enter date2");
+
+        String dateString2 = scanner.nextLine().trim();
+        date2 = LocalDate.parse(dateString2);      } else {
+        System.out.println("Portfolio not found.");
+      }
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
+  }
 
   /**
    * Create a new portfolio.

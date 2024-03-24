@@ -1,6 +1,8 @@
 package Model.Service;
 
 import Controller.Payload;
+import Model.PortfolioInterface;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.SortedMap;
@@ -24,4 +26,6 @@ public interface StockServiceInterface {
 
    SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
           (String symbol, LocalDate startMonth, LocalDate endMonth);
+
+   LocalDate findEarliestStockDate(PortfolioInterface portfolio);
 }

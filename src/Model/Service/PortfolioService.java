@@ -5,6 +5,8 @@ import Controller.fileio.FileIO;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import Model.Portfolio;
 import Model.PortfolioInterface;
+import Model.Tradable;
+import Model.utilities.DateUtils;
+
 import java.time.format.DateTimeFormatter;
 import java.math.RoundingMode;
 import java.time.YearMonth;
@@ -178,7 +183,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
     // Directly use fetchMonthlyClosingPricesForPeriod from StockService.
     SortedMap<LocalDate, BigDecimal> fetchedData = stockService.fetchMonthlyClosingPricesForPeriod
-        (symbol, startDate, endDate);
+            (symbol, startDate, endDate);
 
     // Assuming fetchedData is correctly populated, it can be directly used for plotting.
     monthlyValues.putAll(fetchedData);
@@ -235,27 +240,120 @@ public class PortfolioService implements PortfolioServiceInterface {
     return portfolios.stream().anyMatch(p -> p.getName().equalsIgnoreCase(portfolioName));
   }
 
-  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
-    Map<LocalDate, BigDecimal> values = fetchValuesForPeriod(identifier, startDate, endDate);
+  public SortedMap<LocalDate, BigDecimal> fetchPortfolioValuesForPeriod(String portfolioName, LocalDate startDate, LocalDate endDate) {
+    String resolution = determineResolution(startDate, endDate);
+    SortedMap<LocalDate, BigDecimal> portfolioValues = new TreeMap<>();
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName).orElse(null);
+    LocalDate earliestStockDate = stockService.findEarliestStockDate(portfolio);
 
-    BigDecimal minValue = values.values().stream().min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
-    BigDecimal maxValue = values.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+    // Adjust the start date if it's before the earliest stock addition date
+    LocalDate currentDate = startDate.isBefore(earliestStockDate) ? earliestStockDate : startDate;
+    while (!currentDate.isAfter(endDate)) {
+      LocalDate targetDate = getTargetDateBasedOnResolution(currentDate, resolution, endDate);
 
-    // Assume a fixed scale for simplicity; could be dynamic based on minValue and maxValue
-    AtomicReference<String> scaleType = new AtomicReference<>("absolute");
-    BigDecimal scale = calculateScale(minValue, maxValue, scaleType);
-    int maxAsterisks = 50; // Maximum asterisks per line
+      // Use calculatePortfolioValue for the target date
+      BigDecimal portfolioValue = calculatePortfolioValue(portfolioName, targetDate).orElse(null);;
+      portfolioValues.put(targetDate, portfolioValue);
 
-    System.out.println("Performance of portfolio " + identifier + " from " + startDate + " to " + endDate + "\n");
+      // Increment the date based on the resolution
+      currentDate = incrementDateByResolution(currentDate, resolution);
+    }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM uuu");
-    values.forEach((date, value) -> {
-      int asterisks = value.divide(scale, RoundingMode.HALF_UP).intValue();
-      System.out.println(formatter.format(date) + ": " + "*".repeat(Math.max(0, asterisks)));
-    });
-
-    System.out.println("\nScale: * = " + scale + " dollars (" + scaleType.get() + ")");
+    return portfolioValues;
   }
+
+  private String determineResolution(LocalDate startDate, LocalDate endDate) {
+    long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+    if (daysBetween <= 30) {
+      return "daily";
+    } else if (daysBetween <= 540) { // Up to 18 months
+      return "monthly";
+    } else if (daysBetween <= 1825) { // Up to 5 years
+      return "every 3 months";
+    } else {
+      return "yearly";
+    }
+  }
+
+  public LocalDate getTargetDateBasedOnResolution(LocalDate currentDate, String resolution, LocalDate endDate) {
+    LocalDate targetDate;
+    switch (resolution) {
+      case "daily":
+        targetDate = currentDate; // For daily, the target date is the current date itself.
+        break;
+      case "monthly":
+        // Calculate the last day of the current month or endDate, whichever is earlier.
+        LocalDate endOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfMonth.isBefore(endDate) ? endOfMonth : endDate;
+        break;
+      case "every 3 months":
+        // Calculate the last day of the current quarter.
+        LocalDate endOfQuarter = currentDate.with(TemporalAdjusters.lastDayOfMonth())
+                .plusMonths(2) // Move to the last month of the current quarter.
+                .with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfQuarter.isBefore(endDate) ? endOfQuarter : endDate;
+        break;
+      case "yearly":
+        // Calculate the last day of the current year.
+        LocalDate endOfYear = currentDate.with(TemporalAdjusters.lastDayOfYear());
+        targetDate = endOfYear.isBefore(endDate) ? endOfYear : endDate;
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported resolution: " + resolution);
+    }
+    return targetDate;
+  }
+
+
+  private LocalDate incrementDateByResolution(LocalDate date, String resolution) {
+    switch (resolution) {
+      case "daily":
+        return date.plusDays(1);
+      case "monthly":
+        return date.plusMonths(1);
+      case "every 3 months":
+        return date.plusMonths(3);
+      case "yearly":
+        return date.plusYears(1);
+      default:
+        throw new IllegalArgumentException("Unknown resolution: " + resolution);
+    }
+  }
+
+
+  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
+    try {
+      // Determine whether the identifier is for a stock or a portfolio
+      Map<LocalDate, BigDecimal> values = portfolioExists(identifier) ?
+              fetchPortfolioValuesForPeriod(identifier, startDate, endDate) :
+              fetchValuesForPeriod(identifier, startDate, endDate);
+
+      if (values.isEmpty()) {
+        System.out.println("No data available for " + identifier + " from " + startDate + " to " + endDate);
+        return;
+      }
+
+      BigDecimal minValue = values.values().stream().min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+      BigDecimal maxValue = values.values().stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+
+      AtomicReference<String> scaleType = new AtomicReference<>("absolute");
+      BigDecimal scale = calculateScale(minValue, maxValue, scaleType);
+
+      System.out.println("Performance of " + (portfolioExists(identifier) ? "portfolio" : "stock") +
+              " " + identifier + " from " + startDate + " to " + endDate + "\n");
+
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM uuu");
+      values.forEach((date, value) -> {
+        int asterisksCount = value.divide(scale, RoundingMode.HALF_UP).intValue();
+        System.out.println(formatter.format(date) + ": " + "*".repeat(Math.max(0, asterisksCount)));
+      });
+
+      System.out.println("\nScale: * = " + scale + " dollars (" + scaleType.get() + ")");
+    } catch (Exception e) {
+      System.err.println("An error occurred while plotting performance chart: " + e.getMessage());
+    }
+  }
+
 
   private BigDecimal calculateScale(BigDecimal minValue, BigDecimal maxValue, AtomicReference<String> scaleType) {
     // Calculate the range of values

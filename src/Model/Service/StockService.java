@@ -15,9 +15,11 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import Model.PortfolioInterface;
 import Model.utilities.DateUtils;
 import Model.utilities.StockDataCache;
 import Model.utilities.StockInfo;
+import Model.Tradable;
 
 /**
  * Service class for fetching stock data and calculating stock prices.
@@ -261,6 +263,12 @@ public class StockService implements StockServiceInterface {
       default:
         throw new IllegalArgumentException("Unknown resolution: " + resolution);
     }
+  }
+  public LocalDate findEarliestStockDate(PortfolioInterface portfolio) {
+    return portfolio.getStocks().stream()
+            .map(Tradable::getPurchaseDate)
+            .min(LocalDate::compareTo)
+            .orElseThrow(() -> new IllegalStateException("No stocks found in portfolio: " + portfolio.getName()));
   }
 
 }
