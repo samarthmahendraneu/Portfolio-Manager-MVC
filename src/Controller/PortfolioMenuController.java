@@ -100,7 +100,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     LocalDate date ;
 
     while (true) {
-      System.out.println("Enter the purchase date (YYYY-MM-DD):");
       String dateString = scanner.nextLine().trim();
       try {
         date = LocalDate.parse(dateString);

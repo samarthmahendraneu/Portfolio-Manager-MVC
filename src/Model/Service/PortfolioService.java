@@ -174,6 +174,20 @@ public class PortfolioService implements PortfolioServiceInterface {
     return portfolios.size();
   }
 
+  /**
+   * Retrieves the closing prices of a specified stock symbol
+   * over a given period, adjusted to monthly values.
+   * This method delegates to fetchMonthlyClosingPricesForPeriod
+   * from the StockService to obtain data, which
+   * is then returned in a sorted map for easy consumption.
+   *
+   *
+   * @param symbol The stock symbol for which closing prices are to be fetched.
+   * @param startDate The start date of the period for which data is required. This is inclusive.
+   * @param endDate The end date of the period for which data is required. This is inclusive.
+   * @return A SortedMap where keys are LocalDate objects representing the end of each month.
+   */
+
   @Override
   public SortedMap<LocalDate, BigDecimal> fetchValuesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
     YearMonth startMonth = YearMonth.from(startDate);
@@ -239,6 +253,18 @@ public class PortfolioService implements PortfolioServiceInterface {
     return portfolios.stream().anyMatch(p -> p.getName().equalsIgnoreCase(portfolioName));
   }
 
+  /**
+   * Fetches the total value of a portfolio over a specified period.
+   * The values are aggregated based on a resolution determined by the start and end dates
+   * to ensure the chart has at least 5 lines but no more than 30 lines.
+   *
+   * @param portfolioName The name of the portfolio.
+   * @param startDate The start date of the period.
+   * @param endDate The end date of the period.
+   * @return A sorted map where keys are dates within the specified period and values are
+   *         the total portfolio values on those dates.
+   */
+
   public SortedMap<LocalDate, BigDecimal> fetchPortfolioValuesForPeriod(String portfolioName, LocalDate startDate, LocalDate endDate) {
     String resolution = DateUtils.determineResolution(startDate, endDate);
     SortedMap<LocalDate, BigDecimal> portfolioValues = new TreeMap<>();
@@ -278,6 +304,16 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
   }
 
+  /**
+   * Plots a performance chart for a given stock or portfolio over a specified time frame.
+   * The chart displays the value changes over time, represented by asterisks, where
+   * the scale and number of asterisks are dynamically calculated to fit the data range.
+   *
+   * @param identifier The stock symbol or portfolio name to plot.
+   * @param startDate The start date of the period to plot.
+   * @param endDate The end date of the period to plot.
+   * @throws Exception If any error occurs during the plotting process.
+   */
 
   public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
     try {
@@ -313,7 +349,8 @@ public class PortfolioService implements PortfolioServiceInterface {
   }
 
 
-  private BigDecimal calculateScale(BigDecimal minValue, BigDecimal maxValue, AtomicReference<String> scaleType) {
+  private BigDecimal calculateScale
+          (BigDecimal minValue, BigDecimal maxValue, AtomicReference<String> scaleType) {
     // Calculate the range of values
     BigDecimal range = maxValue.subtract(minValue);
     BigDecimal scale;

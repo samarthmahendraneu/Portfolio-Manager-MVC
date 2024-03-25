@@ -186,10 +186,25 @@ public class StockService implements StockServiceInterface {
 
   private void updateCacheWithApiData(String symbol) {
     String apiResponse = makeApiRequest(symbol); // Your method to fetch data
-    parseAndCacheCsvData(apiResponse, symbol);   // Assuming this method parses the CSV and updates the cache
+    parseAndCacheCsvData(apiResponse, symbol);
   }
 
-  public SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
+  /**
+   * Fetches the closing prices for a given stock symbol over a specified period
+   * at a monthly resolution.
+   * It dynamically adjusts the resolution based on the start and end date
+   * to optimize data representation.
+   * The method checks the cache first and updates it with API data if necessary.
+   *
+   * @param symbol The symbol of the stock.
+   * @param startDate The start date of the period.
+   * @param endDate The end date of the period.
+   * @return A sorted map where keys are dates (end of the month) and values
+   * are the closing prices of the stock.
+   */
+
+  public SortedMap<LocalDate, BigDecimal>
+  fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
     // Determine resolution based on the period
     String resolution = determineResolution(startDate, endDate);
 
@@ -233,18 +248,22 @@ public class StockService implements StockServiceInterface {
     }
   }
 
-  private LocalDate getTargetDateBasedOnResolution(LocalDate date, String resolution, LocalDate endDate) {
+  private LocalDate getTargetDateBasedOnResolution
+          (LocalDate date, String resolution, LocalDate endDate) {
     switch (resolution) {
       case "daily":
         return date;
       case "monthly":
         return DateUtils.getLastWorkingDayOfMonth(date);
       case "every 3 months":
-        LocalDate endOfQuarter = date.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
-        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate) ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
+        LocalDate endOfQuarter
+                = date.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
+        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate)
+                ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
       case "yearly":
         LocalDate endOfYear = date.with(TemporalAdjusters.lastDayOfYear());
-        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate) ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
+        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate)
+                ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
       default:
         throw new IllegalArgumentException("Unknown resolution: " + resolution);
     }
@@ -264,13 +283,32 @@ public class StockService implements StockServiceInterface {
         throw new IllegalArgumentException("Unknown resolution: " + resolution);
     }
   }
+
+  /**
+   * Finds the earliest stock purchase date in a given portfolio.
+   * This can be used to determine the start point for plotting or calculating portfolio values.
+   *
+   * @param portfolio The portfolio from which to find the earliest stock purchase date.
+   * @return The earliest date on which a stock was purchased within the given portfolio.
+   * @throws IllegalStateException If the portfolio does not contain any stocks.
+   */
+
   public LocalDate findEarliestStockDate(PortfolioInterface portfolio) {
     return portfolio.getStocks().stream()
             .map(Tradable::getPurchaseDate)
             .min(LocalDate::compareTo)
-            .orElseThrow(() -> new IllegalStateException("No stocks found in portfolio: " + portfolio.getName()));
+            .orElseThrow(() -> new IllegalStateException("No stocks found in portfolio: "
+                    + portfolio.getName()));
   }
 
+  /**
+   * Saves the current state of the stock data cache to a file.
+   * This allows the cached data to persist beyond the application's runtime,
+   * enabling faster data retrieval without the need for repeated API calls.
+   *
+   * @param filepath The path of the file where the cache should be saved.
+   * @throws Exception If an error occurs during the saving process.
+   */
 
   public void saveCache(String filepath)
   {
@@ -282,6 +320,16 @@ public class StockService implements StockServiceInterface {
     throw e;
     }
   }
+
+  /**
+   * Loads stock data into the cache from a previously saved file.
+   * This method is used at the start of the application to quickly populate the cache
+   * with data that was saved during a previous run, reducing the need for initial API calls.
+   *
+   * @param filepath The path of the file from which to load the cache.
+   * @throws Exception If an error occurs during the loading process.
+   */
+
   public void loadCache(String filepath)
   {
     try {
