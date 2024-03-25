@@ -53,7 +53,7 @@ public interface Tradable {
   /**
    * Calculate Money Invested in the tradable asset.
    */
-  BigDecimal calculateInvestment();
+  BigDecimal calculateInvestment(LocalDate date);
 
 
   /**

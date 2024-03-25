@@ -84,6 +84,34 @@ public class PortfolioController implements PortfolioControllerInterface {
   }
 
   /**
+   * Calculate total investment in a perticular portfolio by a given date.
+   * @param name name of the portfolio
+   * @param onDate date
+   * @return total investment
+   */
+  public Payload calculateTotalInvestment(String name, LocalDate onDate) {
+    try {
+      return new Payload(this.portfolioService.calculatePortfolioInvestment(name, onDate), "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
+  }
+
+  /**
+   * Sell a specific number of shares of a specific stock on a specified date from a given portfolio
+   */
+  public Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol, int quantity,
+      LocalDate date) {
+    try {
+      return new Payload(
+          this.portfolioService.sellStockFromPortfolio(portfolio.getName(), stockSymbol, quantity,
+              date), "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
+  }
+
+  /**
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path where the portfolios will be saved.

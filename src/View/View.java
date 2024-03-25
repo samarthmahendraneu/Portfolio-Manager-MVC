@@ -27,7 +27,9 @@ public class View {
     out.append("7. Graph\n");
     out.append("8. Save Cache\n");
     out.append("9. Load Cache\n");
-    out.append("6. Sell stocks from \n");
+    out.append("10. Add Stock to Portfolio\n");
+    out.append("11. Sell Stock from Portfolio\n");
+    out.append("12. Calculate Investment\n");
     out.append("Select an option: ");
   }
 
@@ -99,6 +101,24 @@ public class View {
    */
   public void displayLoadSuccess(Appendable out) throws IOException {
     out.append("Portfolios have been loaded successfully.\n");
+  }
+
+  /**
+   * Displace displayStockAdded
+   */
+  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity,  Appendable out) throws IOException {
+    out.append("Stock ").append(stockSymbol).append(" with quantity ")
+        .append(String.valueOf(quantity))
+        .append(" added to portfolio ").append(portfolioName).append("\n");
+  }
+
+  /**
+   * Display a success message for selling stocks.
+   */
+  public void displayStockSold(String portfolioName, String symbol, int quantity, Appendable out) throws IOException {
+    out.append("Stock ").append(symbol).append(" with quantity ")
+        .append(String.valueOf(quantity))
+        .append(" sold from portfolio ").append(portfolioName).append("\n");
   }
 
   /**

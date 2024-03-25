@@ -123,12 +123,13 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param quantity      The quantity of the stock to sell.
    * @param date          The date of the sale.
    */
-  public void sellStockFromPortfolio(String portfolioName, String stockSymbol, int quantity,
+  public Boolean sellStockFromPortfolio(String portfolioName, String stockSymbol, int quantity,
       LocalDate date) {
     getPortfolioByName(portfolioName).ifPresent(portfolio -> {
       portfolio.sellStock(stockSymbol, quantity, date,
           (BigDecimal) stockService.fetchPriceOnDate(stockSymbol, date).getData());
     });
+    return true;
   }
 
   /**
@@ -154,6 +155,19 @@ public class PortfolioService implements PortfolioServiceInterface {
   public Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate) {
     validatePortfolioValueInput(portfolioName, onDate);
     return getPortfolioByName(portfolioName).map(p -> p.calculateValue(this.stockService, onDate));
+  }
+
+  /**
+   * Calculates the total investment in a portfolio on a given date.
+   * @param portfolioName The name of the portfolio.
+   * @param onDate The date for which the investment is to be calculated.
+   * @return The total investment in the portfolio on the given date.
+   * @throws IllegalArgumentException If date is in the future or portfolio not found.
+   */
+  public Optional<BigDecimal> calculatePortfolioInvestment(String portfolioName, LocalDate onDate) {
+    validatePortfolioValueInput(portfolioName, onDate);
+    return getPortfolioByName(portfolioName).map(
+        p -> p.calculateInvestment(onDate));
   }
 
   private void validatePortfolioValueInput(String portfolioName, LocalDate onDate) {

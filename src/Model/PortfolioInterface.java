@@ -53,5 +53,5 @@ public interface PortfolioInterface {
    * Calculate investment in the portfolio.
    * @return The total investment in the portfolio.
    */
-  BigDecimal calculateInvestment();
+  BigDecimal calculateInvestment(LocalDate date);
 }

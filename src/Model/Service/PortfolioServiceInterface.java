@@ -60,6 +60,17 @@ public interface PortfolioServiceInterface {
   Optional<BigDecimal> calculatePortfolioValue(String portfolioName, LocalDate onDate);
 
   /**
+   * Sells a stock from a portfolio with the given symbol, quantity, and date.
+   */
+  Boolean sellStockFromPortfolio(String portfolioName, String stockSymbol, int quantity,
+      LocalDate date);
+
+  /**
+   * Calculates the total investment in a portfolio by a given date.
+   */
+  Optional<BigDecimal> calculatePortfolioInvestment(String portfolioName, LocalDate onDate);
+
+  /**
    * Returns a list of all portfolio names.
    *
    * @return A list of all portfolio names.
@@ -109,7 +120,7 @@ public interface PortfolioServiceInterface {
    * is then returned in a sorted map for easy consumption.
    *
    *
-   * @param symbol The stock symbol for which closing prices are to be fetched.
+   * @param identifier The stock symbol for which closing prices are to be fetched.
    * @param startDate The start date of the period for which data is required. This is inclusive.
    * @param endDate The end date of the period for which data is required. This is inclusive.
    * @return A SortedMap where keys are LocalDate objects representing the end of each month.
