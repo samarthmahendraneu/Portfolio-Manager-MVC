@@ -31,12 +31,35 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public PortfolioMenuController(PortfolioControllerInterface portfolioController, View view) {
     this.portfolioController = portfolioController;
     this.view = view;
+    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
+    try {
+      portfolioController.loadCache(cacheFilePath);
+      System.out.println("Cache loaded successfully.");
+    } catch (Exception e) {
+      System.err.println("Failed to load cache: " + e.getMessage());
+    }
+  }
+  private void addShutdownHookForCache() {
+    // Specify the cache file path
+    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
+
+    // Add shutdown hook
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        portfolioController.saveCache(cacheFilePath);
+        System.out.println("Cache saved successfully.");
+      } catch (Exception e) {
+        System.err.println("Failed to save cache: " + e.getMessage());
+        // Handle the failure to save cache appropriately
+      }
+    }));
   }
 
   /**
    * Displays the main menu and handles user input for various portfolio operations.
    */
   public void displayMainMenu() {
+    addShutdownHookForCache();
     boolean running = true;
     while (running) {
       try {
