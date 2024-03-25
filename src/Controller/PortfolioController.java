@@ -14,6 +14,8 @@ import java.time.LocalDate;
 public class PortfolioController implements PortfolioControllerInterface {
 
   private final PortfolioServiceInterface portfolioService;
+  private final StockServiceInterface stockServiceInterface;
+
 
   /**
    * Constructor for the PortfolioControllerBasic class.
@@ -22,6 +24,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    */
   public PortfolioController(StockServiceInterface stockService) {
     this.portfolioService = new PortfolioService(stockService);
+    this.stockServiceInterface = stockService;
   }
 
   /**
@@ -89,6 +92,24 @@ public class PortfolioController implements PortfolioControllerInterface {
   public Payload savePortfolio(String filePath) throws IllegalArgumentException {
     try {
       this.portfolioService.savePortfoliosToCSV(filePath);
+      return new Payload(null, "");
+    } catch (Exception e) {
+      return new Payload(null, e.getMessage());
+    }
+  }
+
+  public Payload saveCache(String filePath) throws IllegalArgumentException {
+    try {
+      stockServiceInterface.saveCache(filePath);
+      return new Payload(null, "");
+    } catch (Exception e) {
+      return new Payload(null, e.getMessage());
+    }
+  }
+
+  public Payload loadCache(String filePath) throws IllegalArgumentException {
+    try {
+      stockServiceInterface.loadCache(filePath);
       return new Payload(null, "");
     } catch (Exception e) {
       return new Payload(null, e.getMessage());

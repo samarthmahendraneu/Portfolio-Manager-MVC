@@ -28,4 +28,8 @@ public interface StockServiceInterface {
           (String symbol, LocalDate startMonth, LocalDate endMonth);
 
    LocalDate findEarliestStockDate(PortfolioInterface portfolio);
+   void loadCache(String filepath);
+
+   void saveCache(String filepath);
+
 }

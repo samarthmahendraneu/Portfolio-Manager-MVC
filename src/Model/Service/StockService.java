@@ -271,4 +271,26 @@ public class StockService implements StockServiceInterface {
             .orElseThrow(() -> new IllegalStateException("No stocks found in portfolio: " + portfolio.getName()));
   }
 
+
+  public void saveCache(String filepath)
+  {
+    try {
+      cache.saveCacheToFile(filepath);
+    }
+    catch (Exception e)
+    {
+    throw e;
+    }
+  }
+  public void loadCache(String filepath)
+  {
+    try {
+      cache.loadCacheFromFile(filepath);
+    }
+    catch (Exception e)
+    {
+      throw e;
+    }
+  }
+
 }

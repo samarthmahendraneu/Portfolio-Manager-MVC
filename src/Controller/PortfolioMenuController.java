@@ -66,6 +66,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             break;
           case 7:
             this.CalculateGraph();
+            break;
+          case 8:
+            this.saveStockCache();
+            break;
+          case 9:
+            this.loadStockCache();
           default:
             System.out.println("Invalid option. Please try again.");
         }
@@ -79,47 +85,42 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public void CalculateGraph() {
     LocalDate date, date2;
 
-    System.out.println("Enter new Stock name:");
+    System.out.println("Enter Stock or Portfolio name:");
     String name = scanner.nextLine().trim();
-    System.out.println("Enter date1");
-
-    String dateString = scanner.nextLine().trim();
-    date = LocalDate.parse(dateString);
-    System.out.println("Enter date2");
-
-    String dateString2 = scanner.nextLine().trim();
-    date2 = LocalDate.parse(dateString2);
-
+    System.out.println("Enter Start Date");
+    date = dateValidator();
+    System.out.println("Enter End Date");
+    date2 = dateValidator();
     portfolioController.GenGraph(name, date, date2);
   }
 
-  public void GraphPortfolio()
+
+  private static LocalDate dateValidator()
   {
-    try {
-      LocalDate date, date2;
+    LocalDate date ;
 
-      view.displayAvailablePortfolios(
-              portfolioController.getPortfolioService().listPortfolioNames(), System.out);
-      System.out.println("Enter the name of the portfolio to examine:");
-      String name = scanner.nextLine().trim();
-      PortfolioInterface portfolio = portfolioController.getPortfolioService()
-              .getPortfolioByName(name).orElse(null);
-
-      if (portfolio != null) {
-        System.out.println("Enter date1");
-
-        String dateString = scanner.nextLine().trim();
+    while (true) {
+      System.out.println("Enter the purchase date (YYYY-MM-DD):");
+      String dateString = scanner.nextLine().trim();
+      try {
         date = LocalDate.parse(dateString);
-        System.out.println("Enter date2");
-
-        String dateString2 = scanner.nextLine().trim();
-        date2 = LocalDate.parse(dateString2);      } else {
-        System.out.println("Portfolio not found.");
+      } catch (Exception e) {
+        System.out.println("Invalid date format. Please try again.");
+        continue;
       }
-    } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      date = LocalDate.parse(dateString);
+      if (!date.isBefore(LocalDate.now())) {
+        System.out.println("Date must be before today. Please try again.");
+        continue;
+      }
+      DayOfWeek dayOfWeek = date.getDayOfWeek();
+      if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+        System.out.println("Date must be on a weekday. Please try again.");
+        continue;
+      }
+      break;
     }
+    return date;
   }
 
   /**
@@ -271,6 +272,44 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       System.out.println("Enter the file path to load portfolios from:");
       String filePath = scanner.nextLine().trim();
       Payload payload = portfolioController.loadPortfolio(filePath);
+      if (Objects.nonNull(payload) && payload.isError()) {
+        System.out.println("Error: " + payload);
+        return;
+      }
+      view.displayLoadSuccess(System.out);
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
+  }
+
+  /**
+   * Saves the portfolio to a specified file path.
+   */
+  public void saveStockCache() {
+    try {
+      System.out.println("Enter the file path to save the cache:");
+      String filePath = scanner.nextLine().trim();
+      Payload payload = portfolioController.saveCache(filePath);
+      if (payload.isError()) {
+        System.out.println("Error: " + payload.getMessage());
+        return;
+      }
+      view.displaySaveSuccess(filePath, System.out);
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
+  }
+
+  /**
+   * Loads portfolios from a specified file path.
+   */
+  public void loadStockCache() {
+    try {
+      System.out.println("Enter the file path to load portfolios from:");
+      String filePath = scanner.nextLine().trim();
+      Payload payload = portfolioController.loadCache(filePath);
       if (Objects.nonNull(payload) && payload.isError()) {
         System.out.println("Error: " + payload);
         return;

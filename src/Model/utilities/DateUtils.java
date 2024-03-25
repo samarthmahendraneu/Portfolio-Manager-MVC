@@ -2,6 +2,8 @@ package Model.utilities;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 
 public class DateUtils {
 
@@ -43,4 +45,47 @@ public class DateUtils {
     }
     return date; // No adjustment needed for weekdays
   }
+
+  public static String determineResolution(LocalDate startDate, LocalDate endDate) {
+    long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+    if (daysBetween <= 30) {
+      return "daily";
+    } else if (daysBetween <= 540) { // Up to 18 months
+      return "monthly";
+    } else if (daysBetween <= 1825) { // Up to 5 years
+      return "every 3 months";
+    } else {
+      return "yearly";
+    }
+  }
+
+  public static LocalDate getTargetDateBasedOnResolution(LocalDate currentDate, String resolution, LocalDate endDate) {
+    LocalDate targetDate;
+    switch (resolution) {
+      case "daily":
+        targetDate = currentDate; // For daily, the target date is the current date itself.
+        break;
+      case "monthly":
+        // Calculate the last day of the current month or endDate, whichever is earlier.
+        LocalDate endOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfMonth.isBefore(endDate) ? endOfMonth : endDate;
+        break;
+      case "every 3 months":
+        // Calculate the last day of the current quarter.
+        LocalDate endOfQuarter = currentDate.with(TemporalAdjusters.lastDayOfMonth())
+                .plusMonths(2) // Move to the last month of the current quarter.
+                .with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfQuarter.isBefore(endDate) ? endOfQuarter : endDate;
+        break;
+      case "yearly":
+        // Calculate the last day of the current year.
+        LocalDate endOfYear = currentDate.with(TemporalAdjusters.lastDayOfYear());
+        targetDate = endOfYear.isBefore(endDate) ? endOfYear : endDate;
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported resolution: " + resolution);
+    }
+    return targetDate;
+  }
+
 }
