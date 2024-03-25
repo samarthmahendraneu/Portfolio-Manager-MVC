@@ -72,6 +72,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             break;
           case 9:
             this.loadStockCache();
+          case 10:
+            // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
+            this.addStockToPortfolio();
+          case 11:
+            // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
+            this.sellStockFromPortfolio();
+          case 12:
+            // the total amount of money invested in a portfolio) by a specific date.
+            this.calculateInvestment();
           default:
             System.out.println("Invalid option. Please try again.");
         }
@@ -190,6 +199,98 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
     System.out.println("Portfolio '" + name + "' has been created and populated.");
   }
+
+  /**
+   * Purchase a specific number of shares of a specific stock on a specified date, and add them to the
+   * portfolio.
+   */
+  public void addStockToPortfolio() {
+    try {
+      view.displayAvailablePortfolios(
+          portfolioController.getPortfolioService().listPortfolioNames(), System.out);
+      System.out.println("Enter the name of the portfolio to add the stock to:");
+      String portfolioName = scanner.nextLine().trim();
+      System.out.println("Enter the stock symbol:");
+      String symbol = scanner.nextLine().trim();
+      System.out.println("Enter the quantity of the stock:");
+      int quantity = scanner.nextInt();
+      scanner.nextLine(); // Consume newline
+      System.out.println("Enter the purchase date (YYYY-MM-DD):");
+      String dateString = scanner.nextLine().trim();
+      LocalDate date = LocalDate.parse(dateString);
+      // get the portfolio by name
+      PortfolioInterface portfolio = portfolioController.getPortfolioService()
+          .getPortfolioByName(portfolioName).orElse(null);
+      Payload payload = portfolioController.addStockToPortfolio(portfolio, symbol, quantity, date);
+      if (this.printIfError(payload)) {
+        return;
+      }
+      view.displayStockAdded(portfolioName, symbol, quantity, System.out);
+    } catch (Exception e) {
+      System.out.println("Error adding stock to portfolio: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
+  }
+
+  /**
+   * Sell a specific number of shares of a specific stock on a specified date from a given portfolio.
+   *
+   */
+  public void sellStockFromPortfolio() {
+    try {
+      view.displayAvailablePortfolios(
+          portfolioController.getPortfolioService().listPortfolioNames(), System.out);
+      System.out.println("Enter the name of the portfolio to sell the stock from:");
+      String portfolioName = scanner.nextLine().trim();
+      System.out.println("Enter the stock symbol:");
+      String symbol = scanner.nextLine().trim();
+      System.out.println("Enter the quantity of the stock:");
+      int quantity = scanner.nextInt();
+      scanner.nextLine(); // Consume newline
+      System.out.println("Enter the purchase date (YYYY-MM-DD):");
+      String dateString = scanner.nextLine().trim();
+      LocalDate date = LocalDate.parse(dateString);
+      // get the portfolio by name
+      PortfolioInterface portfolio = portfolioController.getPortfolioService()
+          .getPortfolioByName(portfolioName).orElse(null);
+      Payload payload = portfolioController.sellStockFromPortfolio(portfolio, symbol, quantity,
+          date);
+      if (this.printIfError(payload)) {
+        return;
+      }
+      view.displayStockSold(portfolioName, symbol, quantity, System.out);
+    } catch (Exception e) {
+      System.out.println("Error selling stock from portfolio: " + e.getMessage());
+      scanner.nextLine(); // Consume newline
+    }
+  }
+
+  /**
+   * Calculate the total amount of money invested in a portfolio by a specific date.
+   */
+public void calculateInvestment() {
+  try {
+    System.out.println("Enter the name of the portfolio:");
+    String name = scanner.nextLine().trim();
+    System.out.println("Enter the date (YYYY-MM-DD) to calculate the investment:");
+    String dateInput = scanner.nextLine().trim();
+    Payload payload = portfolioController.calculateTotalInvestment(name, LocalDate.parse(dateInput));
+    if (this.printIfError(payload)) {
+      return;
+    }
+
+    Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
+    if (portfolioValue.isPresent()) {
+      BigDecimal value = portfolioValue.get();
+      view.displayPortfolioValue(name, dateInput, value.toString(), System.out);
+    } else {
+      System.out.println("No value found for the portfolio '" + name + "' on " + dateInput);
+    }
+  } catch (Exception e) {
+    System.out.println("Error calculating portfolio value: " + e.getMessage());
+    scanner.nextLine(); // Consume newline
+  }
+}
 
   /**
    * Allows the user to examine details of a specific portfolio, such as its stocks and their

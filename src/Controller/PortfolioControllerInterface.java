@@ -42,6 +42,17 @@ public interface PortfolioControllerInterface {
   Payload calculatePortfolioValue(String name, LocalDate onDate);
 
   /**
+   * Calculate total investment in a perticular portfolio by a given date.
+   */
+  Payload calculateTotalInvestment(String name, LocalDate onDate);
+
+  /**
+   * Buys a stock with the given symbol and quantity on the given date at the given price.
+   */
+  Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol, int quantity,
+      LocalDate date);
+
+  /**
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path where the portfolios will be saved.

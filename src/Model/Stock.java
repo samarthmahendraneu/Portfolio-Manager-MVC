@@ -104,11 +104,12 @@ public class Stock implements Tradable {
   }
 
   /**
-   * Get money invested in this stock from the purchase history.
+   * Get money invested in this stock from the purchase history on a given date.
    */
-  public BigDecimal calculateInvestment() {
-    return purchaseHistory.values().stream().map(PurchangeInfo::getPrice)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  public BigDecimal calculateInvestment(LocalDate date) {
+    return purchaseHistory.entrySet().stream().filter(entry -> entry.getKey().isBefore(date))
+            .map(entry -> entry.getValue().getPrice())
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   /**

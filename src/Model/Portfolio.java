@@ -44,9 +44,7 @@ public class Portfolio implements PortfolioInterface {
    */
   public void addStock(String symbol, int quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
     // check if the stock is already in the portfolio - > s.buy else new Stock
-    this.stocks.stream().filter(s -> s.getSymbol().equals(symbol)).findFirst().ifPresentOrElse(s -> s.buy(quantity, purchaseDate, purchasePrice), () -> {
-      this.stocks.add(new Stock(symbol, quantity, purchasePrice, purchaseDate));
-    });
+    this.stocks.stream().filter(s -> s.getSymbol().equals(symbol)).findFirst().ifPresentOrElse(s -> s.buy(quantity, purchaseDate, purchasePrice), () -> this.stocks.add(new Stock(symbol, quantity, purchasePrice, purchaseDate)));
   }
 
   /**
@@ -71,7 +69,8 @@ public class Portfolio implements PortfolioInterface {
   /**
    * calculates the total value of the portfolio on a given date.
    *
-   * @param date
+   * @param stockService The stock service to use to fetch stock prices.
+   * @param date         The date on which to calculate the value.
    */
   @Override
   public BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date) {
@@ -84,11 +83,9 @@ public class Portfolio implements PortfolioInterface {
   /**
    * Get Money invested in this portfolio.
    */
-  public BigDecimal calculateInvestment() {
+  public BigDecimal calculateInvestment(LocalDate date) {
     BigDecimal investment = BigDecimal.ZERO;
-    this.stocks.stream().forEach(s -> {
-      investment.add(s.calculateInvestment());
-    });
+    this.stocks.forEach(s -> investment.add(s.calculateInvestment(date)));
     return investment;
   }
 
