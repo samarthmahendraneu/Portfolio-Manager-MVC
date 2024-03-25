@@ -9,42 +9,61 @@ import java.util.List;
  * View class for the Portfolio Management System.
  */
 public class View {
+  
+  private final Appendable out;
+  public View() {
+    this.out = System.out;
+  }
+
+
+  /**
+   * This method writes a message to the appendable.
+   *
+   * @param message the message to write.
+   * @throws IllegalStateException if there is an error in writing.
+   */
+  public void writeMessage(String message) throws IllegalStateException {
+    try {
+      this.out.append(message);
+
+    } catch (IOException e) {
+      throw new IllegalStateException(e.getMessage());
+    }
+  }
 
   /**
    * Display the main menu options.
    *
-   * @param out The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayMainMenu(Appendable out) throws IOException {
-    out.append("\nPortfolio Management System:\n");
-    out.append("1. Create a new portfolio\n");
-    out.append("2. Examine a portfolio\n");
-    out.append("3. Calculate portfolio value\n");
-    out.append("4. Save portfolio\n");
-    out.append("5. Load portfolio\n");
-    out.append("6. Exit\n");
-    out.append("7. Graph\n");
-    out.append("8. Save Cache\n");
-    out.append("9. Load Cache\n");
-    out.append("10. Add Stock to Portfolio\n");
-    out.append("11. Sell Stock from Portfolio\n");
-    out.append("12. Calculate Investment\n");
-    out.append("Select an option: ");
+  public void displayMainMenu() throws IOException {
+    this.out.append("\nPortfolio Management System:\n");
+    this.out.append("1. Create a new portfolio\n");
+    this.out.append("2. Examine a portfolio\n");
+    this.out.append("3. Calculate portfolio value\n");
+    this.out.append("4. Save portfolio\n");
+    this.out.append("5. Load portfolio\n");
+    this.out.append("6. Exit\n");
+    this.out.append("7. Graph\n");
+    this.out.append("8. Save Cache\n");
+    this.out.append("9. Load Cache\n");
+    this.out.append("10. Add Stock to Portfolio\n");
+    this.out.append("11. Sell Stock from Portfolio\n");
+    this.out.append("12. Calculate Investment\n");
+    this.out.append("Select an option: ");
   }
 
   /**
    * Display available portfolios.
    *
    * @param portfolioNames The names of the available portfolios.
-   * @param out            The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayAvailablePortfolios(List<String> portfolioNames, Appendable out)
+  public void displayAvailablePortfolios(List<String> portfolioNames)
       throws IOException {
-    out.append("Available portfolios:\n");
+    this.out.append("Available portfolios:\n");
     for (String name : portfolioNames) {
-      out.append(name).append("\n");
+      this.out.append(name).append("\n");
     }
   }
 
@@ -53,14 +72,13 @@ public class View {
    *
    * @param name   The name of the portfolio.
    * @param stocks The stocks in the portfolio.
-   * @param out    The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayPortfolioDetails(String name, List<Tradable> stocks, Appendable out)
+  public void displayPortfolioDetails(String name, List<Tradable> stocks)
       throws IOException {
-    out.append("Stocks in ").append(name).append(":\n");
+    this.out.append("Stocks in ").append(name).append(":\n");
     for (Tradable stock : stocks) {
-      out.append(stock.getSymbol()).append(" - Quantity: ")
+      this.out.append(stock.getSymbol()).append(" - Quantity: ")
           .append(String.valueOf(stock.getQuantity()))
           .append(", Purchase Price: ").append(String.valueOf(stock.getPurchasePrice()))
           .append(", Purchase Date: ").append(stock.getPurchaseDate().toString()).append("\n");
@@ -73,12 +91,11 @@ public class View {
    * @param name  The name of the portfolio.
    * @param date  The date for which the value is to be calculated.
    * @param value The value of the portfolio.
-   * @param out   The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayPortfolioValue(String name, String date, String value, Appendable out)
+  public void displayPortfolioValue(String name, String date, String value)
       throws IOException {
-    out.append("Value of the portfolio '").append(name).append("' on ").append(date).append(": ")
+    this.out.append("Value of the portfolio '").append(name).append("' on ").append(date).append(": ")
         .append(value).append("\n");
   }
 
@@ -86,28 +103,26 @@ public class View {
    * Display a success message for saving portfolios.
    *
    * @param filePath The file path where the portfolios were saved.
-   * @param out      The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
   public void displaySaveSuccess(String filePath, Appendable out) throws IOException {
-    out.append("Portfolios have been saved successfully to ").append(filePath).append("\n");
+    this.out.append("Portfolios have been saved successfully to ").append(filePath).append("\n");
   }
 
   /**
    * Display a success message for loading portfolios.
    *
-   * @param out The output to write to.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayLoadSuccess(Appendable out) throws IOException {
-    out.append("Portfolios have been loaded successfully.\n");
+  public void displayLoadSuccess() throws IOException {
+    this.out.append("Portfolios have been loaded successfully.\n");
   }
 
   /**
    * Displace displayStockAdded
    */
-  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity,  Appendable out) throws IOException {
-    out.append("Stock ").append(stockSymbol).append(" with quantity ")
+  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity) throws IOException {
+    this.out.append("Stock ").append(stockSymbol).append(" with quantity ")
         .append(String.valueOf(quantity))
         .append(" added to portfolio ").append(portfolioName).append("\n");
   }
@@ -115,8 +130,8 @@ public class View {
   /**
    * Display a success message for selling stocks.
    */
-  public void displayStockSold(String portfolioName, String symbol, int quantity, Appendable out) throws IOException {
-    out.append("Stock ").append(symbol).append(" with quantity ")
+  public void displayStockSold(String portfolioName, String symbol, int quantity) throws IOException {
+    this.out.append("Stock ").append(symbol).append(" with quantity ")
         .append(String.valueOf(quantity))
         .append(" sold from portfolio ").append(portfolioName).append("\n");
   }
@@ -124,11 +139,10 @@ public class View {
   /**
    * Display an error message.
    *
-   * @param out          The output to write to.
    * @param errorMessage The error message to display.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayError(String errorMessage, Appendable out) throws IOException {
-    out.append("Error: ").append(errorMessage).append("\n");
+  public void displayError(String errorMessage) throws IOException {
+    this.out.append("Error: ").append(errorMessage).append("\n");
   }
 }
