@@ -75,7 +75,7 @@ public interface PortfolioControllerInterface {
    */
   int getNumPortfolios();
 
-   void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
+  void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 
   Payload saveCache(String filePath);
   Payload loadCache(String filePath);

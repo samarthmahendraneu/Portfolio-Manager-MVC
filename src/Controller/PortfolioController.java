@@ -98,6 +98,12 @@ public class PortfolioController implements PortfolioControllerInterface {
     }
   }
 
+  /**
+   * Saves the cache to a CSV file at the given file path.
+   *
+   * @param filePath The file path where the cache will be saved.
+   * @throws IllegalArgumentException if there is an error saving the cache to the file.
+   */
   public Payload saveCache(String filePath) throws IllegalArgumentException {
     try {
       stockServiceInterface.saveCache(filePath);
@@ -107,6 +113,12 @@ public class PortfolioController implements PortfolioControllerInterface {
     }
   }
 
+  /**
+   * loads the cache from a CSV file at the given file path.
+   *
+   * @param filePath The file path from where the cache will be loaded.
+   * @throws IllegalArgumentException if there is an error loading the cache from the file.
+   */
   public Payload loadCache(String filePath) throws IllegalArgumentException {
     try {
       stockServiceInterface.loadCache(filePath);
@@ -139,7 +151,8 @@ public class PortfolioController implements PortfolioControllerInterface {
   }
 
 
-  public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate) throws IllegalArgumentException {
+  public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate)
+          throws IllegalArgumentException {
     try {
       this.portfolioService.plotPerformanceChart(identifier,startDate,endDate);
     } catch (Exception e) {
