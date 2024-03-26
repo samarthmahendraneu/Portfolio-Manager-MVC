@@ -17,9 +17,12 @@ public class Main {
     PortfolioControllerInterface portfolioController = new PortfolioController(
         new StockService("FIR1DN0VB7SQ4SGD"));
     View view = new View();
-    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
+    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController,
+        view);
     // interaction with the user
     // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [Model]
+    controller.loadStockCache();
     controller.displayMainMenu();
+
   }
 }

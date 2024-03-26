@@ -1,8 +1,10 @@
 package Model;
 
+import Model.Transactions.TranactionInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import Model.Service.StockServiceInterface;
+import java.util.Map;
 
 /**
  * Interface for the Tradable class.
@@ -23,19 +25,6 @@ public interface Tradable {
    */
   int getQuantity();
 
-  /**
-   * Getter for the purchase price of the tradable asset.
-   *
-   * @return The purchase price of the tradable asset.
-   */
-  BigDecimal getPurchasePrice();
-
-  /**
-   * Getter for the purchase date of the tradable asset.
-   *
-   * @return The purchase date of the tradable asset.
-   */
-  LocalDate getPurchaseDate();
 
   /**
    * Updates the quantity of the tradable asset.
@@ -60,6 +49,11 @@ public interface Tradable {
    * Calculate the value of the tradable asset on a given date.
    */
   BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date);
+
+  /**
+   * Getter for activity of the tradable asset.
+   */
+  Map<LocalDate, TranactionInfo> getActivityLog();
 
 
 

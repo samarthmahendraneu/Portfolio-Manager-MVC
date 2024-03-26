@@ -8,13 +8,10 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import Model.PortfolioInterface;
 import Model.utilities.DateUtils;
 import Model.utilities.StockDataCache;
@@ -299,11 +296,17 @@ public class StockService implements StockServiceInterface {
    */
 
   public LocalDate findEarliestStockDate(PortfolioInterface portfolio) {
-    return portfolio.getStocks().stream()
-            .map(Tradable::getPurchaseDate)
-            .min(LocalDate::compareTo)
-            .orElseThrow(() -> new IllegalStateException("No stocks found in portfolio: "
-                    + portfolio.getName()));
+    LocalDate earliestDate = null;
+    for (Tradable stock : portfolio.getStocks()) {
+      LocalDate stockDate = stock.getActivityLog().keySet().stream().min(LocalDate::compareTo).orElse(null);
+      if (earliestDate == null || (stockDate != null && stockDate.isBefore(earliestDate))) {
+        earliestDate = stockDate;
+      }
+    }
+    if (earliestDate == null) {
+      throw new IllegalStateException("Portfolio does not contain any stocks.");
+    }
+    return earliestDate;
   }
 
   /**
