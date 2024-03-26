@@ -2,7 +2,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 import Controller.Payload;
 import Controller.PortfolioControllerInterface;
 import Model.PortfolioInterface;
@@ -82,7 +81,7 @@ public class PortfolioControllerTest {
 
     Stock stock = new Stock("AAPL", 10, new BigDecimal("100.00"), LocalDate.now());
     portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), stock.getQuantity(),
-        stock.getPurchaseDate());
+        LocalDate.now());
     assertEquals(1, portfolio.getStocks().size());
   }
 
@@ -97,7 +96,7 @@ public class PortfolioControllerTest {
     Tradable stock = new Stock("AAPL", 0, new BigDecimal("100.00"), LocalDate.now());
     payload = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
         stock.getQuantity(),
-        stock.getPurchaseDate());
+        LocalDate.now());
     assertEquals("Quantity must be positive: 0", payload.getMessage());
 
   }
@@ -112,7 +111,7 @@ public class PortfolioControllerTest {
     Tradable stock = new Stock("AAPL", -10, new BigDecimal("100.00"), LocalDate.now());
     Payload paylpad = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
         stock.getQuantity(),
-        stock.getPurchaseDate());
+        LocalDate.now());
     assertEquals("Quantity must be positive: -10", paylpad.getMessage());
   }
 
@@ -169,7 +168,8 @@ public class PortfolioControllerTest {
     portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-06"));
     payload = portfolioController.calculatePortfolioValue("Test Portfolio",
         LocalDate.parse("2024-02-02"));
-    assertEquals(BigDecimal.ZERO, ((Optional<BigDecimal>) payload.getData()).get());
+    BigDecimal bigDecimal1 = new BigDecimal("0.00");
+    assertEquals(0, bigDecimal1.compareTo(((Optional<BigDecimal>) payload.getData()).get()));
   }
 
   /**
@@ -197,7 +197,6 @@ public class PortfolioControllerTest {
    */
   @Test
   public void testCalculatePortfolioValue_Sunday() {
-    // examine value on sunday February 4 should be same as February 2
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
     portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-04"));
@@ -402,21 +401,6 @@ public class PortfolioControllerTest {
         ((Optional<BigDecimal>) result.getData()).orElse(BigDecimal.valueOf(-1)));
   }
 
-  /**
-   * Adding a stock which already exists.
-   */
-  @Test
-  public void testAddDuplicateStockForSameDate() {
-    String portfolioName = "DupStockPortfolio";
-    portfolioController.createNewPortfolio(portfolioName);
-    LocalDate purchaseDate = LocalDate.now().minusDays(5);
-    portfolioController.addStockToPortfolio(new Portfolio(portfolioName), "GOOGL", 5, purchaseDate);
-    Payload result = portfolioController.addStockToPortfolio(
-        new Portfolio(portfolioName), "GOOGL", 5, purchaseDate);
-
-    assertTrue(result.isError());
-    assertTrue(result.getMessage().contains("Stock already exists"));
-  }
 
   /**
    * Test reading from a non existent file.

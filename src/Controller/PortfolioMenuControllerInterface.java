@@ -35,4 +35,10 @@ public interface PortfolioMenuControllerInterface {
    */
   void loadPortfolio();
 
+  /**
+   * Load the stock cache.
+   */
+  void loadStockCache();
+
+
 }

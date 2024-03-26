@@ -6,7 +6,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Scanner;
 import Model.PortfolioInterface;
 import View.View;
 
@@ -17,7 +16,6 @@ import View.View;
  */
 public class PortfolioMenuController implements PortfolioMenuControllerInterface {
 
-  private static final Scanner scanner = new Scanner(System.in);
   private final PortfolioControllerInterface portfolioController;
   private final View view;
 
@@ -41,8 +39,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     while (running) {
       try {
         view.displayMainMenu();
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        int choice = this.view.readInt();
 
         switch (choice) {
           case 1:
@@ -62,6 +59,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             break;
           case 6:
             this.view.writeMessage("Exiting...");
+            this.saveStockCache();
             running = false;
             break;
           case 7:
@@ -86,16 +84,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         }
       } catch (Exception e) {
         this.view.writeMessage("Error: " + e.getMessage());
-        scanner.nextLine(); // Consume newline
       }
     }
   }
 
   public void CalculateGraph() {
     LocalDate date, date2;
-
     this.view.writeMessage("Enter Stock or Portfolio name:");
-    String name = scanner.nextLine().trim();
+    String name = this.view.readLine();
     this.view.writeMessage("Enter Start Date");
     date = dateValidator();
     this.view.writeMessage("Enter End Date");
@@ -104,12 +100,11 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
 
-  private LocalDate dateValidator()
-  {
-    LocalDate date ;
+  private LocalDate dateValidator() {
+    LocalDate date;
 
     while (true) {
-      String dateString = scanner.nextLine().trim();
+      String dateString = this.view.readLine().trim();
       try {
         date = LocalDate.parse(dateString);
       } catch (Exception e) {
@@ -135,53 +130,46 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * Create a new portfolio.
    */
   public void createNewPortfolio() {
-    this.view.writeMessage("Enter new portfolio name:");
-    String name = scanner.nextLine().trim();
+    this.view.writeMessage("Enter new portfolio name:\n");
+    String name = this.view.readLine().trim();
     Payload payload = portfolioController.createNewPortfolio(name);
     if (this.printIfError(payload)) {
       return;
     }
     Portfolio newPortfolio = (Portfolio) payload.getData();
     boolean flag = true;
-    this.view.writeMessage("Enter the stocks you want to add to the portfolio");
+    this.view.writeMessage("Enter the stocks you want to add to the portfolio \n");
     int quantity = 0;
     while (flag) {
-      this.view.writeMessage("Enter the stock symbol:");
-      String symbol = scanner.nextLine().trim();
+      this.view.writeMessage("Enter the stock symbol:\n");
+      String symbol = this.view.readLine().trim();
       while (true) {
-        this.view.writeMessage("Enter the quantity of the stock:");
-
-        if (scanner.hasNextInt()) {
-          quantity = scanner.nextInt();
-          scanner.nextLine();
-          if (quantity > 0) {
-            break;
-          } else {
-            this.view.writeMessage("Quantity must be greater than 0");
-          }
+        this.view.writeMessage("Enter the quantity of the stock:\n");
+        quantity = this.view.readInt();
+        if (quantity > 0) {
+          break;
         } else {
-          this.view.writeMessage("Cannot purchase Fractional Shares");
-          scanner.nextLine();
+          this.view.writeMessage("Quantity must be greater than 0\n");
         }
       }
       LocalDate date;
       while (true) {
-        this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):");
-        String dateString = scanner.nextLine().trim();
+        this.view.writeMessage("\nEnter the purchase date (YYYY-MM-DD):\n");
+        String dateString = this.view.readLine().trim();
         try {
           date = LocalDate.parse(dateString);
         } catch (Exception e) {
-          this.view.writeMessage("Invalid date format. Please try again.");
+          this.view.writeMessage("Invalid date format. Please try again.\n");
           continue;
         }
         date = LocalDate.parse(dateString);
         if (!date.isBefore(LocalDate.now())) {
-          this.view.writeMessage("Date must be before today. Please try again.");
+          this.view.writeMessage("Date must be before today. Please try again.\n");
           continue;
         }
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-          this.view.writeMessage("Date must be on a weekday. Please try again.");
+          this.view.writeMessage("Date must be on a weekday. Please try again.\n");
           continue;
         }
         break;
@@ -190,33 +178,33 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       if (this.printIfError(payload)) {
         return;
       }
-      this.view.writeMessage("Press q to exit, Press n to go on");
-      String exitChar = scanner.nextLine().trim();
+      this.view.writeMessage("Press q to exit, Press n to go on: \n");
+      String exitChar = this.view.readLine().trim();
       if (exitChar.equals("q")) {
         flag = false;
       }
 
     }
-    this.view.writeMessage("Portfolio '" + name + "' has been created and populated.");
+    this.view.writeMessage("Portfolio '" + name + "' has been created and populated.\n");
   }
 
   /**
-   * Purchase a specific number of shares of a specific stock on a specified date, and add them to the
-   * portfolio.
+   * Purchase a specific number of shares of a specific stock on a specified date, and add them to
+   * the portfolio.
    */
   public void addStockToPortfolio() {
     try {
       view.displayAvailablePortfolios(
           portfolioController.getPortfolioService().listPortfolioNames());
-      this.view.writeMessage("Enter the name of the portfolio to add the stock to:");
-      String portfolioName = scanner.nextLine().trim();
-      this.view.writeMessage("Enter the stock symbol:");
-      String symbol = scanner.nextLine().trim();
-      this.view.writeMessage("Enter the quantity of the stock:");
-      int quantity = scanner.nextInt();
-      scanner.nextLine(); // Consume newline
-      this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):");
-      String dateString = scanner.nextLine().trim();
+      this.view.writeMessage("Enter the name of the portfolio to add the stock to:\n");
+      String portfolioName = this.view.readLine().trim();
+      this.view.writeMessage("Enter the stock symbol:\n");
+      String symbol = this.view.readLine().trim();
+      this.view.writeMessage("Enter the quantity of the stock to be added:\n");
+      int quantity = this.view.readInt();
+      this.view.readLine(); // Consume newline
+      this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):\n");
+      String dateString = this.view.readLine().trim();
       LocalDate date = LocalDate.parse(dateString);
       // get the portfolio by name
       PortfolioInterface portfolio = portfolioController.getPortfolioService()
@@ -228,27 +216,27 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       view.displayStockAdded(portfolioName, symbol, quantity);
     } catch (Exception e) {
       this.view.writeMessage("Error adding stock to portfolio: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
   /**
-   * Sell a specific number of shares of a specific stock on a specified date from a given portfolio.
-   *
+   * Sell a specific number of shares of a specific stock on a specified date from a given
+   * portfolio.
    */
   public void sellStockFromPortfolio() {
     try {
       view.displayAvailablePortfolios(
           portfolioController.getPortfolioService().listPortfolioNames());
       this.view.writeMessage("Enter the name of the portfolio to sell the stock from:");
-      String portfolioName = scanner.nextLine().trim();
+      String portfolioName = this.view.readLine().trim();
       this.view.writeMessage("Enter the stock symbol:");
-      String symbol = scanner.nextLine().trim();
-      this.view.writeMessage("Enter the quantity of the stock:");
-      int quantity = scanner.nextInt();
-      scanner.nextLine(); // Consume newline
+      String symbol = this.view.readLine().trim();
+      this.view.writeMessage("Enter the quantity of the stock to be sold:");
+      int quantity = this.view.readInt();
+      this.view.readLine(); // Consume newline
       this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):");
-      String dateString = scanner.nextLine().trim();
+      String dateString = this.view.readLine().trim();
       LocalDate date = LocalDate.parse(dateString);
       // get the portfolio by name
       PortfolioInterface portfolio = portfolioController.getPortfolioService()
@@ -261,36 +249,36 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       view.displayStockSold(portfolioName, symbol, quantity);
     } catch (Exception e) {
       this.view.writeMessage("Error selling stock from portfolio: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
   /**
    * Calculate the total amount of money invested in a portfolio by a specific date.
    */
-public void calculateInvestment() {
-  try {
-    this.view.writeMessage("Enter the name of the portfolio:");
-    String name = scanner.nextLine().trim();
-    this.view.writeMessage("Enter the date (YYYY-MM-DD) to calculate the investment:");
-    String dateInput = scanner.nextLine().trim();
-    Payload payload = portfolioController.calculateTotalInvestment(name, LocalDate.parse(dateInput));
-    if (this.printIfError(payload)) {
-      return;
-    }
+  public void calculateInvestment() {
+    try {
+      this.view.writeMessage("Enter the name of the portfolio:");
+      String name = this.view.readLine().trim();
+      this.view.writeMessage("Enter the date (YYYY-MM-DD) to calculate the investment:");
+      String dateInput = this.view.readLine().trim();
+      Payload payload = portfolioController.calculateTotalInvestment(name,
+          LocalDate.parse(dateInput));
+      if (this.printIfError(payload)) {
+        return;
+      }
 
-    Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
-    if (portfolioValue.isPresent()) {
-      BigDecimal value = portfolioValue.get();
-      view.displayPortfolioValue(name, dateInput, value.toString());
-    } else {
-      this.view.writeMessage("No value found for the portfolio '" + name + "' on " + dateInput);
+      Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
+      if (portfolioValue.isPresent()) {
+        BigDecimal value = portfolioValue.get();
+        view.displayPortfolioInvestment(name, dateInput, value.toString());
+      } else {
+        this.view.writeMessage("No value found for the portfolio '" + name + "' on " + dateInput);
+      }
+    } catch (Exception e) {
+      this.view.writeMessage("Error calculating portfolio value: " + e.getMessage());
     }
-  } catch (Exception e) {
-    this.view.writeMessage("Error calculating portfolio value: " + e.getMessage());
-    scanner.nextLine(); // Consume newline
   }
-}
 
   /**
    * Allows the user to examine details of a specific portfolio, such as its stocks and their
@@ -301,7 +289,7 @@ public void calculateInvestment() {
       view.displayAvailablePortfolios(
           portfolioController.getPortfolioService().listPortfolioNames());
       this.view.writeMessage("Enter the name of the portfolio to examine:");
-      String name = scanner.nextLine().trim();
+      String name = this.view.readLine().trim();
       PortfolioInterface portfolio = portfolioController.getPortfolioService()
           .getPortfolioByName(name).orElse(null);
 
@@ -312,7 +300,6 @@ public void calculateInvestment() {
       }
     } catch (Exception e) {
       this.view.writeMessage("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
     }
   }
 
@@ -323,9 +310,9 @@ public void calculateInvestment() {
   public void calculatePortfolioValue() {
     try {
       this.view.writeMessage("Enter the name of the portfolio:");
-      String name = scanner.nextLine().trim();
+      String name = this.view.readLine().trim();
       this.view.writeMessage("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
-      String dateInput = scanner.nextLine().trim();
+      String dateInput = this.view.readLine().trim();
       Payload payload = portfolioController.calculatePortfolioValue(name,
           LocalDate.parse(dateInput));
       if (this.printIfError(payload)) {
@@ -341,7 +328,7 @@ public void calculateInvestment() {
       }
     } catch (Exception e) {
       this.view.writeMessage("Error calculating portfolio value: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
@@ -350,8 +337,8 @@ public void calculateInvestment() {
    */
   public void savePortfolio() {
     try {
-      this.view.writeMessage("Enter the file path to save the portfolio:");
-      String filePath = scanner.nextLine().trim();
+      this.view.writeMessage("Enter the file path to save the portfolio (.csv):");
+      String filePath = this.view.readLine().trim();
       Payload payload = portfolioController.savePortfolio(filePath);
       if (payload.isError()) {
         this.view.writeMessage("Error: " + payload.getMessage());
@@ -360,7 +347,7 @@ public void calculateInvestment() {
       view.displaySaveSuccess(filePath, System.out);
     } catch (Exception e) {
       this.view.writeMessage("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
@@ -369,8 +356,8 @@ public void calculateInvestment() {
    */
   public void loadPortfolio() {
     try {
-      this.view.writeMessage("Enter the file path to load portfolios from:");
-      String filePath = scanner.nextLine().trim();
+      this.view.writeMessage("Enter the file path to load portfolios from (.csv):");
+      String filePath = this.view.readLine().trim();
       Payload payload = portfolioController.loadPortfolio(filePath);
       if (Objects.nonNull(payload) && payload.isError()) {
         this.view.writeMessage("Error: " + payload);
@@ -379,7 +366,7 @@ public void calculateInvestment() {
       view.displayLoadSuccess();
     } catch (Exception e) {
       this.view.writeMessage("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
@@ -388,17 +375,16 @@ public void calculateInvestment() {
    */
   public void saveStockCache() {
     try {
-      this.view.writeMessage("Enter the file path to save the cache:");
-      String filePath = scanner.nextLine().trim();
+      String filePath = "cache.csv";
       Payload payload = portfolioController.saveCache(filePath);
       if (payload.isError()) {
         this.view.writeMessage("Error: " + payload.getMessage());
         return;
       }
-      view.displaySaveSuccess(filePath, System.out);
+      view.writeMessage("Cache have been saved successfully to " + filePath + "\n");
     } catch (Exception e) {
       this.view.writeMessage("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      this.view.readLine(); // Consume newline
     }
   }
 
@@ -407,17 +393,14 @@ public void calculateInvestment() {
    */
   public void loadStockCache() {
     try {
-      this.view.writeMessage("Enter the file path to load portfolios from:");
-      String filePath = scanner.nextLine().trim();
+      String filePath = "cache.csv";
       Payload payload = portfolioController.loadCache(filePath);
       if (Objects.nonNull(payload) && payload.isError()) {
-        this.view.writeMessage("Error: " + payload);
         return;
       }
-      view.displayLoadSuccess();
-    } catch (Exception e) {
-      this.view.writeMessage("Error: " + e.getMessage());
-      scanner.nextLine(); // Consume newline
+      view.writeMessage("Cache have been loaded successfully.\n");
+    }
+    catch (Exception e) {return;
     }
   }
 

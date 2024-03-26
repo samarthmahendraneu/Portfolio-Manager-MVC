@@ -61,7 +61,7 @@ public class Portfolio implements PortfolioInterface {
       if (s.getQuantity() < quantity) {
         throw new IllegalArgumentException("Not enough stock to sell");
       }
-      s.sell(s.getQuantity() - quantity, date, sellingPrice);
+      s.sell(quantity, date, sellingPrice);
     });
 
   }
@@ -75,7 +75,6 @@ public class Portfolio implements PortfolioInterface {
   @Override
   public BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date) {
     return this.stocks.stream()
-        .filter(s -> s.getPurchaseDate().isBefore(date) || s.getPurchaseDate().isEqual(date))
         .map(s -> s.calculateValue(stockService, date))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
@@ -85,7 +84,9 @@ public class Portfolio implements PortfolioInterface {
    */
   public BigDecimal calculateInvestment(LocalDate date) {
     BigDecimal investment = BigDecimal.ZERO;
-    this.stocks.forEach(s -> investment.add(s.calculateInvestment(date)));
+    for (Tradable stock : this.stocks) {
+      investment = investment.add(stock.calculateInvestment(date));
+    }
     return investment;
   }
 

@@ -3,7 +3,9 @@ package View;
 
 import Model.Tradable;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * View class for the Portfolio Management System.
@@ -11,8 +13,10 @@ import java.util.List;
 public class View {
   
   private final Appendable out;
+  private final Readable in;
   public View() {
     this.out = System.out;
+    this.in = new InputStreamReader(System.in);
   }
 
 
@@ -29,6 +33,26 @@ public class View {
     } catch (IOException e) {
       throw new IllegalStateException(e.getMessage());
     }
+  }
+
+  /**
+   * This method is used for inputStream
+   */
+  public String readLine() {
+    Scanner scanner = new Scanner(this.in);
+    String line = scanner.nextLine();
+    return line;
+  }
+
+  /**
+   * This method is used for inputStream
+   */
+  public Integer readInt() {
+    Scanner scanner = new Scanner(this.in);
+    Integer res = scanner.nextInt();
+    scanner.nextLine();
+    return res;
+
   }
 
   /**
@@ -50,7 +74,7 @@ public class View {
     this.out.append("10. Add Stock to Portfolio\n");
     this.out.append("11. Sell Stock from Portfolio\n");
     this.out.append("12. Calculate Investment\n");
-    this.out.append("Select an option: ");
+    this.out.append("Select an option: \n");
   }
 
   /**
@@ -78,10 +102,11 @@ public class View {
       throws IOException {
     this.out.append("Stocks in ").append(name).append(":\n");
     for (Tradable stock : stocks) {
+      // display stock name and quantity
       this.out.append(stock.getSymbol()).append(" - Quantity: ")
-          .append(String.valueOf(stock.getQuantity()))
-          .append(", Purchase Price: ").append(String.valueOf(stock.getPurchasePrice()))
-          .append(", Purchase Date: ").append(stock.getPurchaseDate().toString()).append("\n");
+          .append(String.valueOf(stock.getQuantity()));
+      // print new line
+      this.out.append("\n");
     }
   }
 
@@ -96,6 +121,20 @@ public class View {
   public void displayPortfolioValue(String name, String date, String value)
       throws IOException {
     this.out.append("Value of the portfolio '").append(name).append("' on ").append(date).append(": ")
+        .append(value).append("\n");
+  }
+
+  /**
+   * Display portfolio investment on a given date.
+   *
+   * @param name  The name of the portfolio.
+   * @param date  The date for which the value is to be calculated.
+   * @param value The value of the portfolio.
+   * @throws IOException If an error occurs while writing to the output.
+   */
+  public void displayPortfolioInvestment(String name, String date, String value)
+      throws IOException {
+    this.out.append("Investment of the portfolio '").append(name).append("' on ").append(date).append(": ")
         .append(value).append("\n");
   }
 

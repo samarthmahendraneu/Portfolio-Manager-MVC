@@ -40,6 +40,7 @@ public class Payload {
 
   /**
    * isError method checks if the message is empty or not.
+   *
    * @return - type boolean.
    */
   public boolean isError() {

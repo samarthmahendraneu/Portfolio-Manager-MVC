@@ -105,10 +105,7 @@ public class PortfolioService implements PortfolioServiceInterface {
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
         .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
 
-    if (portfolio.getStocks().stream().anyMatch(
-        s -> s.getSymbol().equalsIgnoreCase(symbol) && s.getPurchaseDate().equals(date))) {
-      throw new IllegalArgumentException("Stock already exists in portfolio: " + symbol + " on " + date);
-    } else if (quantity <= 0) {
+    if (quantity <= 0) {
       throw new IllegalArgumentException("Quantity must be positive: " + quantity);
     } else if (date.isAfter(LocalDate.now())) {
       throw new IllegalArgumentException("Date cannot be in the future: " + date);
