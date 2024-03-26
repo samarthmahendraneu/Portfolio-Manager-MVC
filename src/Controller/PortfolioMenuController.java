@@ -30,14 +30,10 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     this.portfolioController = portfolioController;
     this.view = view;
     this.loadStockCache();
-    }
-
+  }
 
   /**
-   * Displays the main menu and handles user input for various portfolio operations.
-   */
-  /**
-   * Displays the main menu and handles user input for various portfolio operations.
+   * Main Menu to choose between Normal and Flexible Portfolio.
    */
   public void displayMainMenu() {
     boolean running = true;
@@ -45,7 +41,35 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       try {
         view.displayMainMenu();
         int choice = this.view.readInt();
+        switch (choice) {
+          case 1:
+            this.displayNormalPortfolioMenu();
+            break;
+          case 2:
+            this.displayFlexiblePortfolioMenu();
+            break;
+          case 3:
+            this.view.writeMessage("Exiting...");
+            running = false;
+            break;
+          default:
+            this.view.writeMessage("Invalid option. Please try again.");
+        }
+      } catch (Exception e) {
+        this.view.writeMessage("Error: " + e.getMessage());
+      }
+    }
+  }
 
+  /**
+   * Displays the main menu for the portfolio management system.
+   */
+  public void displayFlexiblePortfolioMenu() {
+    boolean running = true;
+    while (running) {
+      try {
+        view.displayFlexiblePortfolioMenu();
+        int choice = this.view.readInt();
         switch (choice) {
           case 1:
             this.createNewPortfolio();
@@ -56,28 +80,28 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
           case 3:
             this.calculatePortfolioValue();
             break;
-          case 10:
+          case 4:
             // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
             this.addStockToPortfolio();
             break;
-          case 11:
+          case 5:
             // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
             this.sellStockFromPortfolio();
             break;
-          case 12:
+          case 6:
             // the total amount of money invested in a portfolio) by a specific date.
             this.calculateInvestment();
             break;
-          case 4:
+          case 7:
             this.savePortfolio();
             break;
-          case 5:
+          case 8:
             this.loadPortfolio();
             break;
-          case 7:
+          case 9:
             this.CalculateGraph();
             break;
-          case 6:
+          case 10:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -89,6 +113,50 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         this.view.writeMessage("Error: " + e.getMessage());
       }
     }
+  }
+
+  /**
+   * Display the main menu for Normal Portfolio.
+   */
+  @Override
+  public void displayNormalPortfolioMenu() {
+    boolean running = true;
+    while (running) {
+      try {
+        view.displayNormalPortfolioMenu();
+        int choice = this.view.readInt();
+        switch (choice) {
+          case 1:
+            this.createNewPortfolio();
+            break;
+          case 2:
+            this.examinePortfolio();
+            break;
+          case 3:
+            this.calculatePortfolioValue();
+            break;
+          case 4:
+            this.savePortfolio();
+            break;
+          case 5:
+            this.loadPortfolio();
+            break;
+          case 6:
+            this.CalculateGraph();
+            break;
+          case 7:
+            this.view.writeMessage("Exiting...");
+            this.saveStockCache();
+            running = false;
+            break;
+          default:
+            this.view.writeMessage("Invalid option. Please try again.");
+        }
+      } catch (Exception e) {
+        this.view.writeMessage("Error: " + e.getMessage());
+      }
+    }
+
   }
 
   public void CalculateGraph() {

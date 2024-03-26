@@ -6,9 +6,19 @@ package Controller;
 public interface PortfolioMenuControllerInterface {
 
   /**
-   * Display the main menu.
+   * Main menu to choose between Flexible and Normal Portfolio.
    */
   void displayMainMenu();
+
+  /**
+   * Display the main menu for Flexible Portfolio.
+   */
+  void displayFlexiblePortfolioMenu();
+
+  /**
+   * Display the main menu for Normal Portfolio.
+   */
+  void displayNormalPortfolioMenu();
 
   /**
    * Create a new portfolio.

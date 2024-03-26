@@ -56,24 +56,54 @@ public class View {
   }
 
   /**
-   * Display the main menu options.
+   * display main menu to choose between flexible and normal portfolio management
+   */
+  public void displayMainMenu() throws IOException {
+    this.out.append("\nPortfolio Management System:\n");
+    this.out.append("1.Normal Portfolio Management \n");
+    this.out.append("2.Flexible Portfolio Management\n");
+    this.out.append("3. Exit\n");
+    this.out.append("Select an option: \n");
+  }
+
+  /**
+   * Display the main menu options for flexible portfolio management.
    *
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayMainMenu() throws IOException {
+  public void displayFlexiblePortfolioMenu() throws IOException {
     this.out.append("\nPortfolio Management System:\n");
     this.out.append("1. Create a new portfolio\n");
     this.out.append("2. Examine a portfolio\n");
     this.out.append("3. Calculate portfolio value\n");
-    this.out.append("10. Add Stock to Portfolio\n");
-    this.out.append("11. Sell Stock from Portfolio\n");
-    this.out.append("12. Calculate Investment\n");
-    this.out.append("4. Save portfolio\n");
-    this.out.append("5. Load portfolio\n");
-    this.out.append("7. Graph\n");
-    this.out.append("6. Exit\n");
+    this.out.append("4. Add Stock to Portfolio\n");
+    this.out.append("5. Sell Stock from Portfolio\n");
+    this.out.append("6. Calculate Investment\n");
+    this.out.append("7. Save portfolio\n");
+    this.out.append("8. Load portfolio\n");
+    this.out.append("9. Graph\n");
+    this.out.append("10. Exit\n");
     this.out.append("Select an option: \n");
   }
+
+
+  /**
+   * Display the main menu options for Normal portfolio management.
+   *
+   * @throws IOException If an error occurs while writing to the output.
+   */
+  public void displayNormalPortfolioMenu() throws IOException {
+    this.out.append("\nPortfolio Management System:\n");
+    this.out.append("1. Create a new portfolio\n");
+    this.out.append("2. Examine a portfolio\n");
+    this.out.append("3. Calculate portfolio value\n");
+    this.out.append("4. Save portfolio\n");
+    this.out.append("5. Load portfolio\n");
+    this.out.append("6. Graph\n");
+    this.out.append("7. Exit\n");
+    this.out.append("Select an option: \n");
+  }
+
 
   /**
    * Display available portfolios.
