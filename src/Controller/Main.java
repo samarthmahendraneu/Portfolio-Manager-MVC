@@ -21,7 +21,6 @@ public class Main {
         view);
     // interaction with the user
     // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [Model]
-    controller.loadStockCache();
     controller.displayMainMenu();
 
   }

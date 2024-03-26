@@ -29,35 +29,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public PortfolioMenuController(PortfolioControllerInterface portfolioController, View view) {
     this.portfolioController = portfolioController;
     this.view = view;
-    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
-    try {
-      portfolioController.loadCache(cacheFilePath);
-      System.out.println("Cache loaded successfully.");
-    } catch (Exception e) {
-      System.err.println("Failed to load cache: " + e.getMessage());
+    this.loadStockCache();
     }
-  }
-  private void addShutdownHookForCache() {
-    // Specify the cache file path
-    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
 
-    // Add shutdown hook
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      try {
-        portfolioController.saveCache(cacheFilePath);
-        System.out.println("Cache saved successfully.");
-      } catch (Exception e) {
-        System.err.println("Failed to save cache: " + e.getMessage());
-        // Handle the failure to save cache appropriately
-      }
-    }));
-  }
 
   /**
    * Displays the main menu and handles user input for various portfolio operations.
    */
+  /**
+   * Displays the main menu and handles user input for various portfolio operations.
+   */
   public void displayMainMenu() {
-    addShutdownHookForCache();
     boolean running = true;
     while (running) {
       try {
@@ -74,29 +56,32 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
           case 3:
             this.calculatePortfolioValue();
             break;
+          case 10:
+            // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
+            this.addStockToPortfolio();
+            break;
+          case 11:
+            // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
+            this.sellStockFromPortfolio();
+            break;
+          case 12:
+            // the total amount of money invested in a portfolio) by a specific date.
+            this.calculateInvestment();
+            break;
           case 4:
             this.savePortfolio();
             break;
           case 5:
             this.loadPortfolio();
             break;
+          case 7:
+            this.CalculateGraph();
+            break;
           case 6:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
             break;
-          case 7:
-            this.CalculateGraph();
-            break;
-          case 8:
-            // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
-            this.addStockToPortfolio();
-          case 9:
-            // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
-            this.sellStockFromPortfolio();
-          case 10:
-            // the total amount of money invested in a portfolio) by a specific date.
-            this.calculateInvestment();
           default:
             this.view.writeMessage("Invalid option. Please try again.");
         }
