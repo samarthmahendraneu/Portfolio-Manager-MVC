@@ -236,7 +236,10 @@ public class StockService implements StockServiceInterface {
     long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
     if (daysBetween <= 30) {
       return "daily";
-    } else if (daysBetween <= 540) { // Up to 18 months
+    } else if(daysBetween <= 150){
+      return "every 10 days";
+    }
+    else if (daysBetween <= 540) { // Up to 18 months
       return "monthly";
     } else if (daysBetween <= 1825) { // Up to 5 years
       return "every 3 months";
@@ -248,7 +251,7 @@ public class StockService implements StockServiceInterface {
   private LocalDate getTargetDateBasedOnResolution
           (LocalDate date, String resolution, LocalDate endDate) {
     switch (resolution) {
-      case "daily":
+      case "daily", "every 10 days":
         return date;
       case "monthly":
         return DateUtils.getLastWorkingDayOfMonth(date);
@@ -270,6 +273,8 @@ public class StockService implements StockServiceInterface {
     switch (resolution) {
       case "daily":
         return date.plusDays(1);
+      case "every 10 days":
+        return date.plusDays(10);
       case "monthly":
         return date.plusMonths(1);
       case "every 3 months":

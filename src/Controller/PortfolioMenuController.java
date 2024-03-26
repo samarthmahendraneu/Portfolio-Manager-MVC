@@ -29,12 +29,35 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public PortfolioMenuController(PortfolioControllerInterface portfolioController, View view) {
     this.portfolioController = portfolioController;
     this.view = view;
+    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
+    try {
+      portfolioController.loadCache(cacheFilePath);
+      System.out.println("Cache loaded successfully.");
+    } catch (Exception e) {
+      System.err.println("Failed to load cache: " + e.getMessage());
+    }
+  }
+  private void addShutdownHookForCache() {
+    // Specify the cache file path
+    String cacheFilePath = "stockDataCache.csv"; // Adjust the path as needed
+
+    // Add shutdown hook
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        portfolioController.saveCache(cacheFilePath);
+        System.out.println("Cache saved successfully.");
+      } catch (Exception e) {
+        System.err.println("Failed to save cache: " + e.getMessage());
+        // Handle the failure to save cache appropriately
+      }
+    }));
   }
 
   /**
    * Displays the main menu and handles user input for various portfolio operations.
    */
   public void displayMainMenu() {
+    addShutdownHookForCache();
     boolean running = true;
     while (running) {
       try {
@@ -66,17 +89,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 8:
-            this.saveStockCache();
-            break;
-          case 9:
-            this.loadStockCache();
-          case 10:
             // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
             this.addStockToPortfolio();
-          case 11:
+          case 9:
             // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
             this.sellStockFromPortfolio();
-          case 12:
+          case 10:
             // the total amount of money invested in a portfolio) by a specific date.
             this.calculateInvestment();
           default:
