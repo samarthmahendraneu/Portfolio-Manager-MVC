@@ -91,17 +91,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 8:
-            this.saveStockCache();
-            break;
-          case 9:
-            this.loadStockCache();
-          case 10:
             // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
             this.addStockToPortfolio();
-          case 11:
+          case 9:
             // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
             this.sellStockFromPortfolio();
-          case 12:
+          case 10:
             // the total amount of money invested in a portfolio) by a specific date.
             this.calculateInvestment();
           default:

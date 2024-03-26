@@ -45,11 +45,9 @@ public class View {
     this.out.append("5. Load portfolio\n");
     this.out.append("6. Exit\n");
     this.out.append("7. Graph\n");
-    this.out.append("8. Save Cache\n");
-    this.out.append("9. Load Cache\n");
-    this.out.append("10. Add Stock to Portfolio\n");
-    this.out.append("11. Sell Stock from Portfolio\n");
-    this.out.append("12. Calculate Investment\n");
+    this.out.append("8. Add Stock to Portfolio\n");
+    this.out.append("9. Sell Stock from Portfolio\n");
+    this.out.append("10. Calculate Investment\n");
     this.out.append("Select an option: ");
   }
 
