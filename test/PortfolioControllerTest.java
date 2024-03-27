@@ -25,7 +25,7 @@ import View.View;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test class for the PortfolioController class.
@@ -212,14 +212,14 @@ public class PortfolioControllerTest {
   public void testCalculatePortfolioValue_Sunday() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-04"));
-    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-04"));
+    portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.parse("2024-02-02"));
+    portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.parse("2024-02-02"));
     Payload stock_price_1 = stockService.fetchPriceOnDate("AAPL", LocalDate.parse("2024-02-02"));
     Payload stock_price_2 = stockService.fetchPriceOnDate("GOOGL", LocalDate.parse("2024-02-02"));
     BigDecimal total = ((BigDecimal) stock_price_1.getData()).multiply(new BigDecimal(10))
         .add(((BigDecimal) stock_price_2.getData()).multiply(new BigDecimal(5)));
     payload = portfolioController.calculatePortfolioValue("Test Portfolio",
-        LocalDate.parse("2024-02-02"));
+        LocalDate.parse("2024-02-04"));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
