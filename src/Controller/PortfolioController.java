@@ -243,7 +243,6 @@ public class PortfolioController implements PortfolioControllerInterface {
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
-
   }
 
   // Method to compute X-day moving average for a stock
