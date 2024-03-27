@@ -621,6 +621,81 @@ public class PortfolioControllerTest {
 
 
 
+  // 1. sell stock from a portfolio that does not exist
+  @Test(expected = NullPointerException.class)
+  public void testSellStockFromPortfolio_PortfolioNotFound() {
+    Payload payload = portfolioController.sellStockFromPortfolio(null, "AAPL", 10, LocalDate.now());
+  }
+
+  // 2. sell stock from a portfolio that has no stocks
+  @Test
+  public void testSellStockFromPortfolio_PortfolioNoStocks() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    assertEquals("Stock not found", payload.getMessage());
+  }
+
+  // 3. sell stock from a portfolio that has the stock but not the quantity
+  @Test
+  public void testSellStockFromPortfolio_PortfolioNoQuantity() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 15, LocalDate.now());
+    assertEquals("Not enough stock to sell", payload.getMessage());
+  }
+
+  // 4. sell stock from a portfolio that has the stock and the quantity
+  @Test
+  public void testSellStockFromPortfolio_PortfolioValid() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
+    assertEquals(5, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+  }
+
+  // 5. sell stock from a portfolio that has the stock and the quantity but on a different date
+  @Test
+  public void testSellStockFromPortfolio_PortfolioDifferentDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    assertEquals(5, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(10, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
+  }
+
+  // 6. sell stock from a portfolio that has the stock and the quantity but on a future date
+  @Test
+  public void testSellStockFromPortfolio_PortfolioFutureDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().plusDays(1));
+    assertEquals("Cannot sell stock in the future" + LocalDate.now().plusDays(1), payload.getMessage());
+  }
+
+  // 7. sell stock on different days and validate quantity on different days
+  @Test
+  public void testSellStockFromPortfolio_PortfolioDifferentDays() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 3, LocalDate.now().minusDays(2));
+    assertEquals(2, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(2, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(1)));
+    assertEquals(7, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
+    assertEquals(10, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(3)));
+  }
+
+
+
+
+
+
 
 
 
