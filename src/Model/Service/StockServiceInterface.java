@@ -94,7 +94,8 @@ public interface StockServiceInterface {
    * @return A list of dates within the specified range that are moving crossover days.
    */
   Map<String, Object> findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, int shortMovingPeriod, int longMovingPeriod);
-   * Calculates the x-day moving average for a stock's closing prices over a specified period.
+
+  /** Calculates the x-day moving average for a stock's closing prices over a specified period.
    * This average is a technical analysis tool that smooths out price data to create a constantly
    * updated average price.
    *

@@ -46,7 +46,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    */
   public Payload createNewPortfolio(String name) {
     try {
-      return new Payload(this.portfolioService.createNewPortfolio(name),"");
+      return new Payload(this.portfolioService.createNewPortfolio(name), "");
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
@@ -87,7 +87,8 @@ public class PortfolioController implements PortfolioControllerInterface {
 
   /**
    * Calculate total investment in a perticular portfolio by a given date.
-   * @param name name of the portfolio
+   *
+   * @param name   name of the portfolio
    * @param onDate date
    * @return total investment
    */
@@ -100,9 +101,11 @@ public class PortfolioController implements PortfolioControllerInterface {
   }
 
   /**
-   * Sell a specific number of shares of a specific stock on a specified date from a given portfolio
+   * Sell a specific number of shares of a specific stock on a specified date from a given
+   * portfolio
    */
-  public Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol, int quantity,
+  public Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol,
+      int quantity,
       LocalDate date) {
     try {
       return new Payload(
@@ -174,6 +177,7 @@ public class PortfolioController implements PortfolioControllerInterface {
 
   /**
    * get number of portfolios.
+   *
    * @return number of portfolios
    */
   public int getNumPortfolios() {
@@ -182,17 +186,18 @@ public class PortfolioController implements PortfolioControllerInterface {
 
 
   public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     try {
-      this.portfolioService.plotPerformanceChart(identifier,startDate,endDate);
+      this.portfolioService.plotPerformanceChart(identifier, startDate, endDate);
     } catch (Exception e) {
 
-      System.out.println(e.getMessage());   }
+      System.out.println(e.getMessage());
+    }
   }
 
   /**
-   * Finds the crossover days for a given stock symbol within a specified date range.
-   * A crossover day is a day when the closing price of the stock is higher than the opening price.
+   * Finds the crossover days for a given stock symbol within a specified date range. A crossover
+   * day is a day when the closing price of the stock is higher than the opening price.
    *
    * @param symbol    The symbol of the stock to analyze.
    * @param startDate The start date of the date range.
@@ -203,6 +208,10 @@ public class PortfolioController implements PortfolioControllerInterface {
     try {
       return new Payload(this.stockServiceInterface.findCrossoverDays(symbol, startDate, endDate),
           "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
+  }
 
   public Payload inspectStockPerformance(String symbol, LocalDate date) {
     try {
@@ -214,16 +223,16 @@ public class PortfolioController implements PortfolioControllerInterface {
   }
 
 
-
   /**
-   * Finds the moving crossover days for a given stock symbol within a specified date range.
-   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   * Finds the moving crossover days for a given stock symbol within a specified date range. A
+   * moving crossover day is a day when the closing price of the stock is higher than the moving
+   * average.
    *
-   * @param symbol       The symbol of the stock to analyze.
-   * @param startDate    The start date of the date range.
-   * @param endDate      The end date of the date range.
+   * @param symbol            The symbol of the stock to analyze.
+   * @param startDate         The start date of the date range.
+   * @param endDate           The end date of the date range.
    * @param shortMovingPeriod The number of days to consider for the short moving average.
-   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @param longMovingPeriod  The number of days to consider for the long moving average.
    * @return A list of dates within the specified range that are moving crossover days.
    */
   public Payload findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
@@ -231,16 +240,23 @@ public class PortfolioController implements PortfolioControllerInterface {
     try {
       return new Payload(this.stockServiceInterface.findMovingCrossoverDays(symbol, startDate,
           endDate, shortMovingPeriod, longMovingPeriod), "");
+    } catch (IllegalArgumentException e) {
+      return new Payload(null, e.getMessage());
+    }
+
+  }
 
   // Method to compute X-day moving average for a stock
   public Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days) {
     try {
-      BigDecimal average = stockServiceInterface.computeXDayMovingAverage(symbol, endDate, days);
+      BigDecimal average = stockServiceInterface.computeXDayMovingAverage(symbol, endDate,
+          days);
       return new Payload(average, "");
 
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
   }
-
 }
+
+

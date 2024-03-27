@@ -140,7 +140,7 @@ public interface PortfolioControllerInterface {
    */
   Payload findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate);
 
-   * Computes and returns the moving average of a specified stock's closing prices over a defined
+   /** Computes and returns the moving average of a specified stock's closing prices over a defined
    * number of days leading up to a certain date. This average helps to smooth out price data
    * and identify trends.
    *
