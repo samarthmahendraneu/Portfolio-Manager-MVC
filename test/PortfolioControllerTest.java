@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,8 +26,8 @@ import View.View;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test class for the PortfolioController class.
@@ -1003,8 +1003,6 @@ public class PortfolioControllerTest {
 
     assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
   }
-  @Test
-  public void testPlotPerformanceChartForAAPL() {
 
   //     try {
   //      this.view.writeMessage("Enter the stock symbol:");
@@ -1235,14 +1233,8 @@ public class PortfolioControllerTest {
 
 
 
-
-
-
-
-
-
-
-
+  @Test
+  public void testPlotPerformanceChartForAAPL() {
     StringBuilder expectedOutput = new StringBuilder();
     expectedOutput.append("31 Dec 2014: **************\n");
     expectedOutput.append("31 Dec 2015: *************\n");
