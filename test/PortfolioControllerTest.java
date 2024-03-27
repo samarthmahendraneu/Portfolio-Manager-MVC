@@ -4,14 +4,11 @@ import static org.junit.Assert.assertTrue;
 
 import Controller.Payload;
 import Controller.PortfolioControllerInterface;
-import Controller.PortfolioMenuController;
-import Controller.PortfolioMenuControllerInterface;
 import Model.PortfolioInterface;
 import Model.Service.StockServiceInterface;
 import Model.Tradable;
 
 import View.View;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -690,6 +687,119 @@ public class PortfolioControllerTest {
     assertEquals(7, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
     assertEquals(10, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(3)));
   }
+
+
+  // 1. calculate investment for a portfolio that does not exist
+  @Test
+  public void testCalculateInvestment_PortfolioNotFound() {
+    Payload payload = portfolioController.calculateTotalInvestment(null, LocalDate.now());
+    assertEquals("Portfolio not found: null", payload.getMessage());
+  }
+
+  // 2. calculate investment for a portfolio that has no stocks
+  @Test
+  public void testCalculateInvestment_PortfolioNoStocks() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(0, ((Optional<BigDecimal>) payload.getData()).get().intValue());
+  }
+
+  // 3. calculate investment for a portfolio that has stocks but on a different date
+  @Test
+  public void testCalculateInvestment_PortfolioDifferentDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    // get price of stock on the date
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // 4. calculate investment for a portfolio that has stocks but on a future date
+  @Test
+  public void testCalculateInvestment_PortfolioFutureDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().plusDays(1));
+    assertEquals("Date cannot be in the future: " + LocalDate.now().plusDays(1), payload.getMessage());
+  }
+
+  // 5. calculate investment for a portfolio that has stocks and on the same date
+  @Test
+  public void testCalculateInvestment_PortfolioValid() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    // get price of stock on the date
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+
+  // 6 investment should remain same if no stocks are sold
+  @Test
+  public void testCalculateInvestment_PortfolioNoStocksSold() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    // get price of stock on the date
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // 6. calculate investment for a portfolio that has stocks and on different dates
+  @Test
+  public void testCalculateInvestment_PortfolioDifferentDays() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    // get price of stock on the date
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(2));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // 7. calculate investment for a portfolio that has stocks and on different dates and sell stocks on different dates
+  @Test
+  public void testCalculateInvestment_PortfolioDifferentDaysSellStocks() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    // get price of stock on the date
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(2));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+
+    BigDecimal newTotal = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
+    assertEquals(newTotal, ((Optional<BigDecimal>) payload.getData()).get());
+
+    // total investment remains same
+  }
+
+
+
 
 
 
