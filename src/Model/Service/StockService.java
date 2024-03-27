@@ -1,6 +1,5 @@
 package Model.Service;
 
-import Controller.Payload;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -9,33 +8,34 @@ import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.List;
+
+import Controller.Payload;
 import Model.PortfolioInterface;
-import Model.utilities.DateUtils;
+import Model.Tradable;
 import Model.utilities.StockDataCache;
 import Model.utilities.StockInfo;
-import Model.Tradable;
+
+import static Model.utilities.DateUtils.determineResolution;
+import static Model.utilities.DateUtils.getTargetDateBasedOnResolution;
 
 /**
  * Service class for fetching stock data and calculating stock prices.
  */
 public class StockService implements StockServiceInterface {
 
-  private final StockDataCache cache = new StockDataCache(); // Instance of your caching class
+  private final StockDataCache cache = new StockDataCache();
 
   private final String apiKey;
 
   /**
    * Constructor for the StockService class.
    *
-   * @param apiKey The API key to be used for fetching stock data.
    */
   public StockService(String apiKey) {
     this.apiKey = apiKey;
@@ -43,10 +43,6 @@ public class StockService implements StockServiceInterface {
 
   /**
    * Fetches the closing price of the stock with the given symbol on the given date.
-   *
-   * @param symbol The symbol of the stock to fetch.
-   * @param date   The date for which to fetch the stock price.
-   * @return The closing price of the stock on the given date.
    */
   public Payload fetchPriceOnDate(String symbol, LocalDate date) {
     String message;
@@ -107,8 +103,6 @@ public class StockService implements StockServiceInterface {
 
   /**
    * Fetches stock data for the given symbol from the API and caches it.
-   *
-   * @param symbol The symbol of the stock to fetch.
    */
   private String fetchAndCacheStockData(String symbol) {
     String csvData = makeApiRequest(symbol);
@@ -119,12 +113,7 @@ public class StockService implements StockServiceInterface {
     return null;
   }
 
-  /**
-   * Parses the given CSV data and caches it.
-   *
-   * @param csvData The CSV data to parse and cache.
-   * @param symbol  The symbol of the stock for which the data is being cached.
-   */
+
   private void parseAndCacheCsvData(String csvData, String symbol) {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(csvData.getBytes())))) {
       reader.lines()
@@ -147,9 +136,6 @@ public class StockService implements StockServiceInterface {
 
   /**
    * Makes an API request to fetch stock data for the given symbol.
-   *
-   * @param symbol The symbol of the stock to fetch.
-   * @return The response from the API as a string.
    */
   private String makeApiRequest(String symbol) {
     StringBuilder response = new StringBuilder();
@@ -180,40 +166,7 @@ public class StockService implements StockServiceInterface {
   }
 
 
-  private String makeApiRequestMonthly(String symbol) {
-    StringBuilder response = new StringBuilder();
-    try {
-      String urlString = String.format(
-          "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=%s&datatype=csv&apikey=%s",
-          symbol, this.apiKey);
-      URL url = new URL(urlString);
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("GET");
 
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          response.append(line).append("\n");
-        }
-      }
-
-    } catch (Exception e) {
-      System.out.println("An error occurred while fetching monthly stock data: " + e.getMessage());
-      return "Error";
-    }
-    return response.toString();
-  }
-
-
-  /**
-   * Finds the crossover days for a given stock symbol within a specified date range.
-   * A crossover day is a day when the closing price of the stock is higher than the opening price.
-   *
-   * @param symbol    The symbol of the stock to analyze.
-   * @param startDate The start date of the date range.
-   * @param endDate   The end date of the date range.
-   * @return A list of dates within the specified range that are crossover days.
-   */
   public List<LocalDate> findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate) {
     // both start and end dates cant be in the future
     if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
@@ -242,17 +195,7 @@ public class StockService implements StockServiceInterface {
     return crossoverDays;
     }
 
-    /**
-     * Finds the moving crossover days for a given stock symbol within a specified date range.
-     * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
-     *
-     * @param symbol       The symbol of the stock to analyze.
-     * @param startDate    The start date of the date range.
-     * @param endDate      The end date of the date range.
-     * @param shortMovingPeriod The number of days to consider for the short moving average.
-     * @param longMovingPeriod The number of days to consider for the long moving average.
-     * @return A list of dates within the specified range that are moving crossover days.
-     */
+
     public Map<String, Object> findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, int shortMovingPeriod, int longMovingPeriod) {
       // start date should be before end date
       if (startDate.isAfter(endDate)) {
@@ -374,19 +317,7 @@ public class StockService implements StockServiceInterface {
     parseAndCacheCsvData(apiResponse, symbol);
   }
 
-  /**
-   * Fetches the closing prices for a given stock symbol over a specified period
-   * at a monthly resolution.
-   * It dynamically adjusts the resolution based on the start and end date
-   * to optimize data representation.
-   * The method checks the cache first and updates it with API data if necessary.
-   *
-   * @param symbol The symbol of the stock.
-   * @param startDate The start date of the period.
-   * @param endDate The end date of the period.
-   * @return A sorted map where keys are dates (end of the month) and values
-   * are the closing prices of the stock.
-   */
+
 
   public SortedMap<LocalDate, BigDecimal>
   fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startDate, LocalDate endDate) {
@@ -420,42 +351,6 @@ public class StockService implements StockServiceInterface {
     return values;
   }
 
-  private String determineResolution(LocalDate startDate, LocalDate endDate) {
-    long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
-    if (daysBetween <= 30) {
-      return "daily";
-    } else if(daysBetween <= 150){
-      return "every 10 days";
-    }
-    else if (daysBetween <= 540) { // Up to 18 months
-      return "monthly";
-    } else if (daysBetween <= 1825) { // Up to 5 years
-      return "every 3 months";
-    } else {
-      return "yearly";
-    }
-  }
-
-  private LocalDate getTargetDateBasedOnResolution
-          (LocalDate date, String resolution, LocalDate endDate) {
-    switch (resolution) {
-      case "daily", "every 10 days":
-        return date;
-      case "monthly":
-        return DateUtils.getLastWorkingDayOfMonth(date);
-      case "every 3 months":
-        LocalDate endOfQuarter
-                = date.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
-        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate)
-                ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
-      case "yearly":
-        LocalDate endOfYear = date.with(TemporalAdjusters.lastDayOfYear());
-        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate)
-                ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
-      default:
-        throw new IllegalArgumentException("Unknown resolution: " + resolution);
-    }
-  }
 
   private LocalDate incrementDateByResolution(LocalDate date, String resolution) {
     switch (resolution) {
@@ -474,14 +369,6 @@ public class StockService implements StockServiceInterface {
     }
   }
 
-  /**
-   * Finds the earliest stock purchase date in a given portfolio.
-   * This can be used to determine the start point for plotting or calculating portfolio values.
-   *
-   * @param portfolio The portfolio from which to find the earliest stock purchase date.
-   * @return The earliest date on which a stock was purchased within the given portfolio.
-   * @throws IllegalStateException If the portfolio does not contain any stocks.
-   */
 
   public LocalDate findEarliestStockDate(PortfolioInterface portfolio) {
     LocalDate earliestDate = null;
@@ -497,53 +384,20 @@ public class StockService implements StockServiceInterface {
     return earliestDate;
   }
 
-  /**
-   * Saves the current state of the stock data cache to a file.
-   * This allows the cached data to persist beyond the application's runtime,
-   * enabling faster data retrieval without the need for repeated API calls.
-   *
-   * @param filepath The path of the file where the cache should be saved.
-   * @throws Exception If an error occurs during the saving process.
-   */
+
 
   public void saveCache(String filepath)
   {
-    try {
-      cache.saveCacheToFile(filepath);
-    }
-    catch (Exception e)
-    {
-    throw e;
-    }
+    cache.saveCacheToFile(filepath);
   }
 
-  /**
-   * Loads stock data into the cache from a previously saved file.
-   * This method is used at the start of the application to quickly populate the cache
-   * with data that was saved during a previous run, reducing the need for initial API calls.
-   *
-   * @param filepath The path of the file from which to load the cache.
-   * @throws Exception If an error occurs during the loading process.
-   */
 
   public void loadCache(String filepath)
   {
-    try {
-      cache.loadCacheFromFile(filepath);
-    }
-    catch (Exception e)
-    {
-      throw e;
-    }
+    cache.loadCacheFromFile(filepath);
   }
 
-  /**
-   * Inspects the performance change of a stock on a given day.
-   * It calculates the difference between these prices.
-   *
-   *  object containing stock data for the day.
-   * @return A string message indicating the stock's performance.
-   */
+
   public String inspectStockGainOrLoss(String symbol, LocalDate date) {
 
     // date should be in the past
@@ -571,17 +425,7 @@ public class StockService implements StockServiceInterface {
     }
   }
 
-  /**
-   * Calculates the x-day moving average for a stock's closing prices over a specified period.
-   * This average is a technical analysis tool that smooths out price data to create a constantly
-   * updated average price.
-   *
-   * @param symbol The stock symbol for calculation.
-   * @param endDate End date for the period.
-   * @param days Number of days for the moving average.
-   * @return BigDecimal representing the x-day moving average over the specified period.
-   * @throws IllegalArgumentException If parameters are invalid or the period is too short.
-   */
+
   public BigDecimal computeXDayMovingAverage(String symbol, LocalDate endDate, int days) {
     LocalDate startDate = endDate.minusDays(days);
     BigDecimal sum = BigDecimal.ZERO;

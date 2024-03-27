@@ -1294,8 +1294,8 @@ public class PortfolioControllerTest {
     expectedGraph.append("31 Dec 2019: **\n");
     expectedGraph.append("31 Dec 2020: **\n");
     expectedGraph.append("31 Dec 2021: ****\n");
-    expectedGraph.append("31 Dec 2022: ****\n");
-    expectedGraph.append("31 Dec 2023: *****\n");
+    expectedGraph.append("30 Dec 2022: ****\n");
+    expectedGraph.append("29 Dec 2023: *****\n");
     expectedGraph.append("\nScale: * = 1000 dollars (absolute)");
 
     StringBuilder actualOutput = portfolioController.GenGraph
