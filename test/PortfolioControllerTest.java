@@ -889,7 +889,7 @@ public class PortfolioControllerTest {
 
   @Test
   public void testMovingAverageWithMissingData() {
-    LocalDate endDate = LocalDate.of(2024, 2, 7); // Includes a day with missing data
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
     int days = 5;
     BigDecimal expectedAverage = new BigDecimal("152"); // Manual calculation excluding missing day
     BigDecimal actualAverage = mockStockService.computeXDayMovingAverage("AAPL", endDate, days);
@@ -1043,6 +1043,80 @@ public class PortfolioControllerTest {
             LocalDate.of(2024, 3, 25));
 
     assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
+  }
+
+  @Test
+  public void testCreatePortfolioAndGenerateGraph() {
+    Payload createPayload = portfolioController.createNewPortfolio("Test");
+    assertNotNull(createPayload.getData());
+    Portfolio portfolio = (Portfolio) createPayload.getData();
+
+    Payload addIbmPayload = portfolioController.addStockToPortfolio(portfolio,
+            "IBM", 20, LocalDate.of(2016, 3, 4));
+    assertFalse(addIbmPayload.isError());
+
+    Payload addAaplPayload = portfolioController.addStockToPortfolio(portfolio,
+            "AAPL", 13, LocalDate.of(2021, 3, 4));
+    assertFalse(addAaplPayload.isError());
+
+    StringBuilder expectedGraph = new StringBuilder();
+    expectedGraph.append("31 Dec 2018: **\n");
+    expectedGraph.append("31 Dec 2019: **\n");
+    expectedGraph.append("31 Dec 2020: **\n");
+    expectedGraph.append("31 Dec 2021: ****\n");
+    expectedGraph.append("31 Dec 2022: ****\n");
+    expectedGraph.append("31 Dec 2023: *****\n");
+    expectedGraph.append("\nScale: * = 1000 dollars (absolute)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph
+            ("Test", LocalDate.of(2018, 3, 5),
+                    LocalDate.of(2024, 3, 4));
+    assertEquals(expectedGraph.toString(), actualOutput.toString());
+  }
+
+  @Test
+  public void testCreatePortfolioAndGenerateGraphYearly() {
+    Payload createPayload = portfolioController.createNewPortfolio("Test");
+    assertNotNull(createPayload.getData());
+    Portfolio portfolio = (Portfolio) createPayload.getData();
+
+    Payload addIbmPayload = portfolioController.addStockToPortfolio(portfolio,
+            "IBM", 20, LocalDate.of(2016, 3, 4));
+    assertFalse(addIbmPayload.isError());
+
+    Payload addAaplPayload = portfolioController.addStockToPortfolio(portfolio,
+            "AAPL", 13, LocalDate.of(2021, 3, 4));
+    assertFalse(addAaplPayload.isError());
+
+    StringBuilder expectedGraph = new StringBuilder();
+    expectedGraph.append("5 Mar 2024: ****************************************\n");
+    expectedGraph.append("6 Mar 2024: *****************************************\n");
+    expectedGraph.append("7 Mar 2024: *****************************************\n");
+    expectedGraph.append("8 Mar 2024: *****************************************\n");
+    expectedGraph.append("9 Mar 2024: *****************************************\n");
+    expectedGraph.append("10 Mar 2024: *****************************************\n");
+    expectedGraph.append("11 Mar 2024: *****************************************\n");
+    expectedGraph.append("12 Mar 2024: *****************************************\n");
+    expectedGraph.append("13 Mar 2024: *****************************************\n");
+    expectedGraph.append("14 Mar 2024: *****************************************\n");
+    expectedGraph.append("15 Mar 2024: ****************************************\n");
+    expectedGraph.append("16 Mar 2024: ****************************************\n");
+    expectedGraph.append("17 Mar 2024: ****************************************\n");
+    expectedGraph.append("18 Mar 2024: *****************************************\n");
+    expectedGraph.append("19 Mar 2024: *****************************************\n");
+    expectedGraph.append("20 Mar 2024: *****************************************\n");
+    expectedGraph.append("21 Mar 2024: ****************************************\n");
+    expectedGraph.append("22 Mar 2024: ****************************************\n");
+    expectedGraph.append("23 Mar 2024: ****************************************\n");
+    expectedGraph.append("24 Mar 2024: ****************************************\n");
+    expectedGraph.append("25 Mar 2024: ****************************************\n");
+    expectedGraph.append("26 Mar 2024: ****************************************\n");
+    expectedGraph.append("\nScale: * = 148.0704 dollars (absolute)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph
+            ("Test", LocalDate.of(2024, 3, 5),
+                    LocalDate.of(2024, 3, 26));
+    assertEquals(expectedGraph.toString(), actualOutput.toString());
   }
 }
 
