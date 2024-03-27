@@ -107,6 +107,10 @@ public class PortfolioService implements PortfolioServiceInterface {
     } else if (date.isAfter(LocalDate.now())) {
       throw new IllegalArgumentException("Date cannot be in the future: " + date);
     }
+    // date cannot be in weekend
+    if (date.getDayOfWeek().getValue() > 5) {
+      throw new IllegalArgumentException("Date cannot be on a weekend: " + date);
+    }
   }
 
   /**

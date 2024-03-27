@@ -24,6 +24,14 @@ public interface StockServiceInterface {
   Payload fetchPriceOnDate(String symbol, LocalDate date);
 
   /**
+   * Fetches the closing price of the stock with the given symbol on the previous trading day.
+   * @param symbol
+   * @param date
+   * @return
+   */
+  Payload fetchLastClosePrice(String symbol, LocalDate date);
+
+  /**
    * Fetches the closing prices for a given stock symbol over a specified period
    * at a monthly resolution.
    * It dynamically adjusts the resolution based on the start and end date
@@ -36,8 +44,7 @@ public interface StockServiceInterface {
    * @return A sorted map where keys are dates (end of the month) and values
    * are the closing prices of the stock.
    */
-   SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
-          (String symbol, LocalDate startMonth, LocalDate endMonth);
+   SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startMonth, LocalDate endMonth);
 
   /**
    * Finds the earliest stock purchase date in a given portfolio.

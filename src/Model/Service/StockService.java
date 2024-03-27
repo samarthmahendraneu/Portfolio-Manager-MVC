@@ -49,6 +49,24 @@ public class StockService implements StockServiceInterface {
    * @return The closing price of the stock on the given date.
    */
   public Payload fetchPriceOnDate(String symbol, LocalDate date) {
+    String message;
+
+    if (!cache.hasStockData(symbol, date)) {
+      message = fetchAndCacheStockData(symbol);
+      if (message != null) {
+        return new Payload(null, message);
+      }
+    }
+
+    StockInfo info = cache.getStockData(symbol, date);
+    if (info != null) {
+      return new Payload(info.getClose(), "");
+    }
+
+    return new Payload(BigDecimal.ZERO, "");
+  }
+
+  public Payload fetchLastClosePrice(String symbol, LocalDate date) {
     int traverseCount = 0;
     String message;
 

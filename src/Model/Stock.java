@@ -114,7 +114,7 @@ public class Stock implements Tradable {
     }
 
     // calculate value of the stock on the date
-    return ((BigDecimal) stockService.fetchPriceOnDate(this.symbol, date).getData()).multiply(totalQuantity);
+    return ((BigDecimal) stockService.fetchLastClosePrice(this.symbol, date).getData()).multiply(totalQuantity);
   }
 
   /**

@@ -85,6 +85,18 @@ public  class MockStockService implements StockServiceInterface {
     return null;
   }
 
+  /**
+   * Fetches the closing price of the stock with the given symbol on the previous trading day.
+   *
+   * @param symbol
+   * @param date
+   * @return
+   */
+  @Override
+  public Payload fetchLastClosePrice(String symbol, LocalDate date) {
+    return null;
+  }
+
   @Override
   public SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod(String symbol, LocalDate startMonth, LocalDate endMonth) {
     return null;
