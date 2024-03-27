@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class View {
   
   private final Appendable out;
-  private final Readable in;
+  private Readable in;
   public View() {
     this.out = System.out;
     this.in = new InputStreamReader(System.in);
@@ -56,6 +56,21 @@ public class View {
     return res;
 
   }
+
+  /**
+   * setStreamableInput
+   */
+  public void setStreamableInput(Readable in) {
+    this.in = in;
+  }
+
+  /**
+   * getStreamableOutput
+   */
+  public Appendable getStreamableOutput() {
+    return this.out;
+  }
+
 
   /**
    * display main menu to choose between flexible and normal portfolio management

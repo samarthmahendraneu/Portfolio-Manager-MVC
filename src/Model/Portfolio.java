@@ -105,4 +105,11 @@ public class Portfolio implements PortfolioInterface {
   public String getName() {
     return name;
   }
+
+  /**
+   * Get stock quantity by symbol.
+   */
+  public int getStockQuantity(String symbol, LocalDate date) {
+    return this.stocks.stream().filter(s -> s.getSymbol().equals(symbol)).findFirst().map(s -> s.getQuantity(date)).orElse(0);
+  }
 }

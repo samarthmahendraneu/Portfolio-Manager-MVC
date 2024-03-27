@@ -55,6 +55,11 @@ public interface Tradable {
    */
   Map<LocalDate, TranactionInfo> getActivityLog();
 
+  /**
+   * Integer getTotalQuantity(LocalDate date)
+   */
+  int getQuantity(LocalDate date);
+
 
 
 }
