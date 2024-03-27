@@ -1,13 +1,14 @@
 package Controller;
 
-import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.List;
+
+import Model.Portfolio;
 import Model.PortfolioInterface;
 import View.View;
 
@@ -312,7 +313,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
-  private LocalDate dateValidator() {
+  public LocalDate dateValidator() {
     LocalDate date;
 
     while (true) {
@@ -631,4 +632,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
     return false;
   }
+
+
 }

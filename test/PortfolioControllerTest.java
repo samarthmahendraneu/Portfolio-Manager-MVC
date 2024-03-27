@@ -1,27 +1,31 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import Controller.Payload;
-import Controller.PortfolioControllerInterface;
-import Model.PortfolioInterface;
-import Model.Service.StockServiceInterface;
-import Model.Tradable;
-
-import View.View;
-import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import Controller.Payload;
 import Controller.PortfolioController;
-import Model.Service.StockService;
+import Controller.PortfolioControllerInterface;
+import Mock.MockStockService;
 import Model.Portfolio;
+import Model.PortfolioInterface;
+import Model.Service.StockService;
+import Model.Service.StockServiceInterface;
 import Model.Stock;
+import Model.Tradable;
+import View.View;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * Test class for the PortfolioController class.
@@ -31,7 +35,11 @@ public class PortfolioControllerTest {
   private StockServiceInterface stockService;
   private PortfolioControllerInterface portfolioController;
   private View view;
+  private MockStockService mockStockService;
 
+  private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+  private final PrintStream originalOut = System.out;
+  private ByteArrayInputStream inContent;
   /**
    * Sets up the test environment by creating a new StockService and PortfolioController.
    */
@@ -40,6 +48,8 @@ public class PortfolioControllerTest {
     stockService = new StockService("W0M1JOKC82EZEQA8");
     portfolioController = new PortfolioController(stockService);
     view = new View();
+    mockStockService = new MockStockService();
+
   }
 
   /**
@@ -286,6 +296,7 @@ public class PortfolioControllerTest {
     portfolioController.loadPortfolio("test.csv");
     assertEquals(2, portfolioController.getNumPortfolios());
   }
+
   @Test
   public void testListPortfolioNames() {
     portfolioController.createNewPortfolio("FirstPortfolio");
@@ -502,30 +513,6 @@ public class PortfolioControllerTest {
     Payload loadResult = portfolioController.loadCache(testFilePath);
     assertFalse("Cache loading should succeed.", loadResult.isError());
   }
-
-  @Test
-  public void testComputeStockMovingAverage() {
-    // Example assumes your service layer can handle these calls directly.
-    String symbol = "AAPL";
-    LocalDate endDate = LocalDate.now().minusDays(1); // Use a fixed date or a mock date provider
-    int days = 30;
-
-    Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
-    assertFalse("Should compute moving average without errors.", result.isError());
-    assertEquals(result.getData(), "Moving average should not be null.");
-  }
-
-  @Test
-  public void testInspectStockPerformance() {
-    String symbol = "AAPL";
-    LocalDate date = LocalDate.now().minusDays(1); // Use a fixed date or a mock date provider
-
-    Payload result = portfolioController.inspectStockPerformance(symbol, date);
-    assertFalse("Should inspect stock performance without errors.", result.isError());
-    assertEquals(result.getData(), "Stock performance description should not be null.");
-  }
-
-
 
 
   @Test
@@ -805,6 +792,15 @@ public class PortfolioControllerTest {
     // total investment remains same
   }
 
+  @Test
+  public void testInspectStockGain() {
+    LocalDate date = LocalDate.of(2024, 2, 6); // Example fixed date
+    String symbol = "AAPL";
+    // Assuming setup for cache or API to return specific open and close prices
+    Payload result = portfolioController.inspectStockPerformance(symbol, date);
+    assertFalse(result.isError());
+    assertTrue(((String) result.getData()).contains("Gained by"));
+  }
 
 
 
@@ -868,21 +864,92 @@ public class PortfolioControllerTest {
   }
 
 
+  @Test
+  public void testInspectStockGainOrLoss_DataNotAvailable() {
+    MockStockService mockService = new MockStockService() {
+    };
+    String result = mockService.inspectStockGainOrLoss
+            ("AAPL", LocalDate.of(2024, 1, 14));
+    assertTrue(result.contains("Stock data not available"));
+  }
+  @Test
+  public void testComputeXDayMovingAverage_ValidInput() {
+    BigDecimal average = mockStockService.computeXDayMovingAverage("AAPL", LocalDate.of(2024, 2, 2), 2);
+    assertNotNull(average);
+    assertTrue(average.compareTo(new BigDecimal("153")) == 0);
+  }
+
+  @Test
+  public void testInspectStockGainOrLoss_Gainby2() {
+    String result = mockStockService.inspectStockGainOrLoss
+            ("AAPL", LocalDate.of(2024, 2, 3));
+    assertEquals("Gained by 2", result);
+  }
 
 
+  @Test
+  public void testMovingAverageWithMissingData() {
+    LocalDate endDate = LocalDate.of(2024, 2, 7); // Includes a day with missing data
+    int days = 5;
+    BigDecimal expectedAverage = new BigDecimal("152"); // Manual calculation excluding missing day
+    BigDecimal actualAverage = mockStockService.computeXDayMovingAverage("AAPL", endDate, days);
+    assertEquals(expectedAverage, actualAverage.stripTrailingZeros());
+  }
+
+  @Test
+  public void testMovingAverageWithMinimalMovement() {
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int days = 1; // Only includes the day with minimal movement
+    BigDecimal expectedAverage = new BigDecimal("151");
+    BigDecimal actualAverage = mockStockService.computeXDayMovingAverage("AAPL", endDate, days);
+    assertEquals(expectedAverage, actualAverage.stripTrailingZeros());
+  }
 
 
+  @Test
+  public void testStockPerformanceGain() {
+    LocalDate date = LocalDate.of(2024, 2, 3); // Day with a gain
+    String expectedPerformance = "Gained by 2"; // Open at 154, Close at 156
+    String actualPerformance = mockStockService.inspectStockGainOrLoss("AAPL", date);
+    assertEquals(expectedPerformance, actualPerformance);
+  }
 
+  @Test
+  public void testStockPerformanceLoss() {
+    LocalDate date = LocalDate.of(2024, 2, 4); // Day with a loss
+    String expectedPerformance = "Lost by 5"; // Open at 156, Close at 151
+    String actualPerformance = mockStockService.inspectStockGainOrLoss("AAPL", date);
+    assertEquals(expectedPerformance, actualPerformance);
+  }
 
+  @Test
+  public void testStockPerformanceUnchanged() {
+    LocalDate date = LocalDate.of(2024, 2, 5); // Day unchanged
+    String expectedPerformance = "Unchanged";
+    String actualPerformance = mockStockService.inspectStockGainOrLoss("AAPL", date);
+    assertEquals(expectedPerformance, actualPerformance);
+  }
 
+  @Test
+  public void testDateValidationWithInvalidDate() {
+    MockStockService mockService = new MockStockService();
+    LocalDate futureDate = LocalDate.now().plusDays(10); // Future date
+    assertFalse("Future date should not be valid", mockService.isValidDate(futureDate));
+  }
 
+  @Test
+  public void testDateValidationWithWeekendDate() {
+    MockStockService mockService = new MockStockService();
+    LocalDate weekendDate = LocalDate.of(2023, 10, 8);
+    assertFalse("Weekend date should not be valid", mockService.isValidDate(weekendDate));
+  }
 
-
-
-
-
-
-
+  @Test
+  public void testDateValidationWithValidDate() {
+    MockStockService mockService = new MockStockService();
+    LocalDate validDate = LocalDate.now().minusDays(1); // Previous day
+    assertTrue("Previous day should be valid", mockService.isValidDate(validDate));
+  }
 
 
 }
