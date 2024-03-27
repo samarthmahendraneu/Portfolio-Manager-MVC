@@ -244,7 +244,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     date = dateValidator();
     this.view.writeMessage("Enter End Date");
     date2 = dateValidator();
-    portfolioController.GenGraph(name, date, date2);
+    StringBuilder str = portfolioController.GenGraph(name, date, date2);
+    this.view.writeMessage(str.toString());
   }
 
   public void inspectStockPerformance() {
@@ -401,8 +402,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       int quantity = this.view.readInt();
       this.view.readLine(); // Consume newline
       this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):\n");
-      String dateString = this.view.readLine().trim();
-      LocalDate date = LocalDate.parse(dateString);
+      LocalDate date = this.dateValidator();
       // get the portfolio by name
       PortfolioInterface portfolio = portfolioController.getPortfolioService()
           .getPortfolioByName(portfolioName).orElse(null);
@@ -433,8 +433,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       int quantity = this.view.readInt();
       this.view.readLine(); // Consume newline
       this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):");
-      String dateString = this.view.readLine().trim();
-      LocalDate date = LocalDate.parse(dateString);
+      LocalDate date = this.dateValidator();
       // get the portfolio by name
       PortfolioInterface portfolio = portfolioController.getPortfolioService()
           .getPortfolioByName(portfolioName).orElse(null);

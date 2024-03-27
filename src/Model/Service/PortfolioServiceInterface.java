@@ -139,5 +139,5 @@ public interface PortfolioServiceInterface {
    * @param endDate The end date of the period to plot.
    * @throws Exception If any error occurs during the plotting process.
    */
-  void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
+  StringBuilder plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
 }

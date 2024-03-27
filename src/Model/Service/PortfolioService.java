@@ -326,7 +326,8 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @throws Exception If any error occurs during the plotting process.
    */
 
-  public void plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
+  public StringBuilder plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate) {
+    StringBuilder chartBuilder = new StringBuilder();
     try {
       // Determine whether the identifier is for a stock or a portfolio
       Map<LocalDate, BigDecimal> values = portfolioExists(identifier) ?
@@ -335,7 +336,7 @@ public class PortfolioService implements PortfolioServiceInterface {
 
       if (values.isEmpty()) {
         System.out.println("No data available for " + identifier + " from " + startDate + " to " + endDate);
-        return;
+        return null;
       }
 
       BigDecimal minValue = values.values().stream().min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
@@ -344,19 +345,29 @@ public class PortfolioService implements PortfolioServiceInterface {
       AtomicReference<String> scaleType = new AtomicReference<>("absolute");
       BigDecimal scale = calculateScale(minValue, maxValue, scaleType);
 
-      System.out.println("Performance of " + (portfolioExists(identifier) ? "portfolio" : "stock") +
-              " " + identifier + " from " + startDate + " to " + endDate + "\n");
+      // Construct the performance chart
 
+      // Construct the performance chart
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM uuu");
       values.forEach((date, value) -> {
-        int asterisksCount = value.divide(scale, RoundingMode.HALF_UP).intValue();
-        System.out.println(formatter.format(date) + ": " + "*".repeat(Math.max(0, asterisksCount)));
+        int asterisksCount = value.divide(scale, 2, RoundingMode.HALF_UP).intValue(); // Added rounding
+        chartBuilder.append(formatter.format(date))
+            .append(": ")
+            .append("*".repeat(Math.max(0, asterisksCount)))
+            .append("\n");
       });
 
-      System.out.println("\nScale: * = " + scale + " dollars (" + scaleType.get() + ")");
+      // Append scale info
+      chartBuilder.append("\nScale: * = ")
+          .append(scale)
+          .append(" dollars (")
+          .append(scaleType.get())
+          .append(")");
+      return chartBuilder;
     } catch (Exception e) {
       System.err.println("An error occurred while plotting performance chart: " + e.getMessage());
     }
+    return chartBuilder;
   }
 
 

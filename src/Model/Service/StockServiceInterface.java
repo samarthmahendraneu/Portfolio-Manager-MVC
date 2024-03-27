@@ -4,7 +4,6 @@ import Controller.Payload;
 import Model.PortfolioInterface;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;

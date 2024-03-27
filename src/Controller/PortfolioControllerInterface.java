@@ -95,7 +95,7 @@ public interface PortfolioControllerInterface {
    * @param startDate  The start date of the period for graph generation.
    * @param endDate    The end date of the period for graph generation.
    */
-  void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
+  StringBuilder GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 
   /**
    * Saves the current state of the stock data cache to a specified file path. This method

@@ -185,13 +185,13 @@ public class PortfolioController implements PortfolioControllerInterface {
   }
 
 
-  public void GenGraph(String identifier, LocalDate startDate, LocalDate endDate)
+  public StringBuilder GenGraph(String identifier, LocalDate startDate, LocalDate endDate)
       throws IllegalArgumentException {
     try {
-      this.portfolioService.plotPerformanceChart(identifier, startDate, endDate);
+      return this.portfolioService.plotPerformanceChart(identifier, startDate, endDate);
     } catch (Exception e) {
-
       System.out.println(e.getMessage());
+      return null;
     }
   }
 
