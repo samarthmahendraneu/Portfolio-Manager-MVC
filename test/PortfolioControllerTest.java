@@ -950,6 +950,99 @@ public class PortfolioControllerTest {
     LocalDate validDate = LocalDate.now().minusDays(1); // Previous day
     assertTrue("Previous day should be valid", mockService.isValidDate(validDate));
   }
+  @Test
+  public void testPlotPerformanceChartIntegration() {
+
+    StringBuilder expectedOutput = new StringBuilder();
+    expectedOutput.append("30 Jun 2020: ***************************\n");
+    expectedOutput.append("30 Sept 2020: ***************************\n");
+    expectedOutput.append("31 Dec 2020: ****************************\n");
+    expectedOutput.append("31 Mar 2021: *****************************\n");
+    expectedOutput.append("30 Jun 2021: ********************************\n");
+    expectedOutput.append("30 Sept 2021: *******************************\n");
+    expectedOutput.append("31 Dec 2021: ******************************\n");
+    expectedOutput.append("31 Mar 2022: *****************************\n");
+    expectedOutput.append("30 Jun 2022: *******************************\n");
+    expectedOutput.append("30 Sept 2022: **************************\n");
+    expectedOutput.append("30 Dec 2022: *******************************\n");
+    expectedOutput.append("\nScale: * = 4.4448 dollars (relative)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph(
+            "IBM", LocalDate.of(2020, 4, 3),
+            LocalDate.of(2023, 3, 3));
+
+    assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
+  }
+
+  @Test
+  public void testPlotPerformanceChartForSpecificDateRange() {
+
+    StringBuilder expectedOutput = new StringBuilder();
+    expectedOutput.append("6 Mar 2023: *****************************\n");
+    expectedOutput.append("7 Mar 2023: *****************************\n");
+    expectedOutput.append("8 Mar 2023: ****************************\n");
+    expectedOutput.append("9 Mar 2023: ****************************\n");
+    expectedOutput.append("10 Mar 2023: ****************************\n");
+    expectedOutput.append("13 Mar 2023: ****************************\n");
+    expectedOutput.append("14 Mar 2023: ****************************\n");
+    expectedOutput.append("15 Mar 2023: ***************************\n");
+    expectedOutput.append("16 Mar 2023: ****************************\n");
+    expectedOutput.append("17 Mar 2023: ***************************\n");
+    expectedOutput.append("20 Mar 2023: ****************************\n");
+    expectedOutput.append("21 Mar 2023: ****************************\n");
+    expectedOutput.append("22 Mar 2023: ****************************\n");
+    expectedOutput.append("23 Mar 2023: ***************************\n");
+    expectedOutput.append("24 Mar 2023: ****************************\n");
+    expectedOutput.append("\nScale: * = 4.4224 dollars (relative)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph(
+            "IBM", LocalDate.of(2023, 3, 6),
+                    LocalDate.of(2023, 3, 24));
+
+    assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
+  }
+  @Test
+  public void testPlotPerformanceChartForAAPL() {
 
 
+    StringBuilder expectedOutput = new StringBuilder();
+    expectedOutput.append("31 Dec 2014: **************\n");
+    expectedOutput.append("31 Dec 2015: *************\n");
+    expectedOutput.append("30 Dec 2016: ***************\n");
+    expectedOutput.append("29 Dec 2017: **********************\n");
+    expectedOutput.append("31 Dec 2018: ********************\n");
+    expectedOutput.append("31 Dec 2019: **************************************\n");
+    expectedOutput.append("31 Dec 2020: *****************\n");
+    expectedOutput.append("31 Dec 2021: ***********************\n");
+    expectedOutput.append("30 Dec 2022: *****************\n");
+    expectedOutput.append("29 Dec 2023: *************************\n");
+    expectedOutput.append("\nScale: * = 7.5356 dollars (absolute)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph(
+            "AAPL", LocalDate.of(2014, 3, 5),
+            LocalDate.of(2024, 3, 25));
+
+    assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
+  }
+
+  @Test
+  public void testPlotPerformanceChartForGOOG() {
+
+
+    StringBuilder expectedOutput = new StringBuilder();
+    expectedOutput.append("3 Jan 2024: **************************\n");
+    expectedOutput.append("23 Jan 2024: ***************************\n");
+    expectedOutput.append("2 Feb 2024: **************************\n");
+    expectedOutput.append("12 Feb 2024: ***************************\n");
+    expectedOutput.append("22 Feb 2024: ***************************\n");
+    expectedOutput.append("13 Mar 2024: **************************\n");
+    expectedOutput.append("\nScale: * = 5.3568 dollars (relative)");
+
+    StringBuilder actualOutput = portfolioController.GenGraph(
+            "GOOG", LocalDate.of(2024, 1, 3),
+            LocalDate.of(2024, 3, 25));
+
+    assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
+  }
 }
+
