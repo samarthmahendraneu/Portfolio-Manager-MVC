@@ -197,14 +197,32 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  private int getValidNumberOfDays() {
+    int days = 0;
+    boolean isValidInput = false;
 
+    while (!isValidInput) {
+      try {
+        days = Integer.parseInt(this.view.readLine());
+
+        if (days <= 0) {
+          throw new NumberFormatException("The number of days must be greater than 0.");
+        }
+
+        isValidInput = true;
+      } catch (NumberFormatException e) {
+        this.view.writeMessage("Invalid input: " + e.getMessage() + " Please try again.");
+      }
+    }
+    return days;
+  }
   public void computeStockMovingAverage() {
     this.view.writeMessage("Enter the stock symbol:");
     String symbol = this.view.readLine();
     this.view.writeMessage("Enter the end date (YYYY-MM-DD) for the moving average calculation:");
     LocalDate endDate = dateValidator();
     this.view.writeMessage("Enter the number of days for the moving average:");
-    int days = Integer.parseInt(this.view.readLine()); // Ensure proper error handling or validation here
+    int days = getValidNumberOfDays() ;// Ensure proper error handling or validation here
 
     Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
 
