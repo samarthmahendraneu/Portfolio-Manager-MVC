@@ -4,6 +4,8 @@ import Model.PortfolioInterface;
 import Model.Service.PortfolioService;
 import Model.Service.PortfolioServiceInterface;
 import Model.Service.StockServiceInterface;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -201,10 +203,16 @@ public class PortfolioController implements PortfolioControllerInterface {
     try {
       return new Payload(this.stockServiceInterface.findCrossoverDays(symbol, startDate, endDate),
           "");
+
+  public Payload inspectStockPerformance(String symbol, LocalDate date) {
+    try {
+      String performance = stockServiceInterface.inspectStockGainOrLoss(symbol, date);
+      return new Payload(performance, "");
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }
   }
+
 
 
   /**
@@ -223,6 +231,13 @@ public class PortfolioController implements PortfolioControllerInterface {
     try {
       return new Payload(this.stockServiceInterface.findMovingCrossoverDays(symbol, startDate,
           endDate, shortMovingPeriod, longMovingPeriod), "");
+
+  // Method to compute X-day moving average for a stock
+  public Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days) {
+    try {
+      BigDecimal average = stockServiceInterface.computeXDayMovingAverage(symbol, endDate, days);
+      return new Payload(average, "");
+
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }

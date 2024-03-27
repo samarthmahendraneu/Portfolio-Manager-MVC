@@ -104,13 +104,18 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 10:
-            this.findCrossOverDays();
+            this.inspectStockPerformance();
             break;
           case 11:
-            // moving cross over days
-            this.findMovingCrossOverDays();
+            this.computeStockMovingAverage();
             break;
           case 12:
+            this.findCrossOverDays();
+            break;
+          case 13:
+            this.findMovingCrossOverDays();
+            break;
+          case 14:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -210,10 +215,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 7:
+            this.inspectStockPerformance();
+            break;
+          case 8:
+            this.computeStockMovingAverage();
+            break;
+          case 9:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
             break;
+
           default:
             this.view.writeMessage("Invalid option. Please try again.");
         }
@@ -235,6 +247,55 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     portfolioController.GenGraph(name, date, date2);
   }
 
+  public void inspectStockPerformance() {
+    this.view.writeMessage("Enter the stock symbol:");
+    String symbol = this.view.readLine();
+    this.view.writeMessage("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    LocalDate date = dateValidator();
+    Payload result = portfolioController.inspectStockPerformance(symbol, date);
+
+    if (!result.isError()) {
+      this.view.writeMessage("Stock Performance on " + date + ": " + result.getData());
+    } else {
+      this.view.writeMessage("Error: " + result.getMessage());
+    }
+  }
+
+  private int getValidNumberOfDays() {
+    int days = 0;
+    boolean isValidInput = false;
+
+    while (!isValidInput) {
+      try {
+        days = Integer.parseInt(this.view.readLine());
+
+        if (days <= 0) {
+          throw new NumberFormatException("The number of days must be greater than 0.");
+        }
+
+        isValidInput = true;
+      } catch (NumberFormatException e) {
+        this.view.writeMessage("Invalid input: " + e.getMessage() + " Please try again.");
+      }
+    }
+    return days;
+  }
+  public void computeStockMovingAverage() {
+    this.view.writeMessage("Enter the stock symbol:");
+    String symbol = this.view.readLine();
+    this.view.writeMessage("Enter the end date (YYYY-MM-DD) for the moving average calculation:");
+    LocalDate endDate = dateValidator();
+    this.view.writeMessage("Enter the number of days for the moving average:");
+    int days = getValidNumberOfDays() ;// Ensure proper error handling or validation here
+
+    Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
+
+    if (!result.isError()) {
+      this.view.writeMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": " + result.getData());
+    } else {
+      this.view.writeMessage("Error: " + result.getMessage());
+    }
+  }
 
   private LocalDate dateValidator() {
     LocalDate date;

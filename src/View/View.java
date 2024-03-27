@@ -85,10 +85,12 @@ public class View {
     this.out.append("8. Load portfolio\n");
     this.out.append("9. Graph\n");
     // cross over days
-    this.out.append("10. Crossover Days\n");
+    this.out.append("10. Inspect Stock performance\n");
     // moving average crossover days
-    this.out.append("11. Moving Crossover Days\n");
-    this.out.append("12. Exit\n");
+    this.out.append("11. Calculate X-Day Moving Average\n");
+    this.out.append("12. Crossover Days\n");
+    this.out.append("13. Moving Crossover Days\n");
+    this.out.append("14. Exit\n");
     this.out.append("Select an option: \n");
   }
 
@@ -106,7 +108,9 @@ public class View {
     this.out.append("4. Save portfolio\n");
     this.out.append("5. Load portfolio\n");
     this.out.append("6. Graph\n");
-    this.out.append("7. Exit\n");
+    this.out.append("7. Inspect Stock performance\n");
+    this.out.append("8. Calculate X-Day Moving Average\n");
+    this.out.append("9. Exit\n");
     this.out.append("Select an option: \n");
   }
 

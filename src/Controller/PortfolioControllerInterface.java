@@ -86,9 +86,33 @@ public interface PortfolioControllerInterface {
    */
   int getNumPortfolios();
 
+  /**
+   * Generates a performance graph for a specified stock or portfolio over a given time frame.
+   * The graph represents changes in value with a line of asterisks, where each asterisk's value
+   * is dynamically determined based on the range of values within the period.
+   *
+   * @param identifier The stock symbol or portfolio name.
+   * @param startDate  The start date of the period for graph generation.
+   * @param endDate    The end date of the period for graph generation.
+   */
   void GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 
+  /**
+   * Saves the current state of the stock data cache to a specified file path. This method
+   * allows the persistence of cache data between application sessions, reducing API calls.
+   *
+   * @param filePath The file path where the cache data will be saved.
+   * @return A Payload object indicating success or containing an error message.
+   */
   Payload saveCache(String filePath);
+
+  /**
+   * Loads stock data cache from a specified file path into the application. This method is
+   * useful for initializing the cache with previously saved data upon starting the application.
+   *
+   * @param filePath The file path from where the cache data will be loaded.
+   * @return A Payload object indicating success or containing an error message.
+   */
   Payload loadCache(String filePath);
 
   /**
@@ -115,4 +139,27 @@ public interface PortfolioControllerInterface {
    * @return A list of dates within the specified range that are crossover days.
    */
   Payload findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate);
+
+   * Computes and returns the moving average of a specified stock's closing prices over a defined
+   * number of days leading up to a certain date. This average helps to smooth out price data
+   * and identify trends.
+   *
+   * @param symbol   The symbol of the stock.
+   * @param endDate  The end date for the moving average calculation.
+   * @param days     The number of days over which to calculate the moving average.
+   * @return A Payload object containing the moving average or an error message.
+   */
+  Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days);
+
+  /**
+   * Inspects the performance of a specified stock on a given date, indicating whether it gained,
+   * lost, or remained unchanged. Additionally, it calculates and reports the magnitude of the
+   * gain or loss.
+   *
+   * @param symbol The symbol of the stock.
+   * @param date   The date on which to inspect the stock's performance.
+   * @return A Payload object with the performance description or an error message.
+   */
+  Payload inspectStockPerformance(String symbol, LocalDate date);
+
 }
