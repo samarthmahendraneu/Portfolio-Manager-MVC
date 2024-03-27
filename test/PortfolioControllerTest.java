@@ -1,6 +1,7 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertNotNull;
 
 import Controller.Payload;
 import Controller.PortfolioControllerInterface;
@@ -486,6 +487,40 @@ public class PortfolioControllerTest {
       Payload result = portfolioController.calculatePortfolioValue(portfolioName, LocalDate.now());
       assertTrue(result.getData() instanceof Optional);
     }
+  }
+
+  @Test
+  public void testSaveAndLoadCache() {
+    String testFilePath = "testCache.csv";
+
+    // Assuming saveCache() and loadCache() modify and read an actual file or data structure.
+    Payload saveResult = portfolioController.saveCache(testFilePath);
+    assertFalse("Cache saving should succeed.", saveResult.isError());
+
+    Payload loadResult = portfolioController.loadCache(testFilePath);
+    assertFalse("Cache loading should succeed.", loadResult.isError());
+  }
+
+  @Test
+  public void testComputeStockMovingAverage() {
+    // Example assumes your service layer can handle these calls directly.
+    String symbol = "AAPL";
+    LocalDate endDate = LocalDate.now().minusDays(1); // Use a fixed date or a mock date provider
+    int days = 30;
+
+    Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
+    assertFalse("Should compute moving average without errors.", result.isError());
+    assertNotNull(result.getData(), "Moving average should not be null.");
+  }
+
+  @Test
+  public void testInspectStockPerformance() {
+    String symbol = "AAPL";
+    LocalDate date = LocalDate.now().minusDays(1); // Use a fixed date or a mock date provider
+
+    Payload result = portfolioController.inspectStockPerformance(symbol, date);
+    assertFalse("Should inspect stock performance without errors.", result.isError());
+    assertNotNull(result.getData(), "Stock performance description should not be null.");
   }
 
 
