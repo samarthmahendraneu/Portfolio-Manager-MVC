@@ -41,9 +41,8 @@ public class DateUtils {
     if (daysBetween <= 30) {
       return "daily";
     } else if(daysBetween <= 150){
-      return "every 10 days";
-    }
-    else if (daysBetween <= 540) { // Up to 18 months
+        return "every 10 days";
+    } else if (daysBetween <= 540) { // Up to 18 months
       return "monthly";
     } else if (daysBetween <= 1825) { // Up to 5 years
       return "every 3 months";
@@ -52,27 +51,34 @@ public class DateUtils {
     }
   }
 
-  public static LocalDate getTargetDateBasedOnResolution
-          (LocalDate date, String resolution, LocalDate endDate) {
+  public static LocalDate getTargetDateBasedOnResolution(LocalDate currentDate, String resolution, LocalDate endDate) {
+    LocalDate targetDate;
     switch (resolution) {
-      case "daily", "every 10 days":
-        return date;
+      case "daily":
+        targetDate = currentDate;
+        break;
+      case "every 10 days":
+        targetDate = currentDate;
+        break;
       case "monthly":
-        return DateUtils.getLastWorkingDayOfMonth(date);
+        LocalDate endOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfMonth.isBefore(endDate) ? endOfMonth : endDate;
+        break;
       case "every 3 months":
-        LocalDate endOfQuarter
-                = date.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
-        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate)
-                ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
+        LocalDate endOfQuarter = currentDate.with(TemporalAdjusters.lastDayOfMonth())
+                .plusMonths(2) // Move to the last month of the current quarter.
+                .with(TemporalAdjusters.lastDayOfMonth());
+        targetDate = endOfQuarter.isBefore(endDate) ? endOfQuarter : endDate;
+        break;
       case "yearly":
-        LocalDate endOfYear = date.with(TemporalAdjusters.lastDayOfYear());
-        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate)
-                ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
+        // Calculate the last day of the current year.
+        LocalDate endOfYear = currentDate.with(TemporalAdjusters.lastDayOfYear());
+        targetDate = endOfYear.isBefore(endDate) ? endOfYear : endDate;
+        break;
       default:
-        throw new IllegalArgumentException("Unknown resolution: " + resolution);
+        throw new IllegalArgumentException("Unsupported resolution: " + resolution);
     }
+    return targetDate;
   }
-
-
 
 }
