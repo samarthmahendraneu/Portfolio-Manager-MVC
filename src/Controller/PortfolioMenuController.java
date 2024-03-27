@@ -102,6 +102,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 10:
+            this.inspectStockPerformance();
+            break;
+          case 11:
+            this.computeStockMovingAverage();
+            break;
+          case 12:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -145,10 +151,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.CalculateGraph();
             break;
           case 7:
+            this.inspectStockPerformance();
+            break;
+          case 8:
+            this.computeStockMovingAverage();
+            break;
+          case 9:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
             break;
+
           default:
             this.view.writeMessage("Invalid option. Please try again.");
         }
@@ -170,6 +183,37 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     portfolioController.GenGraph(name, date, date2);
   }
 
+  public void inspectStockPerformance() {
+    this.view.writeMessage("Enter the stock symbol:");
+    String symbol = this.view.readLine();
+    this.view.writeMessage("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    LocalDate date = dateValidator();
+    Payload result = portfolioController.inspectStockPerformance(symbol, date);
+
+    if (!result.isError()) {
+      this.view.writeMessage("Stock Performance on " + date + ": " + result.getData());
+    } else {
+      this.view.writeMessage("Error: " + result.getMessage());
+    }
+  }
+
+
+  public void computeStockMovingAverage() {
+    this.view.writeMessage("Enter the stock symbol:");
+    String symbol = this.view.readLine();
+    this.view.writeMessage("Enter the end date (YYYY-MM-DD) for the moving average calculation:");
+    LocalDate endDate = dateValidator();
+    this.view.writeMessage("Enter the number of days for the moving average:");
+    int days = Integer.parseInt(this.view.readLine()); // Ensure proper error handling or validation here
+
+    Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
+
+    if (!result.isError()) {
+      this.view.writeMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": " + result.getData());
+    } else {
+      this.view.writeMessage("Error: " + result.getMessage());
+    }
+  }
 
   private LocalDate dateValidator() {
     LocalDate date;

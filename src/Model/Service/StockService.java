@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
@@ -347,6 +348,70 @@ public class StockService implements StockServiceInterface {
     {
       throw e;
     }
+  }
+
+  /**
+   * Inspects the performance change of a stock on a given day.
+   * It calculates the difference between these prices.
+   *
+   *  object containing stock data for the day.
+   * @return A string message indicating the stock's performance.
+   */
+  public String inspectStockGainOrLoss(String symbol, LocalDate date) {
+    boolean isDataFullyAvailable = isDataAvailableInCache(symbol, date.minusDays(1), date);
+
+    if (!isDataFullyAvailable) {
+      // Step 2: Fetch from API and update cache
+      updateCacheWithApiData(symbol);
+    }
+
+    StockInfo stockInfo = cache.getStockData(symbol, date);
+    if (stockInfo == null) {
+      return "Stock data not available for " + symbol + " on " + date;
+    }
+    BigDecimal gainLossAmount = stockInfo.getClose().subtract(stockInfo.getOpen());
+    if (gainLossAmount.compareTo(BigDecimal.ZERO) > 0) {
+      return "Gained by " + gainLossAmount;
+    } else if (gainLossAmount.compareTo(BigDecimal.ZERO) < 0) {
+      return "Lost by " + gainLossAmount.abs();
+    } else {
+      return "Unchanged";
+    }
+  }
+
+  /**
+   * Calculates the x-day moving average for a stock's closing prices over a specified period.
+   * This average is a technical analysis tool that smooths out price data to create a constantly
+   * updated average price.
+   *
+   * @param symbol The stock symbol for calculation.
+   * @param endDate End date for the period.
+   * @param days Number of days for the moving average.
+   * @return BigDecimal representing the x-day moving average over the specified period.
+   * @throws IllegalArgumentException If parameters are invalid or the period is too short.
+   */
+  public BigDecimal computeXDayMovingAverage(String symbol, LocalDate endDate, int days) {
+    LocalDate startDate = endDate.minusDays(days);
+    BigDecimal sum = BigDecimal.ZERO;
+    int count = 0;
+
+    for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+      boolean isDataFullyAvailable =
+              isDataAvailableInCache(symbol, endDate.minusDays(days), endDate);
+
+      if (!isDataFullyAvailable) {
+        // Step 2: Fetch from API and update cache
+        updateCacheWithApiData(symbol);
+      }
+
+      StockInfo stockInfo = cache.getStockData(symbol, date);      if (stockInfo != null) {
+        sum = sum.add(stockInfo.getClose());
+        count++;
+      }
+    }
+
+    return count > 0 ? sum.divide(BigDecimal.valueOf(count), RoundingMode.HALF_UP) :
+            BigDecimal.ZERO;
   }
 
 }
