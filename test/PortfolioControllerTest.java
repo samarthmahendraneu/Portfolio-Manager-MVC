@@ -601,6 +601,22 @@ public class PortfolioControllerTest {
     assertEquals(15, portfolio.getStockQuantity("AAPL", LocalDate.now()));
   }
 
+  // add same stock thrice to the portfolio
+  // validate on different dates
+  @Test
+  public void testAddSameStockTwiceToPortfolioValidateDifferentDays() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    assertEquals(1, portfolio.getStocks().size());
+    // add a new date - 1 of current date
+    LocalDate newDate = LocalDate.now().minusDays(1);
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 5, newDate);
+    assertEquals(15, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(5, portfolio.getStockQuantity("AAPL", newDate));
+
+  }
+
 
 
 
