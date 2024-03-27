@@ -528,10 +528,6 @@ public class PortfolioControllerTest {
 
 
 
-
-
-
-
   @Test
   public void testAdditionalAddStockToPortfolio() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
@@ -648,7 +644,8 @@ public class PortfolioControllerTest {
   public void testSellStockFromPortfolio_PortfolioValid() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    // buy 2 days back
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
     payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
     assertEquals(5, portfolio.getStockQuantity("AAPL", LocalDate.now()));
   }
@@ -671,7 +668,7 @@ public class PortfolioControllerTest {
     Portfolio portfolio = (Portfolio) payload.getData();
     payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().plusDays(1));
-    assertEquals("Cannot sell stock in the future" + LocalDate.now().plusDays(1), payload.getMessage());
+    assertEquals("Cannot sell stock in the future", payload.getMessage());
   }
 
   // 7. sell stock on different days and validate quantity on different days
@@ -686,6 +683,16 @@ public class PortfolioControllerTest {
     assertEquals(2, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(1)));
     assertEquals(7, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
     assertEquals(10, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(3)));
+  }
+
+  // 8. try to sell stock more than the quantity available
+  @Test
+  public void testSellStockFromPortfolio_PortfolioMoreQuantity() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 15, LocalDate.now().minusDays(12));
+    assertEquals("Not enough stock to sell", payload.getMessage());
   }
 
 
@@ -797,6 +804,72 @@ public class PortfolioControllerTest {
 
     // total investment remains same
   }
+
+
+
+
+  // 1. add stock to portfolio, sell stock from portfolio and then calculate value
+  @Test
+  public void testAddStockSellStockCalculateValue() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    // buy 2 days back
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
+    // fetch stock price
+    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now());
+    BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(5));
+    assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // 2. add stock to portfolio, sell stock from portfolio and then calculate value on different dates
+  @Test
+  public void testAddStockSellStockCalculateValueDifferentDates() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    // buy 2 days back
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
+    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
+    // fetch stock price
+    Payload stock_price_today = stockService.fetchPriceOnDate("AAPL", LocalDate.now());
+    BigDecimal total_today = ((BigDecimal) stock_price_today.getData()).multiply(new BigDecimal(5));
+    Payload stock_price_yesterday = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(1));
+    assertEquals(total_today, ((Optional<BigDecimal>) payload.getData()).get());
+    BigDecimal total_yesterday = ((BigDecimal) stock_price_yesterday.getData()).multiply(new BigDecimal(10));
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now().minusDays(1));
+    assertEquals(total_yesterday, ((Optional<BigDecimal>) payload.getData()).get());
+  }
+
+  // 1. calculate value for a portfolio that does not exist
+  @Test
+  public void testCalculatePortfolioValue_PortfolioNotFound() {
+    Payload payload = portfolioController.calculatePortfolioValue(null, LocalDate.now());
+    assertEquals("Portfolio not found: null", payload.getMessage());
+  }
+
+  // 2. calculate value for a portfolio that has no stocks
+  @Test
+  public void testCalculatePortfolioValue_PortfolioNoStocks() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
+    assertEquals(0, ((Optional<BigDecimal>) payload.getData()).get().intValue());
+  }
+
+  // 3 calculate value before buying the stock
+  @Test
+  public void testCalculatePortfolioValue_PortfolioBeforeBuyingStock() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
+    assertEquals(0, ((Optional<BigDecimal>) payload.getData()).get().intValue());
+  }
+
+
+
+
 
 
 
