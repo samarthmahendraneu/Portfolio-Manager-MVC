@@ -116,6 +116,30 @@ public interface PortfolioControllerInterface {
   Payload loadCache(String filePath);
 
   /**
+   * Finds the moving crossover days for a given stock symbol within a specified date range.
+   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   *
+   * @param symbol       The symbol of the stock to analyze.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
+   * @param shortMovingPeriod The number of days to consider for the short moving average.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @return A list of dates within the specified range that are moving crossover days.
+   */
+  Payload findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
+      int shortMovingPeriod, int longMovingPeriod);
+
+  /**
+   * Finds the crossover days for a given stock symbol within a specified date range.
+   * A crossover day is a day when the closing price of the stock is higher than the opening price.
+   *
+   * @param symbol    The symbol of the stock to analyze.
+   * @param startDate The start date of the date range.
+   * @param endDate   The end date of the date range.
+   * @return A list of dates within the specified range that are crossover days.
+   */
+  Payload findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate);
+
    * Computes and returns the moving average of a specified stock's closing prices over a defined
    * number of days leading up to a certain date. This average helps to smooth out price data
    * and identify trends.
@@ -137,4 +161,5 @@ public interface PortfolioControllerInterface {
    * @return A Payload object with the performance description or an error message.
    */
   Payload inspectStockPerformance(String symbol, LocalDate date);
+
 }

@@ -4,7 +4,9 @@ package View;
 import Model.Tradable;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -82,9 +84,13 @@ public class View {
     this.out.append("7. Save portfolio\n");
     this.out.append("8. Load portfolio\n");
     this.out.append("9. Graph\n");
+    // cross over days
     this.out.append("10. Inspect Stock performance\n");
+    // moving average crossover days
     this.out.append("11. Calculate X-Day Moving Average\n");
-    this.out.append("12. Exit\n");
+    this.out.append("12. Crossover Days\n");
+    this.out.append("13. Moving Crossover Days\n");
+    this.out.append("14. Exit\n");
     this.out.append("Select an option: \n");
   }
 
@@ -216,4 +222,59 @@ public class View {
   public void displayError(String errorMessage) throws IOException {
     this.out.append("Error: ").append(errorMessage).append("\n");
   }
+
+  /**
+   * Display the crossover days for the given stock symbol.
+   *
+   * @param symbol    The stock symbol.
+   * @param startDate The start date of the date range.
+   * @param endDate   The end date of the date range.
+   * @param dates     The crossover days.
+   */
+  public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, List<LocalDate> dates)
+      throws IOException {
+    this.out.append("Crossover days for stock ").append(symbol).append(" between ")
+        .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n");
+    for (LocalDate date : dates) {
+      this.out.append(date.toString()).append("\n");
+    }
+  }
+
+  /**
+   * Display the moving crossover days for the given stock symbol.
+   *
+   * @param symbol       The stock symbol.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
+   * @param shortMovingPeriod The number of days to consider for the short moving average.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @param result        The moving crossover days.
+   */
+  public void displayMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
+      int shortMovingPeriod, int longMovingPeriod, Map<String, Object> result)
+      throws IOException {
+    List<LocalDate> goldenCrosses = (List<LocalDate>) result.get("goldenCrosses");
+    List<LocalDate> deathCrosses = (List<LocalDate>) result.get("deathCrosses");
+    List<LocalDate> movingCrossoverDays = (List<LocalDate>) result.get("movingCrossoverDays");
+
+    this.out.append("Moving crossover days for stock ").append(symbol).append(" between ")
+        .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n").append(
+        "Short moving period: ").append(String.valueOf(shortMovingPeriod)).append(", Long moving period: ")
+        .append(String.valueOf(longMovingPeriod)).append("\n");
+    this.out.append("Golden Crosses:\n");
+    for (LocalDate goldenDate : goldenCrosses) {
+      this.out.append(goldenDate.toString()).append("\n");
+    }
+    // death crosses
+    this.out.append("Death Crosses:\n");
+    for (LocalDate deathDate : deathCrosses) {
+      this.out.append(deathDate.toString()).append("\n");
+    }
+    // moving crossover days
+    this.out.append("Moving Crossover Days:\n");
+    for (LocalDate movingDate : movingCrossoverDays) {
+      this.out.append(movingDate.toString()).append("\n");
+    }
+
+    }
 }

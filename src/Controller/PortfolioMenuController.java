@@ -4,8 +4,10 @@ import Model.Portfolio;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.List;
 import Model.PortfolioInterface;
 import View.View;
 
@@ -108,6 +110,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.computeStockMovingAverage();
             break;
           case 12:
+            this.findCrossOverDays();
+            break;
+          case 13:
+            this.findMovingCrossOverDays();
+            break;
+          case 14:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -120,6 +128,62 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
     }
   }
+
+  /**
+   * Finds crossover days for a given stock symbol within a specified date range.
+   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   */
+  public void findCrossOverDays() {
+    try {
+      this.view.writeMessage("Enter the stock symbol:");
+      String symbol = this.view.readLine().trim();
+      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
+      String startDateString = this.view.readLine().trim();
+      LocalDate startDate = LocalDate.parse(startDateString);
+      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
+      String endDateString = this.view.readLine().trim();
+      LocalDate endDate = LocalDate.parse(endDateString);
+      Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
+      if (this.printIfError(payload)) {
+        return;
+      }
+      view.displayCrossoverDays(symbol, startDate, endDate, (List<LocalDate>) payload.getData());
+    } catch (Exception e) {
+      this.view.writeMessage("Error finding crossover days: " + e.getMessage());
+      this.view.readLine(); // Consume newline
+    }
+  }
+
+  /**
+    * Finds moving crossover days for a given stock symbol within a specified date range.
+    * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+    */
+  public void findMovingCrossOverDays() {
+    try {
+      this.view.writeMessage("Enter the stock symbol:");
+      String symbol = this.view.readLine().trim();
+      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
+      String startDateString = this.view.readLine().trim();
+      LocalDate startDate = LocalDate.parse(startDateString);
+      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
+      String endDateString = this.view.readLine().trim();
+      LocalDate endDate = LocalDate.parse(endDateString);
+      this.view.writeMessage("Enter the short moving period:");
+      int shortMovingPeriod = this.view.readInt();
+      this.view.writeMessage("Enter the long moving period:");
+      int longMovingPeriod = this.view.readInt();
+      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate,
+          shortMovingPeriod, longMovingPeriod);
+      if (this.printIfError(payload)) {
+        return;
+      }
+      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod,
+          (Map<String, Object>) payload.getData());
+    } catch (Exception e) {
+      this.view.writeMessage("Error finding moving crossover days: " + e.getMessage());
+      }
+    }
+
 
   /**
    * Display the main menu for Normal Portfolio.

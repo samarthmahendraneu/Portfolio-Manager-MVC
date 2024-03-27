@@ -190,6 +190,20 @@ public class PortfolioController implements PortfolioControllerInterface {
       System.out.println(e.getMessage());   }
   }
 
+  /**
+   * Finds the crossover days for a given stock symbol within a specified date range.
+   * A crossover day is a day when the closing price of the stock is higher than the opening price.
+   *
+   * @param symbol    The symbol of the stock to analyze.
+   * @param startDate The start date of the date range.
+   * @param endDate   The end date of the date range.
+   * @return A list of dates within the specified range that are crossover days.
+   */
+  public Payload findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate) {
+    try {
+      return new Payload(this.stockServiceInterface.findCrossoverDays(symbol, startDate, endDate),
+          "");
+
   public Payload inspectStockPerformance(String symbol, LocalDate date) {
     try {
       String performance = stockServiceInterface.inspectStockGainOrLoss(symbol, date);
@@ -199,11 +213,31 @@ public class PortfolioController implements PortfolioControllerInterface {
     }
   }
 
+
+
+  /**
+   * Finds the moving crossover days for a given stock symbol within a specified date range.
+   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   *
+   * @param symbol       The symbol of the stock to analyze.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
+   * @param shortMovingPeriod The number of days to consider for the short moving average.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @return A list of dates within the specified range that are moving crossover days.
+   */
+  public Payload findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
+      int shortMovingPeriod, int longMovingPeriod) {
+    try {
+      return new Payload(this.stockServiceInterface.findMovingCrossoverDays(symbol, startDate,
+          endDate, shortMovingPeriod, longMovingPeriod), "");
+
   // Method to compute X-day moving average for a stock
   public Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days) {
     try {
       BigDecimal average = stockServiceInterface.computeXDayMovingAverage(symbol, endDate, days);
       return new Payload(average, "");
+
     } catch (IllegalArgumentException e) {
       return new Payload(null, e.getMessage());
     }

@@ -11,8 +11,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 import Model.PortfolioInterface;
 import Model.utilities.DateUtils;
 import Model.utilities.StockDataCache;
@@ -66,6 +70,20 @@ public class StockService implements StockServiceInterface {
     } while (traverseCount < 4);
 
     return new Payload(BigDecimal.ZERO, "");
+  }
+
+  private StockInfo fetchCompleteStockDataOnDate(String symbol, LocalDate date) {
+    StockInfo info;
+    String message;
+
+    if (!cache.hasStockData(symbol, date)) {
+      message = fetchAndCacheStockData(symbol);
+      if (message != null) {
+        return null;
+      }
+    }
+    info = cache.getStockData(symbol, date);
+    return info;
   }
 
 
@@ -166,6 +184,119 @@ public class StockService implements StockServiceInterface {
       return "Error";
     }
     return response.toString();
+  }
+
+
+  /**
+   * Finds the crossover days for a given stock symbol within a specified date range.
+   * A crossover day is a day when the closing price of the stock is higher than the opening price.
+   *
+   * @param symbol    The symbol of the stock to analyze.
+   * @param startDate The start date of the date range.
+   * @param endDate   The end date of the date range.
+   * @return A list of dates within the specified range that are crossover days.
+   */
+  public List<LocalDate> findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate) {
+    List<LocalDate> crossoverDays = new ArrayList<>();
+    String csvData = makeApiRequest(symbol);
+    if (csvData.contains("Invalid stock symbol")) {
+      return crossoverDays;
+    }
+    // loop through dates in the range
+    for(LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+      StockInfo info =  this.fetchCompleteStockDataOnDate(symbol, date);
+      if (info != null && info.getClose().compareTo(info.getOpen()) > 0) {
+        crossoverDays.add(date);
+      }
+    }
+    return crossoverDays;
+    }
+
+    /**
+     * Finds the moving crossover days for a given stock symbol within a specified date range.
+     * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+     *
+     * @param symbol       The symbol of the stock to analyze.
+     * @param startDate    The start date of the date range.
+     * @param endDate      The end date of the date range.
+     * @param shortMovingPeriod The number of days to consider for the short moving average.
+     * @param longMovingPeriod The number of days to consider for the long moving average.
+     * @return A list of dates within the specified range that are moving crossover days.
+     */
+    public Map<String, Object> findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, int shortMovingPeriod, int longMovingPeriod) {
+      List<LocalDate> goldenCrosses = new ArrayList<>();
+      List<LocalDate> deathCrosses = new ArrayList<>();
+      List<LocalDate> movingCrossoverDays = new ArrayList<>();
+      LocalDate currentDate = startDate;
+
+      while (!currentDate.isAfter(endDate)) {
+        LocalDate endShortWindow = currentDate.plusDays(shortMovingPeriod - 1);
+        LocalDate endLongWindow = currentDate.plusDays(longMovingPeriod - 1);
+
+        // Retrieve historical stock data for the current window
+        List<BigDecimal> closingPrices = getHistoricalData(symbol, currentDate, endShortWindow);
+        List<BigDecimal> longClosingPrices = getHistoricalData(symbol, currentDate, endLongWindow);
+
+        // Calculate the moving averages
+        double shortMovingAvg = calculateMovingAverage(closingPrices, shortMovingPeriod);
+        double longMovingAvg = calculateMovingAverage(longClosingPrices, longMovingPeriod);
+        double prevShortMovingAvg = getPreviousShortMovingAvg(closingPrices, shortMovingPeriod);
+
+        // Check for crossover
+        boolean crossedAbove = shortMovingAvg > longMovingAvg && shortMovingAvg < prevShortMovingAvg;
+        boolean crossedBelow = shortMovingAvg < longMovingAvg && shortMovingAvg > prevShortMovingAvg;
+
+        if (crossedAbove) {
+          goldenCrosses.add(currentDate);
+          movingCrossoverDays.add(currentDate);
+        } else if (crossedBelow) {
+          deathCrosses.add(currentDate);
+          movingCrossoverDays.add(currentDate);
+        }
+
+        currentDate = currentDate.plusDays(1);
+      }
+
+      Map<String, Object> result = new HashMap<>();
+      result.put("goldenCrosses", goldenCrosses);
+      result.put("deathCrosses", deathCrosses);
+      result.put("movingCrossoverDays", movingCrossoverDays);
+
+      return result;
+    }
+
+  private List<BigDecimal> getHistoricalData(String symbol, LocalDate startDate, LocalDate endDate) {
+    List<BigDecimal> closingPrices = new ArrayList<>();
+    LocalDate currentDate = startDate;
+
+    while (!currentDate.isAfter(endDate)) {
+      StockInfo info = fetchCompleteStockDataOnDate(symbol, currentDate);
+      if (info != null) {
+        closingPrices.add(info.getClose());
+      }
+      currentDate = currentDate.plusDays(1);
+    }
+
+    return closingPrices;
+  }
+
+  private double calculateMovingAverage(List<BigDecimal> prices, int period) {
+    BigDecimal sum = BigDecimal.ZERO;
+    for (int i = 0; i < period && i < prices.size(); i++) {
+      sum = sum.add(prices.get(i));
+    }
+    return (Double) sum.divide(BigDecimal.valueOf(period)).doubleValue();
+    }
+
+  private double getPreviousShortMovingAvg(List<BigDecimal> prices, int period) {
+    if (prices.size() < period + 1) {
+      return 0; // Not enough data to calculate previous moving average
+    }
+    BigDecimal sum = BigDecimal.ZERO;
+    for (int i = 1; i <= period; i++) {
+      sum = sum.add(prices.get(i));
+    }
+    return (Double) sum.divide(BigDecimal.valueOf(period)).doubleValue();
   }
 
 

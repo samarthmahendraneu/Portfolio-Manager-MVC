@@ -5,6 +5,8 @@ import Model.PortfolioInterface;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.math.BigDecimal;
 
@@ -30,12 +32,11 @@ public interface StockServiceInterface {
    * The method checks the cache first and updates it with API data if necessary.
    *
    * @param symbol The symbol of the stock.
-   * @param startDate The start date of the period.
-   * @param endDate The end date of the period.
+   * @param startMonth The start Month of the period.
+   * @param endMonth The end Month of the period.
    * @return A sorted map where keys are dates (end of the month) and values
    * are the closing prices of the stock.
    */
-
    SortedMap<LocalDate, BigDecimal> fetchMonthlyClosingPricesForPeriod
           (String symbol, LocalDate startMonth, LocalDate endMonth);
 
@@ -71,6 +72,28 @@ public interface StockServiceInterface {
   void saveCache(String filepath);
 
   /**
+   * Finds the crossover days for a given stock symbol within a specified date range.
+   * A crossover day is a day when the closing price of the stock is higher than the opening price.
+   *
+   * @param symbol    The symbol of the stock to analyze.
+   * @param startDate The start date of the date range.
+   * @param endDate   The end date of the date range.
+   * @return A list of dates within the specified range that are crossover days.
+   */
+  List<LocalDate> findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate);
+
+  /**
+   * Finds the moving crossover days for a given stock symbol within a specified date range.
+   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   *
+   * @param symbol       The symbol of the stock to analyze.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
+   * @param shortMovingPeriod The number of days to consider for the short moving average.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @return A list of dates within the specified range that are moving crossover days.
+   */
+  Map<String, Object> findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, int shortMovingPeriod, int longMovingPeriod);
    * Calculates the x-day moving average for a stock's closing prices over a specified period.
    * This average is a technical analysis tool that smooths out price data to create a constantly
    * updated average price.
