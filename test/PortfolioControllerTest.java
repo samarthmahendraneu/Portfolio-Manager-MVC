@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,6 +8,7 @@ import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -950,6 +952,242 @@ public class PortfolioControllerTest {
     LocalDate validDate = LocalDate.now().minusDays(1); // Previous day
     assertTrue("Previous day should be valid", mockService.isValidDate(validDate));
   }
+
+  //     try {
+  //      this.view.writeMessage("Enter the stock symbol:");
+  //      String symbol = this.view.readLine().trim();
+  //      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
+  //      String startDateString = this.view.readLine().trim();
+  //      LocalDate startDate = LocalDate.parse(startDateString);
+  //      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
+  //      String endDateString = this.view.readLine().trim();
+  //      LocalDate endDate = LocalDate.parse(endDateString);
+  //      Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
+  //      if (this.printIfError(payload)) {
+  //        return;
+  //      }
+  //      view.displayCrossoverDays(symbol, startDate, endDate, (List<LocalDate>) payload.getData());
+  //    } catch (Exception e) {
+  //      this.view.writeMessage("Error finding crossover days: " + e.getMessage());
+  //      this.view.readLine(); // Consume newline
+  //    }
+
+  // generate to all possible test cases
+
+
+
+
+
+  // 1. valid symbol, start date and end date
+  @Test
+  public void testFindCrossoverDays_ValidInput() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    // [2024-02-01, 2024-02-02, 2024-02-06]
+    List<LocalDate> expectedDates = Arrays.asList(
+            LocalDate.of(2024, 2, 1),
+            LocalDate.of(2024, 2, 2),
+            LocalDate.of(2024, 2, 6)
+    );
+    Payload result = portfolioController.findCrossoverDays("AAPL", startDate, endDate);
+    assertFalse(result.isError());
+    assertEquals(expectedDates, result.getData());
+  }
+
+
+  // 2. invalid symbol, valid start date and end date
+  @Test
+  public void testFindCrossoverDays_InvalidSymbol() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    Payload result = portfolioController.findCrossoverDays("INVALID", startDate, endDate);
+    assertEquals("Invalid stock symbol: " + "INVALID", result.getMessage());
+  }
+
+  // 3. valid symbol, invalid start date and end date
+  @Test
+  public void testFindCrossoverDays_InvalidStartDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 8); // Future date
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    Payload result = portfolioController.findCrossoverDays("AAPL", startDate, endDate);
+    assertEquals("Start date should be before end date", result.getMessage());
+  }
+
+  // 4. valid symbol, start date and invalid end date
+  @Test
+  public void testFindCrossoverDays_InvalidEndDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    // end date as today +1
+    LocalDate endDate = LocalDate.now().plusDays(1);
+    Payload result = portfolioController.findCrossoverDays("AAPL", startDate, endDate);
+    assertEquals("Date cannot be in the future", result.getMessage());
+  }
+
+  // 5. valid symbol, start date after end date
+  @Test
+  public void testFindCrossoverDays_StartDateAfterEndDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 7);
+    LocalDate endDate = LocalDate.of(2024, 2, 1);
+    Payload result = portfolioController.findCrossoverDays("AAPL", startDate, endDate);
+    assertEquals("Start date should be before end date", result.getMessage());
+  }
+
+
+
+  // 1. valid symbol and date
+  @Test
+  public void testInspectStockPerformance_ValidInput() {
+    LocalDate date = LocalDate.of(2024, 2, 6);
+    String expectedPerformance = "Gained by 2.4400";
+    Payload result = portfolioController.inspectStockPerformance("AAPL", date);
+    assertFalse(result.isError());
+    assertEquals(expectedPerformance, result.getData());
+  }
+
+  // 3. valid symbol and invalid date
+  @Test
+  public void testInspectStockPerformance_InvalidDate() {
+    LocalDate date = LocalDate.now().plusDays(1); // Future date
+    Payload result = portfolioController.inspectStockPerformance("AAPL", date);
+    assertEquals("Date cannot be in the future", result.getMessage());
+  }
+
+  // 5. valid symbol and future date
+  @Test
+  public void testInspectStockPerformance_FutureDate() {
+    LocalDate date = LocalDate.now().plusDays(10); // Future date
+    Payload result = portfolioController.inspectStockPerformance("AAPL", date);
+    assertEquals("Date cannot be in the future", result.getMessage());
+  }
+
+
+  //       this.view.writeMessage("Enter the stock symbol:");
+  //      String symbol = this.view.readLine().trim();
+  //      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
+  //      String startDateString = this.view.readLine().trim();
+  //      LocalDate startDate = LocalDate.parse(startDateString);
+  //      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
+  //      String endDateString = this.view.readLine().trim();
+  //      LocalDate endDate = LocalDate.parse(endDateString);
+  //      this.view.writeMessage("Enter the short moving period:");
+  //      int shortMovingPeriod = this.view.readInt();
+  //      this.view.writeMessage("Enter the long moving period:");
+  //      int longMovingPeriod = this.view.readInt();
+  //      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate,
+  //          shortMovingPeriod, longMovingPeriod);
+  //      if (this.printIfError(payload)) {
+  //        return;
+  //      }
+  //      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod,
+  //          (Map<String, Object>) payload.getData());
+  //    } catch (Exception e) {
+  //      this.view.writeMessage("Error finding moving crossover days: " + e.getMessage());
+  //      }
+
+  // result is stored in map with key "movingCrossoverDays"
+
+
+
+
+
+
+
+
+  // 1. valid symbol, start date, end date, short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_ValidInput() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 5;
+    // [2024-02-01, 2024-02-02, 2024-02-06]
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Map<String, Object> data = (Map<String, Object>) result.getData();
+    List<LocalDate> res = (List<LocalDate>) data.get("movingCrossoverDays");
+    // expected [2024-02-02, 2024-02-04, 2024-02-05]
+    List<LocalDate> expectedDates = Arrays.asList(
+            LocalDate.of(2024, 2, 2),
+            LocalDate.of(2024, 2, 4),
+            LocalDate.of(2024, 2, 5)
+    );
+    assertEquals(expectedDates, res);
+  }
+
+  //invalid symbol, valid start date, end date, short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_InvalidSymbol() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 5;
+    Payload result = portfolioController.findMovingCrossoverDays("INVALID", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Invalid stock symbol", result.getMessage());
+  }
+
+  // 3. valid symbol, invalid start date, end date, short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_InvalidStartDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 8); // Future date
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 5;
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Start date should be before end date", result.getMessage());
+  }
+
+  // 4. valid symbol, start date, invalid end date, short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_InvalidEndDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    // end date as today +1
+    LocalDate endDate = LocalDate.now().plusDays(1);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 5;
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Date cannot be in the future", result.getMessage());
+  }
+
+  // 5. valid symbol, start date, end date, invalid short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_InvalidShortMovingPeriod() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int shortMovingPeriod = 0;
+    int longMovingPeriod = 5;
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Short moving period should be greater than 0", result.getMessage());
+  }
+
+  // 6. valid symbol, start date, end date, short moving period and invalid long moving period
+  @Test
+  public void testFindMovingCrossoverDays_InvalidLongMovingPeriod() {
+    LocalDate startDate = LocalDate.of(2024, 2, 1);
+    LocalDate endDate = LocalDate.of(2024, 2, 7);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 0;
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Short moving period should be less than long moving period", result.getMessage());
+  }
+
+  // 7. valid symbol, start date after end date, short moving period and long moving period
+  @Test
+  public void testFindMovingCrossoverDays_StartDateAfterEndDate() {
+    LocalDate startDate = LocalDate.of(2024, 2, 7);
+    LocalDate endDate = LocalDate.of(2024, 2, 1);
+    int shortMovingPeriod = 2;
+    int longMovingPeriod = 5;
+    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Start date should be before end date", result.getMessage());
+  }
+
+
+
+
+
+
+
+
+
 
 
 }

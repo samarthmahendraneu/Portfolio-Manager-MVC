@@ -97,7 +97,7 @@ public class StockService implements StockServiceInterface {
     if (!cache.hasStockData(symbol, date)) {
       message = fetchAndCacheStockData(symbol);
       if (message != null) {
-        return null;
+        throw new IllegalArgumentException(message);
       }
     }
     info = cache.getStockData(symbol, date);
@@ -215,10 +215,22 @@ public class StockService implements StockServiceInterface {
    * @return A list of dates within the specified range that are crossover days.
    */
   public List<LocalDate> findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate) {
+    // both start and end dates cant be in the future
+    if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Date cannot be in the future");
+    }
+    // start date should be before end date
+    if (startDate.isAfter(endDate)) {
+      throw new IllegalArgumentException("Start date should be before end date");
+    }
+    // start != end
+    if (startDate.isEqual(endDate)) {
+      throw new IllegalArgumentException("Start date should not be equal to end date");
+    }
     List<LocalDate> crossoverDays = new ArrayList<>();
     String csvData = makeApiRequest(symbol);
     if (csvData.contains("Invalid stock symbol")) {
-      return crossoverDays;
+      throw new IllegalArgumentException("Invalid stock symbol: " + symbol);
     }
     // loop through dates in the range
     for(LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
@@ -242,6 +254,32 @@ public class StockService implements StockServiceInterface {
      * @return A list of dates within the specified range that are moving crossover days.
      */
     public Map<String, Object> findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, int shortMovingPeriod, int longMovingPeriod) {
+      // start date should be before end date
+      if (startDate.isAfter(endDate)) {
+        throw new IllegalArgumentException("Start date should be before end date");
+      }
+      // start != end
+      if (startDate.isEqual(endDate)) {
+        throw new IllegalArgumentException("Start date should not be equal to end date");
+      }
+      // both start and end dates cant be in the future
+      if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+        throw new IllegalArgumentException("Date cannot be in the future");
+      }
+      // short moving period should be less than long moving period
+      if (shortMovingPeriod >= longMovingPeriod) {
+        throw new IllegalArgumentException("Short moving period should be less than long moving period");
+      }
+      // short moving period should be greater than 0
+      if (shortMovingPeriod <= 0) {
+        throw new IllegalArgumentException("Short moving period should be greater than 0");
+      }
+
+      // long moving period should be greater than 0
+      if (longMovingPeriod <= 0) {
+        throw new IllegalArgumentException("Long moving period should be greater than 0");
+      }
+
       List<LocalDate> goldenCrosses = new ArrayList<>();
       List<LocalDate> deathCrosses = new ArrayList<>();
       List<LocalDate> movingCrossoverDays = new ArrayList<>();
@@ -507,6 +545,11 @@ public class StockService implements StockServiceInterface {
    * @return A string message indicating the stock's performance.
    */
   public String inspectStockGainOrLoss(String symbol, LocalDate date) {
+
+    // date should be in the past
+    if (date.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Date cannot be in the future");
+    }
     boolean isDataFullyAvailable = isDataAvailableInCache(symbol, date.minusDays(1), date);
 
     if (!isDataFullyAvailable) {
