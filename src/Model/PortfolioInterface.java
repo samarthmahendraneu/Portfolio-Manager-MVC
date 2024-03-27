@@ -54,4 +54,13 @@ public interface PortfolioInterface {
    * @return The total investment in the portfolio.
    */
   BigDecimal calculateInvestment(LocalDate date);
+
+  /**
+   * getStockQuantity(String symbol)
+   * @param symbol The symbol of the stock.
+   * @param date The date of the stock.
+   * @return The quantity of the stock.
+   */
+  int getStockQuantity(String symbol, LocalDate date);
+
 }

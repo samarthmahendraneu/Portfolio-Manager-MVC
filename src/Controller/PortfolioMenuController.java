@@ -35,6 +35,20 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
   /**
+   * set streamble input for testing.
+   */
+  public void setStreamableInput(Readable input) {
+    this.view.setStreamableInput(input);
+  }
+
+  /**
+   * get streamble output for testing.
+   */
+  public Appendable getStreamableOutput() {
+    return this.view.getStreamableOutput();
+  }
+
+  /**
    * Main Menu to choose between Normal and Flexible Portfolio.
    */
   public void displayMainMenu() {

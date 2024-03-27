@@ -1,14 +1,17 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.testng.Assert.assertNotNull;
 
 import Controller.Payload;
 import Controller.PortfolioControllerInterface;
+import Controller.PortfolioMenuController;
+import Controller.PortfolioMenuControllerInterface;
 import Model.PortfolioInterface;
 import Model.Service.StockServiceInterface;
 import Model.Tradable;
 
+import View.View;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -30,6 +33,7 @@ public class PortfolioControllerTest {
 
   private StockServiceInterface stockService;
   private PortfolioControllerInterface portfolioController;
+  private View view;
 
   /**
    * Sets up the test environment by creating a new StockService and PortfolioController.
@@ -38,6 +42,7 @@ public class PortfolioControllerTest {
   public void setUp() {
     stockService = new StockService("W0M1JOKC82EZEQA8");
     portfolioController = new PortfolioController(stockService);
+    view = new View();
   }
 
   /**
@@ -510,7 +515,7 @@ public class PortfolioControllerTest {
 
     Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
     assertFalse("Should compute moving average without errors.", result.isError());
-    assertNotNull(result.getData(), "Moving average should not be null.");
+    assertEquals(result.getData(), "Moving average should not be null.");
   }
 
   @Test
@@ -520,8 +525,106 @@ public class PortfolioControllerTest {
 
     Payload result = portfolioController.inspectStockPerformance(symbol, date);
     assertFalse("Should inspect stock performance without errors.", result.isError());
-    assertNotNull(result.getData(), "Stock performance description should not be null.");
+    assertEquals(result.getData(), "Stock performance description should not be null.");
   }
+
+
+
+
+
+
+
+
+  @Test
+  public void testAdditionalAddStockToPortfolio() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    assertEquals(1, portfolio.getStocks().size());
+    // add one more stock to the portfolio
+    payload = portfolioController.addStockToPortfolio(portfolio, "GOOGL", 5, LocalDate.now());
+    assertEquals(2, portfolio.getStocks().size());
+  }
+
+  //testAddStockToPortfolio_EmptyPortfolioName
+  @Test
+  public void testAddStockToPortfolio_EmptyPortfolioName() {
+    Payload payload = portfolioController.createNewPortfolio("");
+    assertEquals("Portfolio name cannot be empty", payload.getMessage());
+  }
+
+  // testAddStockToPortfolio_InvalidStockSymbol
+  @Test
+  public void testAddStockToPortfolio_InvalidStockSymbol() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "INVALID", 10, LocalDate.now());
+    assertEquals("Invalid stock symbol", payload.getMessage());
+  }
+
+  // testAddStockToPortfolio_InvalidQuantity
+  @Test
+  public void testAddStockToPortfolioInvalidQuantity() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 0, LocalDate.now());
+    assertEquals("Quantity must be positive: 0", payload.getMessage());
+  }
+
+  // testAddStockToPortfolio_FutureDate
+  @Test
+  public void testAddStockToPortfolio_FutureDate() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    LocalDate futureDate = LocalDate.now().plusDays(1);
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, futureDate);
+    assertEquals("Date cannot be in the future: " + futureDate, payload.getMessage());
+  }
+
+  // testAddStockToPortfolio_PortfolioNotFound expect null pointer exception
+  @Test(expected = NullPointerException.class)
+  public void testAddStockToPortfolio_PortfolioNotFound() {
+    Payload payload = portfolioController.addStockToPortfolio(null, "AAPL", 10, LocalDate.now());
+    assertEquals("Portfolio not found: null", payload.getMessage());
+  }
+
+  // add same stock twice to the portfolio
+  @Test
+  public void testAddSameStockTwiceToPortfolio() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    assertEquals(1, portfolio.getStocks().size());
+    // add a new date - 1 of current date
+    LocalDate newDate = LocalDate.now().minusDays(1);
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 5, newDate);
+    assertEquals(15, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+  }
+
+  // add same stock thrice to the portfolio
+  // validate on different dates
+  @Test
+  public void testAddSameStockTwiceToPortfolioValidateDifferentDays() {
+    Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
+    Portfolio portfolio = (Portfolio) payload.getData();
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now());
+    assertEquals(1, portfolio.getStocks().size());
+    // add a new date - 1 of current date
+    LocalDate newDate = LocalDate.now().minusDays(1);
+    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 5, newDate);
+    assertEquals(15, portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(5, portfolio.getStockQuantity("AAPL", newDate));
+
+  }
+
+
+
+
+
+
+
+
+
 
 
 }

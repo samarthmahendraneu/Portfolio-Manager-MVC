@@ -77,5 +77,20 @@ public interface PortfolioMenuControllerInterface {
    */
   void computeStockMovingAverage();
 
+  /**
+   * void setStreamableInput(Readable input)
+   */
+  void setStreamableInput(Readable input);
+
+  /**
+   * void getStreamableOutput()
+   */
+  Appendable getStreamableOutput();
+
+  /**
+   * void addStockToPortfolio()
+   */
+  void addStockToPortfolio();
+
 
 }
