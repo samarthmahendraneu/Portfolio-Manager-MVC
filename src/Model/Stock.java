@@ -107,7 +107,8 @@ public class Stock implements Tradable {
         if (entry.getValue() instanceof PurchangeInfo) {
           totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
         } else {
-          totalQuantity = totalQuantity.subtract(new BigDecimal(entry.getValue().getQuantity()));
+          // value of sale is  already stored as negative quantity
+          totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
         }
       }
     }
@@ -120,19 +121,15 @@ public class Stock implements Tradable {
    * get total quantity of the stock on a given date using activity log.
    */
   public int getQuantity(LocalDate date) {
-    BigDecimal totalQuantity = BigDecimal.ZERO;
+    int totalQuantity = 0;
 
     for (Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
       if (entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
-        if (entry.getValue() instanceof PurchangeInfo) {
-          totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
-        } else {
-          totalQuantity = totalQuantity.subtract(new BigDecimal(entry.getValue().getQuantity()));
-        }
+          totalQuantity = totalQuantity + entry.getValue().getQuantity();
       }
     }
 
-    return totalQuantity.intValue();
+    return totalQuantity;
   }
 
   /**

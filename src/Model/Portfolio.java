@@ -56,14 +56,26 @@ public class Portfolio implements PortfolioInterface {
    * @throws IllegalArgumentException if the stock is not in the portfolio.
    */
   public void sellStock(String stock, int quantity, LocalDate date, BigDecimal sellingPrice) throws IllegalArgumentException {
-    // stream through the stocks in the portfolio and find the stock to sell
-    this.getStocks().stream().filter(s -> s.getSymbol().equals(stock)).findFirst().ifPresent(s -> {
-      if (s.getQuantity() < quantity) {
-        throw new IllegalArgumentException("Not enough stock to sell");
-      }
-      s.sell(quantity, date, sellingPrice);
-    });
+    // throw an if date is in the future
+    if (date.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Cannot sell stock in the future");
+    }
 
+    // stream through the stocks in the portfolio and find the stock to sell
+    this.getStocks().stream()
+        .filter(s -> s.getSymbol().equals(stock))
+        .findFirst()
+        .ifPresentOrElse(
+            s -> {
+              if (s.getQuantity() < quantity) {
+                throw new IllegalArgumentException("Not enough stock to sell");
+              }
+              s.sell(quantity, date, sellingPrice);
+            },
+            () -> {
+              throw new IllegalArgumentException("Stock not found");
+            }
+        );
   }
 
   /**
