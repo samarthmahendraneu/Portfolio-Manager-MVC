@@ -1,89 +1,52 @@
 # Portfolio Management System Design Overview
 
-The Portfolio Management System is a Java-based application that allows users to manage their stock portfolios. It follows the Model-View-Controller (MVC) design pattern to separate concerns and enhance maintainability. The system provides functionalities such as creating new portfolios, examining and calculating portfolio values, and saving or loading portfolios from files.
+The Portfolio Management System is a sophisticated Java application tailored for users aiming to meticulously manage their stock portfolios. By adhering to the Model-View-Controller (MVC) architectural pattern, the system ensures a clear separation of concerns, thus fostering maintainability and scalability. Users are equipped with comprehensive functionalities including the creation and examination of portfolios, value calculations, as well as robust file management capabilities for portfolio data persistence.
 
 ## Components
 
+### Utilities
+
+#### DateUtils
+- A utility class providing methods to calculate dates based on specific business rules, such as determining the last working day of a month or year, adjusting for weekends, and deciding data resolution based on the date range.
+- Enhances the system's capability to handle date-based calculations more effectively, supporting features like historical data analysis and reporting.
+
+### File Management
+
+#### FileIO
+- An interface defining methods for reading from and writing to files, encapsulating the file operation logic.
+- Enables the Portfolio Management System to offer functionalities for saving portfolios to and loading portfolios from external files, thus allowing data persistence and easy data sharing.
+
 ### Main
-- Entry point of the application.
-- Initializes the system and starts the user interface.
+- Serves as the application's entry point, initiating the system setup and triggering the user interface.
 
-### Payload
-- A data structure used to encapsulate the result of an operation, including any data, messages, or error states.
-- Variables:
-  - `data`: Object
-  - `message`: String
-  - `error`: boolean
+### Model
 
-### Portfolio
-- Represents a stock portfolio with a name and a list of stocks.
-- Provides methods to add stocks to the portfolio.
-- Variables:
-  - `name`: String
-  - `stocks`: List<Tradable>
+#### Portfolio and Tradable
+- Core entities representing stock portfolios and tradable items (stocks) within those portfolios.
+- Offer methods for portfolio manipulation such as adding or selling stocks, calculating portfolio values, and maintaining a collection of stock data.
 
-### PortfolioController
-- Handles the business logic for portfolio operations.
-- Interacts with the `PortfolioServiceInterface` to perform operations like creating portfolios, adding stocks, and calculating values.
-- Variables:
-  - `portfolioService`: PortfolioServiceInterface
+### Controller
 
-### PortfolioControllerInterface
-- An interface defining the operations that a portfolio controller must support.
+#### PortfolioController and PortfolioMenuController
+- Act as the intermediaries between the model and view, handling business logic for portfolio operations and user interactions through a menu-driven interface.
+- Utilize services provided by `PortfolioServiceInterface` and `StockServiceInterface` to perform operations and fetch stock data.
 
-### PortfolioInterface
-- An interface defining the operations that a portfolio must support.
+### Transactions Package
 
-### PortfolioMenuController
-- Manages the interaction between user inputs and portfolio operations through a menu interface.
-- Implements the `PortfolioMenuControllerInterface`.
-- Variables:
-  - `portfolioController`: PortfolioControllerInterface
-  - `view`: View
+The `Transactions` package within the `Model` is designed to encapsulate the transactional details of stock trades, including both purchases and sales. It defines a base interface and concrete classes to represent transaction-specific information.
 
-### PortfolioMenuControllerInterface
-- An interface defining the operations that the menu controller must support.
+### Service
 
-### PortfolioService
-- Provides services related to portfolio management, such as listing portfolio names, checking if a portfolio exists, and saving/loading portfolios.
-- Interacts with the `StockServiceInterface` to retrieve stock data.
-- Variables:
-  - `numberOfPortfolios`: int
-
-### PortfolioServiceInterface
-- An interface defining the services that a portfolio service must provide.
-
-### Stock
-- Represents an individual stock within a portfolio, including details like symbol, quantity, purchase price, and date.
-- Variables:
-  - `symbol`: String
-  - `quantity`: int
-  - `purchasePrice`: BigDecimal
-  - `purchaseDate`: LocalDate
-
-### StockDataCache
-- Caches stock data to reduce the need for repeated API calls.
-
-### StockInfo
-- Encapsulates detailed information about a stock, such as open, high, low, close prices, and volume for a specific date.
-
-### StockService
-- Responsible for fetching stock data from external sources, such as an API.
-- Parses and caches data to improve performance and reduce dependency on external services.
-
-### StockServiceInterface
-- An interface defining the operations that a stock service must support.
-
-### Tradable
-- An interface representing a tradable item, such as a stock, with properties like quantity, purchase price, and date.
+#### PortfolioService and StockService
+- Provide domain-specific services related to portfolio management and stock data retrieval.
+- Interact with external data sources and caches to fetch and store stock information, enhancing system performance and reducing dependency on external services.
 
 ### View
-- Responsible for displaying information to the user.
-- Variables:
-  - `displayError(String, Appendable)`: void
-  - `displayPortfolioDetails(String, List<Tradable>, Appendable)`: void
-  - `displaySaveSuccess(String, Appendable)`: void
-  - `displayMainMenu(Appendable)`: void
-  - `displayPortfolioValue(String, String, String, Appendable)`: void
-  - `displayAvailablePortfolios(List<String>, Appendable)`: void
-  - `displayLoadSuccess(Appendable)`: void
+- Manages all user interface and display logic, presenting information to users and collecting user inputs.
+- Utilizes `View` components to display errors, portfolio details, and success messages.
+
+### Enhancements
+- **Date Handling**: With `DateUtils`, the system now includes advanced date manipulation capabilities, supporting dynamic resolution adjustment and end-of-period calculations to cater to various reporting needs.
+- **File Operations**: Through the `FileIO` interface, the system has enhanced file management functionalities, allowing users to persist portfolio data across sessions and facilitating easy data exchange.
+
+By incorporating these new functionalities, the Portfolio Management System not only maintains its robust portfolio management features but also introduces improved date handling and file operation capabilities, further enriching the user experience and system efficiency.
