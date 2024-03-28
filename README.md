@@ -4,41 +4,62 @@ The Portfolio Management System is a comprehensive Java-based application design
 
 ## Features
 
-- **Portfolio Creation**: Users can create multiple portfolios, each with a unique name, to manage different sets of investments.
-- **Stock Transactions**: Supports adding stocks to portfolios through purchase and sale transactions, including details such as quantity, price, and date.
-- **Portfolio Examination**: Offers the ability to examine the detailed composition of any portfolio, including the stocks held, quantities, purchase prices, and dates.
-- **Performance Analysis**: Generates performance charts for portfolios or individual stocks over specified time frames, providing insights into investment performance.
-- **Data Persistence**: Allows saving portfolios to and loading from CSV files, ensuring data persistence between application sessions.
-- **Market Analysis Tools**: Includes functionalities for calculating moving averages, identifying crossover days, and more, aiding in market analysis and decision-making.
+- **Create a Portfolio**: Users can create multiple portfolios to manage different sets of stock investments.
+- **Examine a Portfolio**: View detailed information about the stocks in a portfolio, including current holdings and transaction history.
+- **Calculate Portfolio Value**: Determine the total value of a portfolio on a specified date.
+- **Add Stock to Portfolio**: Purchase stocks to add to a portfolio by specifying the stock symbol, quantity, and purchase date.
+- **Sell Stock from Portfolio**: Sell stocks from a portfolio, adjusting the portfolio's holdings accordingly.
+- **Calculate Investment**: Analyze the total amount of money invested in a portfolio up to a specified date.
+- **Save/Load Portfolio**: Portfolios can be saved to a file for later retrieval, allowing for persistent management over time.
+- **Graph**: Plot a bar chart illustrating the performance of a stock or portfolio over a specified timeframe.
+- **Inspect Stock Performance**: Check if a stock gained or lost on a specific day.
+- **Calculate X-Day Moving Average**: Compute the moving average over a specified number of days for a given stock.
+- **Crossover Days**: Identify the days within a specified period when a stock's closing price crossed over its opening price.
+- **Moving Crossover Days**: Find the days where the stock's closing price crossed over its moving average within a specified period.
 
+## Getting Started
+
+### Menu Options
+
+1. **Create a new portfolio**
+2. **Examine a portfolio**
+3. **Calculate portfolio value**
+4. **Add Stock to Portfolio**
+5. **Sell Stock from Portfolio**
+6. **Calculate Investment**
+7. **Save portfolio**
+8. **Load portfolio**
+9. **Graph**
+10. **Inspect Stock performance**
+11. **Calculate X-Day Moving Average**
+12. **Crossover Days**
+13. **Moving Crossover Days**
+14. **Exit**
+
+Select an option from the menu to perform the corresponding action. The system is designed to be intuitive and user-friendly, guiding you through each process step by step.
+
+## Usage Example
+
+After launching the application, you will be presented with the main menu. From here, you can choose to create a new portfolio, examine existing portfolios, add or sell stocks, and perform various analyses on your stock holdings.
+
+### Create a New Portfolio
+
+1. Select "1. Create a new portfolio" from the main menu.
+2. Enter a name for your new portfolio when prompted.
+
+### Add Stock to a Portfolio
+
+1. Select "4. Add Stock to Portfolio" from the main menu.
+2. Follow the prompts to specify the stock symbol, quantity, and purchase date.
+
+### Inspect Stock Performance
+
+1. Select "10. Inspect Stock performance" from the main menu.
+2. Enter the stock symbol and the date you wish to inspect.
+
+Continue exploring other options from the menu to fully utilize the capabilities of the Portfolio Management System.
 ## Installation
 
 1. Ensure you have Java JDK 8 or higher installed on your system.
 2. Clone the repository to your local machine:
 
-## Usage
-
-The application provides a text-based user interface for interacting with the system. Users can navigate through the menu to manage their stock portfolios. Below are some of the key functionalities available:
-
-1. **Create New Portfolio**: Users can create a new portfolio by providing a unique name. This portfolio will be used to manage a collection of stock transactions.
-
-2. **Add Stock to Portfolio**: Users can add stock transactions to any created portfolio by specifying the stock symbol, quantity, purchase price, and purchase date.
-
-3. **Sell Stock from Portfolio**: Similar to adding stock, users can record the sale of stock within a portfolio by providing the necessary transaction details.
-
-4. **Calculate Portfolio Value**: This feature allows users to calculate the total value of a portfolio on a specific date, taking into account the current value of the stocks within it.
-
-5. **Analyze Portfolio Performance**: Users can generate reports on the performance of their portfolios over time, including gains, losses, and comparison against market indices.
-
-6. **Save and Load Portfolios**: Portfolios can be saved to a file for persistence and loaded from a file to resume management in future sessions.
-
-### Example Workflow
-
-1. Start the application and select the option to create a new portfolio.
-2. Enter a name for your portfolio.
-3. Choose to add a stock to your portfolio and enter the stock symbol, quantity, purchase price, and date of purchase.
-4. Repeat the process to add more stocks or sell existing ones.
-5. Calculate the total value of your portfolio or analyze its performance on a given date.
-6. Save your portfolio to a file for future use.
-
-Navigate through the menu options to explore all functionalities. The system is designed to be intuitive, guiding users through each process step by step.
