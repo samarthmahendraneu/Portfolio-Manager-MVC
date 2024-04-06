@@ -1,28 +1,20 @@
-package controller.fileio;
+package Controller.fileio;
 
 import java.io.IOException;
 import java.util.List;
-import model.PortfolioInterface;
+import Model.PortfolioInterface;
 
-/**
- * Interface for the FileIO class.
- */
 public interface FileIO {
 
   /**
-   * Reads the file and returns a list of portfolios.
+   * Reads the file
    *
-   * @param filePath The path of the file to read
-   * @return List of portfolios
+   * @return
    */
   List<PortfolioInterface> readFile(String filePath) throws IOException;
 
   /**
-   * Writes to the file.
-   *
-   * @param portfolio The list of portfolios to write to the file
-   * @param filePath  The path of the file to write the portfolios to
-   * @return True if the write was successful, false otherwise
+   * Writes to the file
    */
   Boolean writeFile(List<PortfolioInterface> portfolio, String filePath) throws IOException;
 }

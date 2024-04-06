@@ -1,4 +1,4 @@
-package controller;
+package Controller;
 
 /**
  * this class has two variables acts as a payload data - type class of any type message - type.
@@ -23,7 +23,7 @@ public class Payload {
   /**
    * getter for the data variable.
    *
-   * @return data - type class of any type
+   * @return data
    */
   public Object getData() {
     return data;
@@ -47,12 +47,7 @@ public class Payload {
     return !message.isEmpty();
   }
 
-  /**
-   * IsNotError method checks if the message contains the word "Error" or not.
-   *
-   * @return - type boolean.
-   */
-  public boolean isNotError() {
+  public boolean IsNotError() {
     return !message.contains("Error");
   }
 

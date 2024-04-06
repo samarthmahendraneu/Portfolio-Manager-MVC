@@ -1,9 +1,9 @@
-package controller;
+package Controller;
 
-import model.PortfolioInterface;
-import model.service.PortfolioService;
-import model.service.PortfolioServiceInterface;
-import model.service.StockServiceInterface;
+import Model.PortfolioInterface;
+import Model.Service.PortfolioService;
+import Model.Service.PortfolioServiceInterface;
+import Model.Service.StockServiceInterface;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -102,7 +102,7 @@ public class PortfolioController implements PortfolioControllerInterface {
 
   /**
    * Sell a specific number of shares of a specific stock on a specified date from a given
-   * portfolio.
+   * portfolio
    */
   public Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol,
       int quantity,
@@ -184,17 +184,8 @@ public class PortfolioController implements PortfolioControllerInterface {
     return this.portfolioService.getNumberOfPortfolios();
   }
 
-  /**
-   * Generates a performance graph for a given stock symbol or portfolio name within a specified
-   * date range. The graph displays the performance of the stock or portfolio over time.
-   *
-   * @param identifier The stock symbol or portfolio name.
-   * @param startDate  The start date of the period for graph generation.
-   * @param endDate    The end date of the period for graph generation.
-   * @return A StringBuilder object containing the performance graph.
-   * @throws IllegalArgumentException If an error occurs during the graph generation process.
-   */
-  public StringBuilder genGraph(String identifier, LocalDate startDate, LocalDate endDate)
+
+  public StringBuilder GenGraph(String identifier, LocalDate startDate, LocalDate endDate)
       throws IllegalArgumentException {
     try {
       return this.portfolioService.plotPerformanceChart(identifier, startDate, endDate);
@@ -222,13 +213,6 @@ public class PortfolioController implements PortfolioControllerInterface {
     }
   }
 
-  /**
-   * Fetches the closing price of the stock with the given symbol on the previous trading day.
-   *
-   * @param symbol The symbol of the stock.
-   * @param date   The date on which to inspect the stock's performance.
-   * @return A Payload object containing the stock's performance information.
-   */
   public Payload inspectStockPerformance(String symbol, LocalDate date) {
     try {
       String performance = stockServiceInterface.inspectStockGainOrLoss(symbol, date);
@@ -261,17 +245,7 @@ public class PortfolioController implements PortfolioControllerInterface {
     }
   }
 
-
-  /**
-   * Computes and returns the moving average of a specified stock's closing prices over a defined
-   * number of days leading up to a certain date. This average helps to smooth out price data and
-   * identify trends.
-   *
-   * @param symbol  The symbol of the stock.
-   * @param endDate The end date for the moving average calculation.
-   * @param days    The number of days over which to calculate the moving average.
-   * @return A Payload object containing the moving average or an error message.
-   */
+  // Method to compute X-day moving average for a stock
   public Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days) {
     try {
       BigDecimal average = stockServiceInterface.computeXDayMovingAverage(symbol, endDate,

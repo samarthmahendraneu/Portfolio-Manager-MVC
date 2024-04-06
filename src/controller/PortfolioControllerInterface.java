@@ -1,8 +1,8 @@
-package controller;
+package Controller;
 
 
-import model.PortfolioInterface;
-import model.service.PortfolioServiceInterface;
+import Model.PortfolioInterface;
+import Model.Service.PortfolioServiceInterface;
 import java.time.LocalDate;
 
 /**
@@ -26,6 +26,7 @@ public interface PortfolioControllerInterface {
    * @param symbol    The symbol of the stock to be added.
    * @param quantity  The quantity of the stock to be added.
    * @param date      The date on which the stock was purchased.
+   *
    * @return The updated portfolio.
    */
   Payload addStockToPortfolio(PortfolioInterface portfolio, String symbol, int quantity,
@@ -55,17 +56,19 @@ public interface PortfolioControllerInterface {
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path where the portfolios will be saved.
-   * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
+   *
+   * @return The payload containing the portfolios.
    */
   Payload savePortfolio(String filePath) throws IllegalArgumentException;
 
   /**
-   * Loads the portfolios from a CSV file at the given file path.
+   * Loads portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
-   * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
+   *
+   * @return The payload containing the portfolios.
    */
   Payload loadPortfolio(String filePath) throws IllegalArgumentException;
 
@@ -84,19 +87,19 @@ public interface PortfolioControllerInterface {
   int getNumPortfolios();
 
   /**
-   * Generates a performance graph for a specified stock or portfolio over a given time frame. The
-   * graph represents changes in value with a line of asterisks, where each asterisk's value is
-   * dynamically determined based on the range of values within the period.
+   * Generates a performance graph for a specified stock or portfolio over a given time frame.
+   * The graph represents changes in value with a line of asterisks, where each asterisk's value
+   * is dynamically determined based on the range of values within the period.
    *
    * @param identifier The stock symbol or portfolio name.
    * @param startDate  The start date of the period for graph generation.
    * @param endDate    The end date of the period for graph generation.
    */
-  StringBuilder genGraph(String identifier, LocalDate startDate, LocalDate endDate);
+  StringBuilder GenGraph(String identifier, LocalDate startDate, LocalDate endDate);
 
   /**
-   * Saves the current state of the stock data cache to a specified file path. This method allows
-   * the persistence of cache data between application sessions, reducing API calls.
+   * Saves the current state of the stock data cache to a specified file path. This method
+   * allows the persistence of cache data between application sessions, reducing API calls.
    *
    * @param filePath The file path where the cache data will be saved.
    * @return A Payload object indicating success or containing an error message.
@@ -104,8 +107,8 @@ public interface PortfolioControllerInterface {
   Payload saveCache(String filePath);
 
   /**
-   * Loads stock data cache from a specified file path into the application. This method is useful
-   * for initializing the cache with previously saved data upon starting the application.
+   * Loads stock data cache from a specified file path into the application. This method is
+   * useful for initializing the cache with previously saved data upon starting the application.
    *
    * @param filePath The file path from where the cache data will be loaded.
    * @return A Payload object indicating success or containing an error message.
@@ -113,23 +116,22 @@ public interface PortfolioControllerInterface {
   Payload loadCache(String filePath);
 
   /**
-   * Finds the moving crossover days for a given stock symbol within a specified date range. A
-   * moving crossover day is a day when the closing price of the stock is higher than the moving
-   * average.
+   * Finds the moving crossover days for a given stock symbol within a specified date range.
+   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
    *
-   * @param symbol            The symbol of the stock to analyze.
-   * @param startDate         The start date of the date range.
-   * @param endDate           The end date of the date range.
+   * @param symbol       The symbol of the stock to analyze.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
    * @param shortMovingPeriod The number of days to consider for the short moving average.
-   * @param longMovingPeriod  The number of days to consider for the long moving average.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
    * @return A list of dates within the specified range that are moving crossover days.
    */
   Payload findMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       int shortMovingPeriod, int longMovingPeriod);
 
   /**
-   * Finds the crossover days for a given stock symbol within a specified date range. A crossover
-   * day is a day when the closing price of the stock is higher than the opening price.
+   * Finds the crossover days for a given stock symbol within a specified date range.
+   * A crossover day is a day when the closing price of the stock is higher than the opening price.
    *
    * @param symbol    The symbol of the stock to analyze.
    * @param startDate The start date of the date range.
@@ -138,22 +140,21 @@ public interface PortfolioControllerInterface {
    */
   Payload findCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate);
 
-  /**
-   * Computes and returns the moving average of a specified stock's closing prices over a defined
-   * number of days leading up to a certain date. This average helps to smooth out price data and
-   * identify trends.
+   /** Computes and returns the moving average of a specified stock's closing prices over a defined
+   * number of days leading up to a certain date. This average helps to smooth out price data
+   * and identify trends.
    *
-   * @param symbol  The symbol of the stock.
-   * @param endDate The end date for the moving average calculation.
-   * @param days    The number of days over which to calculate the moving average.
+   * @param symbol   The symbol of the stock.
+   * @param endDate  The end date for the moving average calculation.
+   * @param days     The number of days over which to calculate the moving average.
    * @return A Payload object containing the moving average or an error message.
    */
   Payload computeStockMovingAverage(String symbol, LocalDate endDate, int days);
 
   /**
    * Inspects the performance of a specified stock on a given date, indicating whether it gained,
-   * lost, or remained unchanged. Additionally, it calculates and reports the magnitude of the gain
-   * or loss.
+   * lost, or remained unchanged. Additionally, it calculates and reports the magnitude of the
+   * gain or loss.
    *
    * @param symbol The symbol of the stock.
    * @param date   The date on which to inspect the stock's performance.

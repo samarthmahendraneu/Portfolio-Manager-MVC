@@ -1,4 +1,4 @@
-package controller.fileio;
+package Controller.fileio;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,21 +12,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Portfolio;
-import model.PortfolioInterface;
-import model.Tradable;
-import model.transactions.TranactionInfo;
+import Model.Portfolio;
+import Model.PortfolioInterface;
+import Model.Tradable;
+import Model.Transactions.TranactionInfo;
 
-/**
- * Class to read and write to a CSV file.
- */
 public class CsvFileIO implements FileIO {
 
   /**
-   * Reads the file.
+   * Reads the file
    *
-   * @param filePath The path of the file to read.
-   * @return List of portfolios
+   * @param filePath
+   * @return
    */
   @Override
   public List<PortfolioInterface> readFile(String filePath) throws IOException {
@@ -41,11 +38,12 @@ public class CsvFileIO implements FileIO {
       reader.lines().forEach(line -> {
         String[] data = line.split(",");
         Portfolio portfolio = portfolioMap.computeIfAbsent(data[0], Portfolio::new);
-        if (Float.parseFloat(data[2]) < 0) {
-          portfolio.sellStock(data[1], (int) Float.parseFloat(data[2]) * -1,
+        // if Integer.parseInt(data[2]) is negative, then its selling the stock else adding the stock
+        if (Integer.parseInt(data[2]) < 0) {
+          portfolio.sellStock(data[1], Integer.parseInt(data[2]) * -1,
               LocalDate.parse(data[4]), new BigDecimal(data[3]));
         } else {
-          portfolio.addStock(data[1], (int) Float.parseFloat(data[2]), new BigDecimal(data[3]),
+          portfolio.addStock(data[1], Integer.parseInt(data[2]), new BigDecimal(data[3]),
               LocalDate.parse(data[4]));
         }
       });
@@ -55,12 +53,10 @@ public class CsvFileIO implements FileIO {
   }
 
   /**
-   * Writes to the file.
+   * Writes to the file
    *
-   * @param portfolios portfolios to write to the file
-   * @param filePath   path of the file to write
-   * @return true if the file was written successfully
-   * @throws IOException if there was an error writing to the file
+   * @param portfolios
+   * @param filePath
    */
   @Override
   public Boolean writeFile(List<PortfolioInterface> portfolios, String filePath)
@@ -73,7 +69,7 @@ public class CsvFileIO implements FileIO {
             LocalDate date = entry.getKey();
             TranactionInfo info = entry.getValue();
             BigDecimal price = info.getPrice();
-            Float quantity = info.getQuantity();
+            Integer quantity = info.getQuantity();
             writer.append(String.join(",", portfolio.getName(), stock.getSymbol(),
                 String.valueOf(quantity), price.toString(), date.toString()));
             writer.append("\n");

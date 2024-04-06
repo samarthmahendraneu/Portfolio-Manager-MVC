@@ -1,7 +1,7 @@
-package view;
+package View;
 
 
-import model.Tradable;
+import Model.Tradable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
@@ -13,10 +13,9 @@ import java.util.Scanner;
  * View class for the Portfolio Management System.
  */
 public class View {
-
+  
   private final Appendable out;
   private Readable in;
-
   public View() {
     this.out = System.out;
     this.in = new InputStreamReader(System.in);
@@ -39,8 +38,7 @@ public class View {
   }
 
   /**
-   * This method is used for inputStream.
-   * @return the line read from the input stream.
+   * This method is used for inputStream
    */
   public String readLine() {
     Scanner scanner = new Scanner(this.in);
@@ -49,8 +47,7 @@ public class View {
   }
 
   /**
-   * This method is used for inputStream.
-   * @return the integer read from the input stream.
+   * This method is used for inputStream
    */
   public Integer readInt() {
     Scanner scanner = new Scanner(this.in);
@@ -61,14 +58,14 @@ public class View {
   }
 
   /**
-   * set the input stream.
+   * setStreamableInput
    */
   public void setStreamableInput(Readable in) {
     this.in = in;
   }
 
   /**
-   * get the output stream.
+   * getStreamableOutput
    */
   public Appendable getStreamableOutput() {
     return this.out;
@@ -76,7 +73,7 @@ public class View {
 
 
   /**
-   * display main menu to choose between flexible and normal portfolio management.
+   * display main menu to choose between flexible and normal portfolio management
    */
   public void displayMainMenu() throws IOException {
     this.out.append("\nPortfolio Management System:\n");
@@ -108,8 +105,7 @@ public class View {
     this.out.append("11. Calculate X-Day Moving Average\n");
     this.out.append("12. Crossover Days\n");
     this.out.append("13. Moving Crossover Days\n");
-    this.out.append("14. Dollar cost Averaging\n");
-    this.out.append("15. Exit\n");
+    this.out.append("14. Exit\n");
     this.out.append("Select an option: \n");
   }
 
@@ -177,8 +173,7 @@ public class View {
    */
   public void displayPortfolioValue(String name, String date, String value)
       throws IOException {
-    this.out.append("Value of the portfolio '").append(name).append("' on ").append(date)
-        .append(": ")
+    this.out.append("Value of the portfolio '").append(name).append("' on ").append(date).append(": ")
         .append(value).append("\n");
   }
 
@@ -192,8 +187,7 @@ public class View {
    */
   public void displayPortfolioInvestment(String name, String date, String value)
       throws IOException {
-    this.out.append("Investment of the portfolio '").append(name).append("' on ").append(date)
-        .append(": ")
+    this.out.append("Investment of the portfolio '").append(name).append("' on ").append(date).append(": ")
         .append(value).append("\n");
   }
 
@@ -217,10 +211,9 @@ public class View {
   }
 
   /**
-   * Displace a success message for creating a new portfolio.
+   * Displace displayStockAdded
    */
-  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity)
-      throws IOException {
+  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity) throws IOException {
     this.out.append("Stock ").append(stockSymbol).append(" with quantity ")
         .append(String.valueOf(quantity))
         .append(" added to portfolio ").append(portfolioName).append("\n");
@@ -229,8 +222,7 @@ public class View {
   /**
    * Display a success message for selling stocks.
    */
-  public void displayStockSold(String portfolioName, String symbol, int quantity)
-      throws IOException {
+  public void displayStockSold(String portfolioName, String symbol, int quantity) throws IOException {
     this.out.append("Stock ").append(symbol).append(" with quantity ")
         .append(String.valueOf(quantity))
         .append(" sold from portfolio ").append(portfolioName).append("\n");
@@ -254,8 +246,7 @@ public class View {
    * @param endDate   The end date of the date range.
    * @param dates     The crossover days.
    */
-  public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
-      List<LocalDate> dates)
+  public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, List<LocalDate> dates)
       throws IOException {
     this.out.append("Crossover days for stock ").append(symbol).append(" between ")
         .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n");
@@ -267,12 +258,12 @@ public class View {
   /**
    * Display the moving crossover days for the given stock symbol.
    *
-   * @param symbol            The stock symbol.
-   * @param startDate         The start date of the date range.
-   * @param endDate           The end date of the date range.
+   * @param symbol       The stock symbol.
+   * @param startDate    The start date of the date range.
+   * @param endDate      The end date of the date range.
    * @param shortMovingPeriod The number of days to consider for the short moving average.
-   * @param longMovingPeriod  The number of days to consider for the long moving average.
-   * @param result            The moving crossover days.
+   * @param longMovingPeriod The number of days to consider for the long moving average.
+   * @param result        The moving crossover days.
    */
   public void displayMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       int shortMovingPeriod, int longMovingPeriod, Map<String, Object> result)
@@ -282,10 +273,8 @@ public class View {
     List<LocalDate> movingCrossoverDays = (List<LocalDate>) result.get("movingCrossoverDays");
 
     this.out.append("Moving crossover days for stock ").append(symbol).append(" between ")
-        .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n")
-        .append(
-            "Short moving period: ").append(String.valueOf(shortMovingPeriod))
-        .append(", Long moving period: ")
+        .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n").append(
+        "Short moving period: ").append(String.valueOf(shortMovingPeriod)).append(", Long moving period: ")
         .append(String.valueOf(longMovingPeriod)).append("\n");
     this.out.append("Golden Crosses:\n");
     for (LocalDate goldenDate : goldenCrosses) {
@@ -302,5 +291,5 @@ public class View {
       this.out.append(movingDate.toString()).append("\n");
     }
 
-  }
+    }
 }
