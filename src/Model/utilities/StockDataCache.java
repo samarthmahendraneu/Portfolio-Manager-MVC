@@ -1,4 +1,4 @@
-package Model.utilities;
+package model.utilities;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,6 +52,11 @@ public class StockDataCache {
     return stockDataCache.containsKey(symbol) && stockDataCache.get(symbol).containsKey(date);
   }
 
+  /**
+   * Saves the cache to a file.
+   *
+   * @param filePath The path to the file where the cache is to be saved.
+   */
   public void saveCacheToFile(String filePath) {
     try (PrintWriter out = new PrintWriter(new FileWriter(filePath))) {
       out.println("Symbol,Date,Open,High,Low,Close,Volume"); // CSV header
@@ -61,7 +66,7 @@ public class StockDataCache {
           LocalDate date = dateEntry.getKey();
           StockInfo info = dateEntry.getValue();
           out.printf("%s,%s,%f,%f,%f,%f,%d%n", symbol, date, info.getOpen(), info.getHigh(),
-                  info.getLow(), info.getClose(), info.getVolume());
+              info.getLow(), info.getClose(), info.getVolume());
         }
       }
     } catch (IOException e) {
@@ -69,6 +74,11 @@ public class StockDataCache {
     }
   }
 
+  /**
+   * Loads the cache from a file.
+   *
+   * @param filePath The path to the file from which the cache is to be loaded.
+   */
   public void loadCacheFromFile(String filePath) {
     try (Scanner scanner = new Scanner(new File(filePath))) {
       if (scanner.hasNextLine()) { // Skip header

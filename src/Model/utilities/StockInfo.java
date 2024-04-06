@@ -1,4 +1,4 @@
-package Model.utilities;
+package model.utilities;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

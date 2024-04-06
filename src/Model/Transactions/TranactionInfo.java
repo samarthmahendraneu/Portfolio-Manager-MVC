@@ -1,6 +1,10 @@
-package Model.Transactions;
+package model.transactions;
+
 import java.math.BigDecimal;
 
+/**
+ * Interface for the TransactionInfo class.
+ */
 public interface TranactionInfo {
 
 
@@ -9,7 +13,7 @@ public interface TranactionInfo {
    *
    * @return The quantity of the stock.
    */
-  int getQuantity();
+  float getQuantity();
 
   /**
    * Get the purchase price of the stock.

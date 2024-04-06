@@ -1,13 +1,16 @@
-package Model.Transactions;
+package model.transactions;
 
 import java.math.BigDecimal;
 
-public class SaleInfo implements TranactionInfo{
+/**
+ * Class to represent the sale of a stock.
+ */
+public class SaleInfo implements TranactionInfo {
 
   /**
    * The quantity of the stock. Sell price of the stock.
    */
-  private int quantity;
+  private float quantity;
   private final BigDecimal sellPrice;
 
   /**
@@ -16,7 +19,7 @@ public class SaleInfo implements TranactionInfo{
    * @param quantity  The quantity of the stock.
    * @param sellPrice The sell price of the stock.
    */
-  public SaleInfo(int quantity, BigDecimal sellPrice) {
+  public SaleInfo(float quantity, BigDecimal sellPrice) {
     this.quantity = quantity;
     this.sellPrice = sellPrice;
   }
@@ -26,7 +29,7 @@ public class SaleInfo implements TranactionInfo{
    *
    * @return The quantity of the stock.
    */
-  public int getQuantity() {
+  public float getQuantity() {
     return quantity;
   }
 

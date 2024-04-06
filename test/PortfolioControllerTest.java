@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import Controller.Payload;
-import Controller.PortfolioController;
-import Controller.PortfolioControllerInterface;
-import Mock.MockStockService;
-import Model.Portfolio;
-import Model.PortfolioInterface;
-import Model.Service.StockService;
-import Model.Service.StockServiceInterface;
-import Model.Stock;
-import Model.Tradable;
-import View.View;
+import controller.Payload;
+import controller.PortfolioController;
+import controller.PortfolioControllerInterface;
+import mock.MockStockService;
+import model.Portfolio;
+import model.PortfolioInterface;
+import model.service.StockService;
+import model.service.StockServiceInterface;
+import model.Stock;
+import model.Tradable;
+import view.View;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,12 +36,11 @@ public class PortfolioControllerTest {
 
   private StockServiceInterface stockService;
   private PortfolioControllerInterface portfolioController;
-  private View view;
   private MockStockService mockStockService;
-
   private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
   private final PrintStream originalOut = System.out;
   private ByteArrayInputStream inContent;
+
   /**
    * Sets up the test environment by creating a new StockService and PortfolioController.
    */
@@ -49,7 +48,7 @@ public class PortfolioControllerTest {
   public void setUp() {
     stockService = new StockService("W0M1JOKC82EZEQA8");
     portfolioController = new PortfolioController(stockService);
-    view = new View();
+    View view = new View();
     mockStockService = new MockStockService();
 
   }
@@ -331,6 +330,7 @@ public class PortfolioControllerTest {
     String message = payload.getMessage();
     assertEquals("Date cannot be in the future: " + futureDate, message);
   }
+
   @Test
   public void testCreatePortfolioWithEmptyName() {
     Payload result = portfolioController.createNewPortfolio("");
@@ -359,7 +359,8 @@ public class PortfolioControllerTest {
 
     // List all portfolio names and verify
     List<String> portfolioNames = portfolioController.getPortfolioService().listPortfolioNames();
-    assertEquals("Expected number of portfolios does not match", numberOfPortfolios, portfolioNames.size());
+    assertEquals("Expected number of portfolios does not match",
+            numberOfPortfolios, portfolioNames.size());
 
     // Verify each portfolio name is correctly listed
     IntStream.rangeClosed(1, numberOfPortfolios).forEach(i -> {
@@ -479,7 +480,7 @@ public class PortfolioControllerTest {
           purchaseDate);
     }
     Payload result = portfolioController.savePortfolio("test.csv");
-    assertTrue(result.IsNotError());
+    assertTrue(result.isNotError());
   }
 
 
@@ -634,8 +635,10 @@ public class PortfolioControllerTest {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
     // buy 2 days back
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now());
     assertEquals(5, portfolio.getStockQuantity("AAPL", LocalDate.now()));
   }
 
@@ -644,10 +647,13 @@ public class PortfolioControllerTest {
   public void testSellStockFromPortfolio_PortfolioDifferentDate() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
     assertEquals(5, portfolio.getStockQuantity("AAPL", LocalDate.now()));
-    assertEquals(10, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
+    assertEquals(10, portfolio.getStockQuantity(
+            "AAPL", LocalDate.now().minusDays(2)));
   }
 
   // 6. sell stock from a portfolio that has the stock and the quantity but on a future date
@@ -655,8 +661,10 @@ public class PortfolioControllerTest {
   public void testSellStockFromPortfolio_PortfolioFutureDate() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().plusDays(1));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now().plusDays(1));
     assertEquals("Cannot sell stock in the future", payload.getMessage());
   }
 
@@ -665,9 +673,12 @@ public class PortfolioControllerTest {
   public void testSellStockFromPortfolio_PortfolioDifferentDays() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 3, LocalDate.now().minusDays(2));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 3, LocalDate.now().minusDays(2));
     assertEquals(2, portfolio.getStockQuantity("AAPL", LocalDate.now()));
     assertEquals(2, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(1)));
     assertEquals(7, portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
@@ -679,8 +690,10 @@ public class PortfolioControllerTest {
   public void testSellStockFromPortfolio_PortfolioMoreQuantity() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 15, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 15, LocalDate.now().minusDays(12));
     assertEquals("Not enough stock to sell", payload.getMessage());
   }
 
@@ -706,7 +719,8 @@ public class PortfolioControllerTest {
   public void testCalculateInvestment_PortfolioDifferentDate() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     // get price of stock on the date
     Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
     BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
@@ -719,9 +733,12 @@ public class PortfolioControllerTest {
   public void testCalculateInvestment_PortfolioFutureDate() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().plusDays(1));
-    assertEquals("Date cannot be in the future: " + LocalDate.now().plusDays(1), payload.getMessage());
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().plusDays(1));
+    assertEquals("Date cannot be in the future: " + LocalDate.now().plusDays(
+            1), payload.getMessage());
   }
 
   // 5. calculate investment for a portfolio that has stocks and on the same date
@@ -729,11 +746,14 @@ public class PortfolioControllerTest {
   public void testCalculateInvestment_PortfolioValid() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     // get price of stock on the date
-    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    Payload stock_price = stockService.fetchPriceOnDate(
+            "AAPL", LocalDate.now().minusDays(12));
     BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now());
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
@@ -743,13 +763,17 @@ public class PortfolioControllerTest {
   public void testCalculateInvestment_PortfolioNoStocksSold() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     // get price of stock on the date
-    Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
+    Payload stock_price = stockService.fetchPriceOnDate(
+            "AAPL", LocalDate.now().minusDays(12));
     BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now());
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(1));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
@@ -758,35 +782,42 @@ public class PortfolioControllerTest {
   public void testCalculateInvestment_PortfolioDifferentDays() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     // get price of stock on the date
     Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
     BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
     payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(1));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(2));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(2));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
-  // 7. calculate investment for a portfolio that has stocks and on different dates and sell stocks on different dates
   @Test
   public void testCalculateInvestment_PortfolioDifferentDaysSellStocks() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     // get price of stock on the date
     Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(12));
     BigDecimal total = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
     payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now());
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(1));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(2));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(2));
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
-    payload = portfolioController.calculateTotalInvestment("Test Portfolio", LocalDate.now().minusDays(1));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
+    payload = portfolioController.calculateTotalInvestment(
+            "Test Portfolio", LocalDate.now().minusDays(1));
 
     BigDecimal newTotal = ((BigDecimal) stock_price.getData()).multiply(new BigDecimal(10));
     assertEquals(newTotal, ((Optional<BigDecimal>) payload.getData()).get());
@@ -812,8 +843,10 @@ public class PortfolioControllerTest {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
     // buy 2 days back
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now());
     payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
     // fetch stock price
     Payload stock_price = stockService.fetchPriceOnDate("AAPL", LocalDate.now());
@@ -821,22 +854,29 @@ public class PortfolioControllerTest {
     assertEquals(total, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
-  // 2. add stock to portfolio, sell stock from portfolio and then calculate value on different dates
   @Test
   public void testAddStockSellStockCalculateValueDifferentDates() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
     Portfolio portfolio = (Portfolio) payload.getData();
     // buy 2 days back
-    payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
-    payload = portfolioController.sellStockFromPortfolio(portfolio, "AAPL", 5, LocalDate.now());
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now());
+    payload = portfolioController.addStockToPortfolio(
+            portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
+    payload = portfolioController.sellStockFromPortfolio(
+            portfolio, "AAPL", 5, LocalDate.now());
+    payload = portfolioController.calculatePortfolioValue(
+            "Test Portfolio", LocalDate.now());
     // fetch stock price
-    Payload stock_price_today = stockService.fetchPriceOnDate("AAPL", LocalDate.now());
-    BigDecimal total_today = ((BigDecimal) stock_price_today.getData()).multiply(new BigDecimal(5));
-    Payload stock_price_yesterday = stockService.fetchPriceOnDate("AAPL", LocalDate.now().minusDays(1));
+    Payload stock_price_today = stockService.fetchPriceOnDate(
+            "AAPL", LocalDate.now());
+    BigDecimal total_today = ((BigDecimal) stock_price_today.getData()).multiply(new BigDecimal(
+            5));
+    Payload stock_price_yesterday = stockService.fetchPriceOnDate(
+            "AAPL", LocalDate.now().minusDays(1));
     assertEquals(total_today, ((Optional<BigDecimal>) payload.getData()).get());
-    BigDecimal total_yesterday = ((BigDecimal) stock_price_yesterday.getData()).multiply(new BigDecimal(10));
-    payload = portfolioController.calculatePortfolioValue("Test Portfolio", LocalDate.now().minusDays(1));
+    BigDecimal total_yesterday = ((BigDecimal) stock_price_yesterday.getData()).multiply(
+            new BigDecimal(10));
+    payload = portfolioController.calculatePortfolioValue(
+            "Test Portfolio", LocalDate.now().minusDays(1));
     assertEquals(total_yesterday, ((Optional<BigDecimal>) payload.getData()).get());
   }
 
@@ -870,21 +910,23 @@ public class PortfolioControllerTest {
   public void testInspectStockGainOrLoss_DataNotAvailable() {
     MockStockService mockService = new MockStockService() {
     };
-    String result = mockService.inspectStockGainOrLoss
-            ("AAPL", LocalDate.of(2024, 1, 14));
+    String result = mockService.inspectStockGainOrLoss(
+            "AAPL", LocalDate.of(2024, 1, 14));
     assertTrue(result.contains("Stock data not available"));
   }
+
   @Test
   public void testComputeXDayMovingAverage_ValidInput() {
-    BigDecimal average = mockStockService.computeXDayMovingAverage("AAPL", LocalDate.of(2024, 2, 2), 2);
+    BigDecimal average = mockStockService.computeXDayMovingAverage(
+            "AAPL", LocalDate.of(2024, 2, 2), 2);
     assertNotNull(average);
     assertTrue(average.compareTo(new BigDecimal("153")) == 0);
   }
 
   @Test
   public void testInspectStockGainOrLoss_Gainby2() {
-    String result = mockStockService.inspectStockGainOrLoss
-            ("AAPL", LocalDate.of(2024, 2, 3));
+    String result = mockStockService.inspectStockGainOrLoss(
+            "AAPL", LocalDate.of(2024, 2, 3));
     assertEquals("Gained by 2", result);
   }
 
@@ -893,8 +935,9 @@ public class PortfolioControllerTest {
   public void testMovingAverageWithMissingData() {
     LocalDate endDate = LocalDate.of(2024, 2, 7);
     int days = 5;
-    BigDecimal expectedAverage = new BigDecimal("152"); // Manual calculation excluding missing day
-    BigDecimal actualAverage = mockStockService.computeXDayMovingAverage("AAPL", endDate, days);
+    BigDecimal expectedAverage = new BigDecimal("152");
+    BigDecimal actualAverage = mockStockService.computeXDayMovingAverage(
+            "AAPL", endDate, days);
     assertEquals(expectedAverage, actualAverage.stripTrailingZeros());
   }
 
@@ -952,24 +995,25 @@ public class PortfolioControllerTest {
     LocalDate validDate = LocalDate.now().minusDays(1); // Previous day
     assertTrue("Previous day should be valid", mockService.isValidDate(validDate));
   }
+
   @Test
   public void testPlotPerformanceChartIntegration() {
 
     StringBuilder expectedOutput = new StringBuilder();
     expectedOutput.append("30 Jun 2020: ***************************\n");
-    expectedOutput.append("30 Sept 2020: ***************************\n");
+    expectedOutput.append("30 Sep 2020: ***************************\n");
     expectedOutput.append("31 Dec 2020: ****************************\n");
     expectedOutput.append("31 Mar 2021: *****************************\n");
     expectedOutput.append("30 Jun 2021: ********************************\n");
-    expectedOutput.append("30 Sept 2021: *******************************\n");
+    expectedOutput.append("30 Sep 2021: *******************************\n");
     expectedOutput.append("31 Dec 2021: ******************************\n");
     expectedOutput.append("31 Mar 2022: *****************************\n");
     expectedOutput.append("30 Jun 2022: *******************************\n");
-    expectedOutput.append("30 Sept 2022: **************************\n");
+    expectedOutput.append("30 Sep 2022: **************************\n");
     expectedOutput.append("30 Dec 2022: *******************************\n");
     expectedOutput.append("\nScale: * = 4.4448 dollars (relative)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph(
+    StringBuilder actualOutput = portfolioController.genGraph(
             "IBM", LocalDate.of(2020, 4, 3),
             LocalDate.of(2023, 3, 3));
 
@@ -997,39 +1041,14 @@ public class PortfolioControllerTest {
     expectedOutput.append("24 Mar 2023: ****************************\n");
     expectedOutput.append("\nScale: * = 4.4224 dollars (relative)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph(
+    StringBuilder actualOutput = portfolioController.genGraph(
             "IBM", LocalDate.of(2023, 3, 6),
                     LocalDate.of(2023, 3, 24));
 
     assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
   }
 
-  //     try {
-  //      this.view.writeMessage("Enter the stock symbol:");
-  //      String symbol = this.view.readLine().trim();
-  //      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
-  //      String startDateString = this.view.readLine().trim();
-  //      LocalDate startDate = LocalDate.parse(startDateString);
-  //      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
-  //      String endDateString = this.view.readLine().trim();
-  //      LocalDate endDate = LocalDate.parse(endDateString);
-  //      Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
-  //      if (this.printIfError(payload)) {
-  //        return;
-  //      }
-  //      view.displayCrossoverDays(symbol, startDate, endDate, (List<LocalDate>) payload.getData());
-  //    } catch (Exception e) {
-  //      this.view.writeMessage("Error finding crossover days: " + e.getMessage());
-  //      this.view.readLine(); // Consume newline
-  //    }
 
-  // generate to all possible test cases
-
-
-
-
-
-  // 1. valid symbol, start date and end date
   @Test
   public void testFindCrossoverDays_ValidInput() {
     LocalDate startDate = LocalDate.of(2024, 2, 1);
@@ -1112,36 +1131,6 @@ public class PortfolioControllerTest {
   }
 
 
-  //       this.view.writeMessage("Enter the stock symbol:");
-  //      String symbol = this.view.readLine().trim();
-  //      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
-  //      String startDateString = this.view.readLine().trim();
-  //      LocalDate startDate = LocalDate.parse(startDateString);
-  //      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
-  //      String endDateString = this.view.readLine().trim();
-  //      LocalDate endDate = LocalDate.parse(endDateString);
-  //      this.view.writeMessage("Enter the short moving period:");
-  //      int shortMovingPeriod = this.view.readInt();
-  //      this.view.writeMessage("Enter the long moving period:");
-  //      int longMovingPeriod = this.view.readInt();
-  //      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate,
-  //          shortMovingPeriod, longMovingPeriod);
-  //      if (this.printIfError(payload)) {
-  //        return;
-  //      }
-  //      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod,
-  //          (Map<String, Object>) payload.getData());
-  //    } catch (Exception e) {
-  //      this.view.writeMessage("Error finding moving crossover days: " + e.getMessage());
-  //      }
-
-  // result is stored in map with key "movingCrossoverDays"
-
-
-
-
-
-
 
 
   // 1. valid symbol, start date, end date, short moving period and long moving period
@@ -1152,7 +1141,8 @@ public class PortfolioControllerTest {
     int shortMovingPeriod = 2;
     int longMovingPeriod = 5;
     // [2024-02-01, 2024-02-02, 2024-02-06]
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     Map<String, Object> data = (Map<String, Object>) result.getData();
     List<LocalDate> res = (List<LocalDate>) data.get("movingCrossoverDays");
     // expected [2024-02-02, 2024-02-04, 2024-02-05]
@@ -1171,7 +1161,8 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.of(2024, 2, 7);
     int shortMovingPeriod = 2;
     int longMovingPeriod = 5;
-    Payload result = portfolioController.findMovingCrossoverDays("INVALID", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "INVALID", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     assertEquals("Invalid stock symbol", result.getMessage());
   }
 
@@ -1182,7 +1173,8 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.of(2024, 2, 7);
     int shortMovingPeriod = 2;
     int longMovingPeriod = 5;
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     assertEquals("Start date should be before end date", result.getMessage());
   }
 
@@ -1194,7 +1186,8 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.now().plusDays(1);
     int shortMovingPeriod = 2;
     int longMovingPeriod = 5;
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     assertEquals("Date cannot be in the future", result.getMessage());
   }
 
@@ -1205,7 +1198,8 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.of(2024, 2, 7);
     int shortMovingPeriod = 0;
     int longMovingPeriod = 5;
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     assertEquals("Short moving period should be greater than 0", result.getMessage());
   }
 
@@ -1216,8 +1210,10 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.of(2024, 2, 7);
     int shortMovingPeriod = 2;
     int longMovingPeriod = 0;
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
-    assertEquals("Short moving period should be less than long moving period", result.getMessage());
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    assertEquals("Short moving period should be less than long moving period",
+            result.getMessage());
   }
 
   // 7. valid symbol, start date after end date, short moving period and long moving period
@@ -1227,7 +1223,8 @@ public class PortfolioControllerTest {
     LocalDate endDate = LocalDate.of(2024, 2, 1);
     int shortMovingPeriod = 2;
     int longMovingPeriod = 5;
-    Payload result = portfolioController.findMovingCrossoverDays("AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
+    Payload result = portfolioController.findMovingCrossoverDays(
+            "AAPL", startDate, endDate, shortMovingPeriod, longMovingPeriod);
     assertEquals("Start date should be before end date", result.getMessage());
   }
 
@@ -1248,7 +1245,7 @@ public class PortfolioControllerTest {
     expectedOutput.append("29 Dec 2023: *************************\n");
     expectedOutput.append("\nScale: * = 7.5356 dollars (absolute)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph(
+    StringBuilder actualOutput = portfolioController.genGraph(
             "AAPL", LocalDate.of(2014, 3, 5),
             LocalDate.of(2024, 3, 25));
 
@@ -1268,7 +1265,7 @@ public class PortfolioControllerTest {
     expectedOutput.append("13 Mar 2024: **************************\n");
     expectedOutput.append("\nScale: * = 5.3568 dollars (relative)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph(
+    StringBuilder actualOutput = portfolioController.genGraph(
             "GOOG", LocalDate.of(2024, 1, 3),
             LocalDate.of(2024, 3, 25));
 
@@ -1298,8 +1295,8 @@ public class PortfolioControllerTest {
     expectedGraph.append("29 Dec 2023: *****\n");
     expectedGraph.append("\nScale: * = 1000 dollars (absolute)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph
-            ("Test", LocalDate.of(2018, 3, 5),
+    StringBuilder actualOutput = portfolioController.genGraph(
+            "Test", LocalDate.of(2018, 3, 5),
                     LocalDate.of(2024, 3, 4));
     assertEquals(expectedGraph.toString(), actualOutput.toString());
   }
@@ -1343,8 +1340,8 @@ public class PortfolioControllerTest {
     expectedGraph.append("26 Mar 2024: ****************************************\n");
     expectedGraph.append("\nScale: * = 148.0704 dollars (absolute)");
 
-    StringBuilder actualOutput = portfolioController.GenGraph
-            ("Test", LocalDate.of(2024, 3, 5),
+    StringBuilder actualOutput = portfolioController.genGraph(
+            "Test", LocalDate.of(2024, 3, 5),
                     LocalDate.of(2024, 3, 26));
     assertEquals(expectedGraph.toString(), actualOutput.toString());
   }

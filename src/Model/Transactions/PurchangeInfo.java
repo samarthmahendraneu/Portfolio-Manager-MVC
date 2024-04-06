@@ -1,12 +1,13 @@
-package Model.Transactions;
+package model.transactions;
+
 import java.math.BigDecimal;
 
+/**
+ * Class to represent the purchase of a stock.
+ */
 public class PurchangeInfo implements TranactionInfo {
 
-  /**
-   * The quantity of the stock. Purchase price of the stock.
-   */
-  private final int quantity;
+  private final float quantity;
   private final BigDecimal purchasePrice;
 
   /**
@@ -15,15 +16,25 @@ public class PurchangeInfo implements TranactionInfo {
    * @param quantity      The quantity of the stock.
    * @param purchasePrice The purchase price of the stock.
    */
-  public PurchangeInfo(int quantity, BigDecimal purchasePrice) {
+  public PurchangeInfo(float quantity, BigDecimal purchasePrice) {
     this.quantity = quantity;
     this.purchasePrice = purchasePrice;
   }
 
-  public int getQuantity() {
+  /**
+   * Getter for the quantity of the stock.
+   *
+   * @return The quantity of the stock.
+   */
+  public float getQuantity() {
     return quantity;
   }
 
+  /**
+   * Get the purchase price of the stock.
+   *
+   * @return The purchase price of the stock.
+   */
   public BigDecimal getPrice() {
     return purchasePrice;
   }

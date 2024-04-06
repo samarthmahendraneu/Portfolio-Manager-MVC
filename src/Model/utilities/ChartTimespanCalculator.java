@@ -1,11 +1,20 @@
-package Model.utilities;
+package model.utilities;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Class to calculate the recommended resolution for a chart based on the timespan of the data.
+ */
 public class ChartTimespanCalculator {
 
+  /**
+   * Determines the recommended resolution for a chart based on the timespan of the data.
+   *
+   * @param startDate The start date of the data.
+   * @param endDate   The end date of the data.
+   * @return The recommended resolution for the chart.
+   */
   public static String determineResolution(LocalDate startDate, LocalDate endDate) {
     long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
     long yearsBetween = ChronoUnit.YEARS.between(startDate, endDate);
@@ -14,7 +23,8 @@ public class ChartTimespanCalculator {
     if (daysBetween <= 30) {
       return "daily";
     }
-    // Monthly resolution for periods up to 1.5 years to aim for a detailed yet not overcrowded chart
+    // Monthly resolution for periods up to 1.5 years to aim for a detailed yet not
+    // overcrowded chart
     else if (yearsBetween <= 1.5) {
       return "monthly";
     }
@@ -27,6 +37,12 @@ public class ChartTimespanCalculator {
       return "yearly";
     }
   }
+
+  /**
+   * Main method to test the determineResolution method.
+   *
+   * @param args Command line arguments.
+   */
   public static void main(String[] args) {
     LocalDate startDate = LocalDate.of(2020, 3, 3);
     LocalDate endDate = LocalDate.of(2022, 3, 18);

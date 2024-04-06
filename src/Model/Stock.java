@@ -1,13 +1,13 @@
-package Model;
+package model;
 
-import Model.Transactions.PurchangeInfo;
-import Model.Transactions.SaleInfo;
-import Model.Transactions.TranactionInfo;
+import model.transactions.PurchangeInfo;
+import model.transactions.SaleInfo;
+import model.transactions.TranactionInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import Model.Service.StockServiceInterface;
+import model.service.StockServiceInterface;
 
 /**
  * Class to represent a stock in a portfolio.
@@ -15,8 +15,9 @@ import Model.Service.StockServiceInterface;
 public class Stock implements Tradable {
 
   private final String symbol;
-  private int quantity;
+  private float quantity;
   private final Map<LocalDate, TranactionInfo> Activity = new HashMap<>();
+
 
   /**
    * Constructor for the Stock class.
@@ -26,7 +27,7 @@ public class Stock implements Tradable {
    * @param purchasePrice The purchase price of the stock.
    * @param purchaseDate  The date on which the stock was purchased.
    */
-  public Stock(String symbol, int quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
+  public Stock(String symbol, float quantity, BigDecimal purchasePrice, LocalDate purchaseDate) {
     this.symbol = symbol;
     this.quantity = quantity;
     this.Activity.put(purchaseDate, new PurchangeInfo(quantity, purchasePrice));
@@ -46,15 +47,33 @@ public class Stock implements Tradable {
    *
    * @return The quantity of the stock.
    */
-  public int getQuantity() {
+  public float getQuantity() {
     return quantity;
+  }
+
+  /**
+   * get total quantity of the stock on a given date using activity log.
+   *
+   * @param date date to calculate the quantity
+   * @return total quantity of the stock
+   */
+  public float getQuantity(LocalDate date) {
+    float totalQuantity = 0;
+
+    for (Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
+      if (entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
+        totalQuantity = totalQuantity + entry.getValue().getQuantity();
+      }
+    }
+
+    return totalQuantity;
   }
 
 
   /**
    * Updates the stock and add stock history.
    */
-  public void sell(int quantity, LocalDate date, BigDecimal sellingPrice) {
+  public void sell(float quantity, LocalDate date, BigDecimal sellingPrice) {
     if (quantity < 0) {
       throw new IllegalArgumentException("Quantity cannot be negative");
     }
@@ -68,8 +87,13 @@ public class Stock implements Tradable {
 
   /**
    * Buy extra stock and add stock history.
+   *
+   * @param quantity      quantity of the stock to buy
+   * @param date          date of the purchase
+   * @param purchasePrice price of the stock on the date
+   * @throws IllegalArgumentException if quantity is negative
    */
-  public void buy(int quantity, LocalDate date, BigDecimal purchasePrice) {
+  public void buy(float quantity, LocalDate date, BigDecimal purchasePrice) {
     if (quantity < 0) {
       throw new IllegalArgumentException("Quantity cannot be negative");
     }
@@ -80,11 +104,14 @@ public class Stock implements Tradable {
 
   /**
    * Get money invested in this stock from the purchase history on a given date.
+   *
+   * @param date date to calculate the investment
    */
   public BigDecimal calculateInvestment(LocalDate date) {
     return Activity.entrySet().stream()
         .filter(entry -> entry.getKey().isBefore(date))
-        .map(entry -> entry.getValue().getPrice().multiply(BigDecimal.valueOf(entry.getValue().getQuantity())))
+        .map(entry -> entry.getValue().getPrice()
+            .multiply(BigDecimal.valueOf(entry.getValue().getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
   }
@@ -92,18 +119,16 @@ public class Stock implements Tradable {
   /**
    * Calculate the value of the tradable asset on a given date.
    *
-   * @param stockService
-   * @param date
+   * @param stockService The stock service to use to fetch stock prices.
+   * @param date         The date on which to calculate the value.
    */
   @Override
   public BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date) {
-    // return ((BigDecimal) stockService.fetchPriceOnDate(this.symbol, date).getData()).multiply(new BigDecimal(this.quantity));
-
     // calculate total purchase quantity before the date from the activity
     BigDecimal totalQuantity = BigDecimal.ZERO;
 
-    for(Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
-      if(entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
+    for (Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
+      if (entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
         if (entry.getValue() instanceof PurchangeInfo) {
           totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
         } else {
@@ -114,26 +139,14 @@ public class Stock implements Tradable {
     }
 
     // calculate value of the stock on the date
-    return ((BigDecimal) stockService.fetchLastClosePrice(this.symbol, date).getData()).multiply(totalQuantity);
-  }
-
-  /**
-   * get total quantity of the stock on a given date using activity log.
-   */
-  public int getQuantity(LocalDate date) {
-    int totalQuantity = 0;
-
-    for (Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
-      if (entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
-          totalQuantity = totalQuantity + entry.getValue().getQuantity();
-      }
-    }
-
-    return totalQuantity;
+    return ((BigDecimal) stockService.fetchLastClosePrice(this.symbol, date).getData()).multiply(
+        totalQuantity);
   }
 
   /**
    * getter for activity in the stock.
+   *
+   * @return activity log of the stock
    */
   public Map<LocalDate, TranactionInfo> getActivityLog() {
     return this.Activity;

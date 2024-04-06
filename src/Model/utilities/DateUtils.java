@@ -1,15 +1,21 @@
-package Model.utilities;
+package model.utilities;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
+/**
+ * Utility class for date-related operations.
+ */
 public class DateUtils {
 
   /**
-   * Returns the last working day of the given month.
-   * If the last day of the month is a weekend, it adjusts to the closest Friday.
+   * Returns the last working day of the given month. If the last day of the month is a weekend, it
+   * adjusts to the closest Friday.
+   *
+   * @param date The date for which to find the last working day of the month.
+   * @return The last working day of the month.
    */
   public static LocalDate getLastWorkingDayOfMonth(LocalDate date) {
     LocalDate lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth());
@@ -17,8 +23,11 @@ public class DateUtils {
   }
 
   /**
-   * Returns the last working day of the given year.
-   * If the last day of the year is a weekend, it adjusts to the closest Friday.
+   * Returns the last working day of the given year. If the last day of the year is a weekend, it
+   * adjusts to the closest Friday.
+   *
+   * @param date The date for which to find the last working day of the year.
+   * @return The last working day of the year.
    */
   public static LocalDate getLastWorkingDayOfYear(LocalDate date) {
     LocalDate lastDayOfYear = LocalDate.of(date.getYear(), 12, 31);
@@ -27,6 +36,9 @@ public class DateUtils {
 
   /**
    * Adjusts the given date to the closest previous working day if it falls on a weekend.
+   *
+   * @param date The date to adjust.
+   * @return The adjusted date.
    */
   private static LocalDate adjustForWeekend(LocalDate date) {
     if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
@@ -36,12 +48,20 @@ public class DateUtils {
     }
     return date; // No adjustment needed for weekdays
   }
+
+  /**
+   * Determines the recommended resolution for a chart based on the timespan of the data.
+   *
+   * @param startDate The start date of the data.
+   * @param endDate   The end date of the data.
+   * @return The recommended resolution for the chart.
+   */
   public static String determineResolution(LocalDate startDate, LocalDate endDate) {
     long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
     if (daysBetween <= 30) {
       return "daily";
-    } else if(daysBetween <= 150){
-        return "every 10 days";
+    } else if (daysBetween <= 150) {
+      return "every 10 days";
     } else if (daysBetween <= 540) { // Up to 18 months
       return "monthly";
     } else if (daysBetween <= 1825) { // Up to 5 years
@@ -51,34 +71,36 @@ public class DateUtils {
     }
   }
 
-  public static LocalDate getTargetDateBasedOnResolution(LocalDate currentDate, String resolution, LocalDate endDate) {
+  /**
+   * Returns the target date based on the resolution.
+   *
+   * @param currentDate The current date.
+   * @param resolution  The resolution for the chart.
+   * @param endDate     The end date of the data.
+   * @return The target date based on the resolution.
+   */
+  public static LocalDate getTargetDateBasedOnResolution(LocalDate currentDate, String resolution,
+      LocalDate endDate) {
     LocalDate targetDate;
     switch (resolution) {
       case "daily":
-        targetDate = currentDate;
-        break;
+        return currentDate;
       case "every 10 days":
-        targetDate = currentDate;
-        break;
+        return currentDate;
       case "monthly":
-        LocalDate endOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-        targetDate = endOfMonth.isBefore(endDate) ? endOfMonth : endDate;
-        break;
+        return DateUtils.getLastWorkingDayOfMonth(currentDate);
       case "every 3 months":
-        LocalDate endOfQuarter = currentDate.with(TemporalAdjusters.lastDayOfMonth())
-                .plusMonths(2) // Move to the last month of the current quarter.
-                .with(TemporalAdjusters.lastDayOfMonth());
-        targetDate = endOfQuarter.isBefore(endDate) ? endOfQuarter : endDate;
-        break;
+        LocalDate endOfQuarter
+            = currentDate.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
+        return DateUtils.getLastWorkingDayOfMonth(endOfQuarter).isAfter(endDate)
+            ? null : DateUtils.getLastWorkingDayOfMonth(endOfQuarter);
       case "yearly":
-        // Calculate the last day of the current year.
         LocalDate endOfYear = currentDate.with(TemporalAdjusters.lastDayOfYear());
-        targetDate = endOfYear.isBefore(endDate) ? endOfYear : endDate;
-        break;
+        return DateUtils.getLastWorkingDayOfYear(endOfYear).isAfter(endDate)
+            ? null : DateUtils.getLastWorkingDayOfYear(endOfYear);
       default:
         throw new IllegalArgumentException("Unsupported resolution: " + resolution);
     }
-    return targetDate;
   }
 
 }

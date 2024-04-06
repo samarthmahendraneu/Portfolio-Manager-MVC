@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -8,9 +8,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import Model.Portfolio;
-import Model.PortfolioInterface;
-import View.View;
+import model.Portfolio;
+import model.PortfolioInterface;
+import model.service.PortfolioServiceInterface;
+import view.View;
 
 
 /**
@@ -20,6 +21,9 @@ import View.View;
 public class PortfolioMenuController implements PortfolioMenuControllerInterface {
 
   private final PortfolioControllerInterface portfolioController;
+
+  private final PortfolioServiceInterface portfolioService;
+
   private final View view;
 
   /**
@@ -33,6 +37,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     this.portfolioController = portfolioController;
     this.view = view;
     this.loadStockCache();
+    this.portfolioService = portfolioController.getPortfolioService();
   }
 
   /**
@@ -98,11 +103,13 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.calculatePortfolioValue();
             break;
           case 4:
-            // Purchase a specific number of shares of a specific stock on a specified date, and add them to the portfolio
+            // Purchase a specific number of shares of a specific stock on a specified date, and add
+            // them to the portfolio
             this.addStockToPortfolio();
             break;
           case 5:
-            // Sell a specific number of shares of a specific stock on a specified date from a given portfolio
+            // Sell a specific number of shares of a specific stock on a specified date from a
+            // given portfolio
             this.sellStockFromPortfolio();
             break;
           case 6:
@@ -116,7 +123,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.loadPortfolio();
             break;
           case 9:
-            this.CalculateGraph();
+            this.calculateGraph();
             break;
           case 10:
             this.inspectStockPerformance();
@@ -131,6 +138,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.findMovingCrossOverDays();
             break;
           case 14:
+            this.dollarCostAvergaing();
+            break;
+          case 15:
             this.view.writeMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -145,8 +155,28 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
   /**
-   * Finds crossover days for a given stock symbol within a specified date range.
-   * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
+   * Dollar Cost Averaging.
+   */
+  public void dollarCostAvergaing(){
+      this.view.writeMessage("Enter the Portfolio Name:");
+      String name = this.view.readLine().trim();
+      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
+      String startDateString = this.view.readLine().trim();
+      LocalDate startDate = LocalDate.parse(startDateString);
+      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
+      String endDateString = this.view.readLine().trim();
+      LocalDate endDate = LocalDate.parse(endDateString);
+      this.view.writeMessage("Enter the investment amount per month in USD:");
+      BigDecimal investmentAmount = new BigDecimal(this.view.readLine().trim());
+      this.view.writeMessage("Enter the frequency type : 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
+      int frequency = this.view.readInt();
+      this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate, frequency);
+      this.view.writeMessage("Dollar Cost Averaging has been successfully applied to the portfolio.");
+  }
+
+  /**
+   * Finds crossover days for a given stock symbol within a specified date range. A moving crossover
+   * day is a day when the closing price of the stock is higher than the moving average.
    */
   public void findCrossOverDays() {
     try {
@@ -170,9 +200,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
   /**
-    * Finds moving crossover days for a given stock symbol within a specified date range.
-    * A moving crossover day is a day when the closing price of the stock is higher than the moving average.
-    */
+   * Finds moving crossover days for a given stock symbol within a specified date range. A moving
+   * crossover day is a day when the closing price of the stock is higher than the moving average.
+   */
   public void findMovingCrossOverDays() {
     try {
       this.view.writeMessage("Enter the stock symbol:");
@@ -192,12 +222,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       if (this.printIfError(payload)) {
         return;
       }
-      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod,
-          (Map<String, Object>) payload.getData());
+      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod,
+          longMovingPeriod, (Map<String, Object>) payload.getData());
     } catch (Exception e) {
       this.view.writeMessage("Error finding moving crossover days: " + e.getMessage());
-      }
     }
+  }
 
 
   /**
@@ -227,7 +257,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.loadPortfolio();
             break;
           case 6:
-            this.CalculateGraph();
+            this.calculateGraph();
             break;
           case 7:
             this.inspectStockPerformance();
@@ -251,18 +281,25 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   }
 
-  public void CalculateGraph() {
-    LocalDate date, date2;
+  /**
+   * Calculate the graph for the given stock or portfolio.
+   */
+  public void calculateGraph() {
+    LocalDate date;
+    LocalDate date2;
     this.view.writeMessage("Enter Stock or Portfolio name:");
     String name = this.view.readLine();
     this.view.writeMessage("Enter Start Date");
     date = dateValidator();
     this.view.writeMessage("Enter End Date");
     date2 = dateValidator();
-    StringBuilder str = portfolioController.GenGraph(name, date, date2);
+    StringBuilder str = portfolioController.genGraph(name, date, date2);
     this.view.writeMessage(str.toString());
   }
 
+  /**
+   * Inspect the stock performance for a given stock symbol on a specified date.
+   */
   public void inspectStockPerformance() {
     this.view.writeMessage("Enter the stock symbol:");
     String symbol = this.view.readLine();
@@ -277,6 +314,11 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  /**
+   * Get the number of days for the moving average calculation.
+   *
+   * @return the number of days for the moving average calculation.
+   */
   private int getValidNumberOfDays() {
     int days = 0;
     boolean isValidInput = false;
@@ -296,23 +338,34 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
     return days;
   }
+
+  /**
+   * Compute the moving average for a given stock symbol on a specified date.
+   */
   public void computeStockMovingAverage() {
     this.view.writeMessage("Enter the stock symbol:");
     String symbol = this.view.readLine();
     this.view.writeMessage("Enter the end date (YYYY-MM-DD) for the moving average calculation:");
     LocalDate endDate = dateValidator();
     this.view.writeMessage("Enter the number of days for the moving average:");
-    int days = getValidNumberOfDays() ;// Ensure proper error handling or validation here
+    int days = getValidNumberOfDays();// Ensure proper error handling or validation here
 
     Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
 
     if (!result.isError()) {
-      this.view.writeMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": " + result.getData());
+      this.view.writeMessage(
+          days + "-Day Moving Average for "
+              + symbol + " as of " + endDate + ": " + result.getData());
     } else {
       this.view.writeMessage("Error: " + result.getMessage());
     }
   }
 
+  /**
+   * Validates the date input.
+   *
+   * @return the validated date.
+   */
   public LocalDate dateValidator() {
     LocalDate date;
 
@@ -610,8 +663,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         return;
       }
       view.writeMessage("Cache have been loaded successfully.\n");
-    }
-    catch (Exception e) {return;
+    } catch (Exception e) {
+      return;
     }
   }
 
