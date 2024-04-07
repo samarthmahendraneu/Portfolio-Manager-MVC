@@ -1,4 +1,4 @@
-package model.utilities;
+package Model.utilities;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

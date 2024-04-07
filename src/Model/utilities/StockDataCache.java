@@ -1,4 +1,4 @@
-package model.utilities;
+package Model.utilities;
 
 import java.io.File;
 import java.io.FileNotFoundException;
