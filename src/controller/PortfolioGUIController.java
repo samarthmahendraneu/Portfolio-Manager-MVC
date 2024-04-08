@@ -40,7 +40,7 @@ public class PortfolioGUIController {
   private void createNewPortfolio() {
     String name = JOptionPane.showInputDialog(view, "Enter new portfolio name:");
     if (name == null || name.trim().isEmpty()) {
-      JOptionPane.showMessageDialog(view, "Portfolio name cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+      view.showMessageDialog( "Portfolio name cannot be empty.");
       return;
     }
 
@@ -49,7 +49,7 @@ public class PortfolioGUIController {
 
       boolean addMoreStocks = true;
       while (addMoreStocks) {
-        String symbol = JOptionPane.showInputDialog(view, "Enter stock symbol to add to the portfolio, or cancel to finish:");
+        String symbol = view.showInputDialog("Enter stock symbol to add to the portfolio, or cancel to finish:");
         if (symbol == null || symbol.trim().isEmpty()) {
           addMoreStocks = false;
           continue;
@@ -58,11 +58,11 @@ public class PortfolioGUIController {
         Integer quantity = null;
         while (quantity == null) {
           try {
-            String quantityString = JOptionPane.showInputDialog(view, "Enter quantity of the stock:");
+            String quantityString = view.showInputDialog( "Enter quantity of the stock:");
             quantity = Integer.parseInt(quantityString);
             if (quantity <= 0) throw new NumberFormatException();
           } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(view, "Please enter a valid quantity greater than 0.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            view.showMessageDialog("Please enter a valid quantity greater than 0.");
             quantity = null;
           }
         }
@@ -122,6 +122,21 @@ public class PortfolioGUIController {
           JOptionPane.showMessageDialog(view, "Error calculating portfolio value: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
       }
+    }
+  }
+
+  public void savePortfolio() {
+    String filePath = view.showInputDialog("Enter the file path to save the portfolio (.csv):");
+    if (filePath == null || filePath.trim().isEmpty()) {
+      view.showMessageDialog("File path cannot be empty.");
+      return;
+    }
+
+    try {
+       portfolioService.savePortfoliosToCSV(filePath.trim());
+      }
+     catch (Exception e) {
+      view.showMessageDialog("Error: " + e.getMessage());
     }
   }
 
