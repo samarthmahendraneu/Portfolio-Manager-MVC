@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import model.PortfolioInterface;
 import model.service.PortfolioService;
 import model.service.PortfolioServiceInterface;
 import model.service.StockService;
+import model.service.StockServiceInterface;
 
 /**
  * GUI controller for managing the interaction between GUI view and portfolio operations.
@@ -20,10 +22,13 @@ import model.service.StockService;
 public class PortfolioGUIController {
   private final PortfolioServiceInterface portfolioService;
 
+  private static StockServiceInterface stockService = new StockService("FIR1DN0VB7SQ4SGD");
+
   private final GUIView view;
 
-  public PortfolioGUIController(PortfolioServiceInterface portfolioService, GUIView view) {
+  public PortfolioGUIController(PortfolioServiceInterface portfolioService, StockServiceInterface stockService, GUIView view) {
     this.portfolioService = portfolioService;
+    this.stockService = stockService;
     this.view = view;
     initViewListeners();
   }
@@ -32,6 +37,10 @@ public class PortfolioGUIController {
     view.setCreatePortfolioAction(e -> createNewPortfolio());
     view.setExaminePortfolioButtonListener(e->examinePortfolio());
     view.setCalculatePortfolioValueButtonListener(e->calculatePortfolioValue());
+    view.setSavePortfolioButtonListener(e->savePortfolio());
+    view.setLoadPortfolioButtonListener(e->loadPortfolio());
+    view.setGraphButtonListener(e->calculateGraph());
+    view.setInspectStockPerformanceButtonListener(e->inspectStockPerformance());
     // Continue initializing listeners for other buttons...
   }
 
@@ -63,7 +72,7 @@ public class PortfolioGUIController {
             if (quantity <= 0) throw new NumberFormatException();
           } catch (NumberFormatException e) {
             view.showMessageDialog("Please enter a valid quantity greater than 0.");
-            quantity = null;
+            continue;
           }
         }
 
@@ -72,15 +81,16 @@ public class PortfolioGUIController {
           try {
             String dateString = JOptionPane.showInputDialog(view, "Enter the purchase date (YYYY-MM-DD):");
             date = LocalDate.parse(dateString);
-            // Validate the date as per your requirements here
           } catch (DateTimeParseException e) {
             JOptionPane.showMessageDialog(view, "Please enter a valid date in the format YYYY-MM-DD.", "Invalid Date", JOptionPane.ERROR_MESSAGE);
-            date = null;
+            continue;
           }
         }
 
         // Add stock to the newly created portfolio
         portfolioService.addStockToPortfolio(name, symbol, quantity, date);
+        view.showMessageDialog("Stock has been added successfully");
+
       }
 
       JOptionPane.showMessageDialog(view, "Portfolio '" + name + "' has been created and populated.", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -134,11 +144,55 @@ public class PortfolioGUIController {
 
     try {
        portfolioService.savePortfoliosToCSV(filePath.trim());
-      }
+       view.showMessageDialog("Portfolio has been saved to path"+filePath);
+
+    }
      catch (Exception e) {
-      view.showMessageDialog("Error: " + e.getMessage());
+      view.showMessageDialog("Error: Invalid Path");
     }
   }
+
+  public void loadPortfolio() {
+    String filePath = view.showInputDialog("Enter the file path to load the portfolio (.csv):");
+    if (filePath == null || filePath.trim().isEmpty()) {
+      view.showMessageDialog("File path cannot be empty.");
+      return;
+    }
+
+    try {
+      portfolioService.loadPortfoliosFromCSV(filePath.trim());
+      view.showMessageDialog("Portfolio has been loaded from path"+filePath);
+
+    }
+    catch (Exception e) {
+      view.showMessageDialog("Error: Invalid Path");
+    }
+  }
+
+  public void calculateGraph() {
+    // Prompt for Stock or Portfolio name
+    String name = view.showInputDialog("Enter Stock or Portfolio name:");
+    if (name == null || name.isEmpty()) {
+      view.showMessage("Operation cancelled or no name entered.");
+      return;
+    }
+
+    // Prompt for Start Date
+    LocalDate startDate = view.promptForDate("Enter Start Date (YYYY-MM-DD):");
+    if (startDate == null) return; // Error message handled within validateAndParseDate
+
+    // Prompt for End Date
+    LocalDate endDate = view.promptForDate("Enter End Date (YYYY-MM-DD):");
+    if (endDate == null) return; // Error message handled within validateAndParseDate
+
+    // Generate the graph panel using the method from earlier example
+    Map<LocalDate, BigDecimal> values =
+            portfolioService.plotPerformanceChartGUI(name, startDate, endDate); // Adapt this method for your GUI
+
+    // Display the chart
+
+    // Now, tell the view to display this chart
+    view.displayPerformanceChart(values);  }
 
   private void addStockToPortfolio(ActionEvent e){
       // This is simplified and assumes methods for adding stock are present in PortfolioServiceInterface
@@ -176,13 +230,32 @@ public class PortfolioGUIController {
       }
     }
   }
+
+  /**
+   * Inspect the stock performance for a given stock symbol on a specified date.
+   */
+  public void inspectStockPerformance() {
+    String symbol = this.view.showInputDialog("Enter the stock symbol:");
+
+    LocalDate date = view.promptForDate("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    if (date == null) return; // Error message handled within validateAndParseDate
+
+    String result = stockService.inspectStockGainOrLoss(symbol, date);
+
+    if (!result.isEmpty()) {
+      this.view.showMessage("Stock Performance on " + date + ": " + result);
+    } else {
+      this.view.showMessage("Error: showing stock gain/loss. Please try again in sometime");
+    }
+  }
+
   public static void main(String[] args) {
     // Example main method to run the GUI
     SwingUtilities.invokeLater(() -> {
 
       PortfolioServiceInterface portfolioService = new PortfolioService( new StockService("FIR1DN0VB7SQ4SGD")); // Initialize your portfolio service here
       GUIView view = new GUIView();
-      new PortfolioGUIController(portfolioService, view);
+      new PortfolioGUIController(portfolioService, stockService, view);
     });
   }
 }

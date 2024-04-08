@@ -415,6 +415,20 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
     return chartBuilder;
   }
+  public Map<LocalDate, BigDecimal>  plotPerformanceChartGUI(String identifier, LocalDate startDate, LocalDate endDate) {
+    Map<LocalDate, BigDecimal> values = portfolioExists(identifier)
+            ? fetchPortfolioValuesForPeriod(identifier, startDate, endDate) :
+            fetchValuesForPeriod(identifier, startDate, endDate);
+
+    if (values.isEmpty()) {
+      System.out.println(
+              "No data available for " + identifier + " from " + startDate + " to " + endDate);
+      return null;
+    }
+
+
+    return values;
+  }
 
   /**
    * Calculates the scale for the performance chart based on the range of values.

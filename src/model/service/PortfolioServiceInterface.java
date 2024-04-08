@@ -1,12 +1,13 @@
 package model.service;
 
-import model.PortfolioInterface;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import model.PortfolioInterface;
 
 /**
  * Interface for the PortfolioService class.
@@ -132,6 +133,8 @@ public interface PortfolioServiceInterface {
    * @throws Exception If any error occurs during the plotting process.
    */
   StringBuilder plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
+
+  Map<LocalDate, BigDecimal> plotPerformanceChartGUI(String identifier, LocalDate startDate, LocalDate endDate);
 
   void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate, LocalDate endDate, int frequency);
 }

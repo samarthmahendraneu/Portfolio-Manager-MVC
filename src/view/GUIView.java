@@ -2,8 +2,15 @@ package View;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 import javax.swing.*;
+
+import model.utilities.BarChartPanel;
 
 public class GUIView extends JFrame {
   private JPanel cards; // a panel that uses CardLayout
@@ -122,7 +129,6 @@ public class GUIView extends JFrame {
   private JPanel createFlexiblePortfolioPanel() {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 1)); // Single column layout
-
     // Add buttons for flexible portfolio actions here, similar to the NormalPortfolioPanel
     // For example:
     addButton = new JButton("Add Stock to Portfolio");
@@ -226,6 +232,49 @@ public class GUIView extends JFrame {
   public void showInfoMessage(String infoMessage) {
     showMessage(infoMessage);
   }
+  public String showInputDialog(String message) {
+    return JOptionPane.showInputDialog(this, message);
+  }
+
+  public void showMessageDialog(String message) {
+    JOptionPane.showMessageDialog(this, message);
+  }
+
+  public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
+    // Create the panel that will display the graph
+    BarChartPanel barChartPanel = new BarChartPanel(data);
+    barChartPanel.displayInWindow();
+    // Create a new JFrame to display the graph
+
+  }
+
+  // Method to prompt for a date with validation
+  public LocalDate promptForDate(String message) {
+    LocalDate date = null;
+    while (date == null) {
+      String dateString = showInputDialog( message);
+      if (dateString == null || dateString.isEmpty()) {
+        showMessage( "Operation cancelled or no date entered.");
+        break; // Exit the method if user cancels or inputs an empty string
+      }
+
+      try {
+        date = LocalDate.parse(dateString);
+        if (!date.isBefore(LocalDate.now())) {
+          showMessage("Date must be before today. Please try again.");
+          date = null; // Reset date to null to continue the loop
+        } else if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+          showMessage("Date must be on a weekday. Please try again.");
+          date = null; // Reset date to null to continue the loop
+        }
+      } catch (DateTimeParseException e) {
+        showMessage("Invalid date format. Please try again.");
+        // No need to reset date to null here because it's already null
+      }
+    }
+    return date;
+  }
+
 
 
 }
