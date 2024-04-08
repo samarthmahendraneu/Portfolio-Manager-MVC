@@ -1,4 +1,4 @@
-package Model.Transactions;
+package model.transactions;
 
 import java.math.BigDecimal;
 

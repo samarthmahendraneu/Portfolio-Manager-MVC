@@ -19,8 +19,9 @@ public class Main {
     View view = new View();
     PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController,
         view);
+
     // interaction with the user
-    // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [Model]
+    // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [model]
     controller.displayMainMenu();
 
   }

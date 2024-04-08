@@ -1,9 +1,10 @@
 package controller;
 
 
+import java.time.LocalDate;
+
 import model.PortfolioInterface;
 import model.service.PortfolioServiceInterface;
-import java.time.LocalDate;
 
 /**
  * Interface for the Portfolio Management System Controller.
@@ -70,7 +71,7 @@ public interface PortfolioControllerInterface {
   Payload loadPortfolio(String filePath) throws IllegalArgumentException;
 
   /**
-   * get Portfolio Service.
+   * get Portfolio service.
    *
    * @return PortfolioServiceInterface
    */

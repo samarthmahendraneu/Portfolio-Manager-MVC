@@ -1,30 +1,31 @@
 package model.service;
 
-import controller.Payload;
-import controller.fileio.CsvFileIO;
-import controller.fileio.FileIO;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import controller.Payload;
+import controller.fileio.CsvFileIO;
+import controller.fileio.FileIO;
 import model.Portfolio;
 import model.PortfolioInterface;
 import model.utilities.DateUtils;
-import java.time.format.DateTimeFormatter;
-import java.math.RoundingMode;
-import java.time.YearMonth;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 
 /**
- * Service class for managing portfolios.
+ * service class for managing portfolios.
  */
 public class PortfolioService implements PortfolioServiceInterface {
 

@@ -1,10 +1,11 @@
 package model;
 
-import model.transactions.TranactionInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import model.service.StockServiceInterface;
 import java.util.Map;
+
+import model.service.StockServiceInterface;
+import model.transactions.TranactionInfo;
 
 /**
  * Interface for the Tradable class.

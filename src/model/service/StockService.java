@@ -24,7 +24,7 @@ import static model.utilities.DateUtils.determineResolution;
 import static model.utilities.DateUtils.getTargetDateBasedOnResolution;
 
 /**
- * Service class for fetching stock data and calculating stock prices.
+ * service class for fetching stock data and calculating stock prices.
  */
 public class StockService implements StockServiceInterface {
 

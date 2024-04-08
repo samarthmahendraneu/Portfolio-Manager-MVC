@@ -1,6 +1,6 @@
 # Portfolio Management System Design Overview
 
-The Portfolio Management System is a sophisticated Java application tailored for users aiming to meticulously manage their stock portfolios. By adhering to the Model-View-Controller (MVC) architectural pattern, the system ensures a clear separation of concerns, thus fostering maintainability and scalability. Users are equipped with comprehensive functionalities including the creation and examination of portfolios, value calculations, as well as robust file management capabilities for portfolio data persistence.
+The Portfolio Management System is a sophisticated Java application tailored for users aiming to meticulously manage their stock portfolios. By adhering to the model-View-Controller (MVC) architectural pattern, the system ensures a clear separation of concerns, thus fostering maintainability and scalability. Users are equipped with comprehensive functionalities including the creation and examination of portfolios, value calculations, as well as robust file management capabilities for portfolio data persistence.
 
 ## Components
 
@@ -19,7 +19,7 @@ The Portfolio Management System is a sophisticated Java application tailored for
 ### Main
 - Serves as the application's entry point, initiating the system setup and triggering the user interface.
 
-### Model
+### model
 
 #### Portfolio and Tradable
 - Core entities representing stock portfolios and tradable items (stocks) within those portfolios.
@@ -33,7 +33,7 @@ The Portfolio Management System is a sophisticated Java application tailored for
 
 ### Transactions Package
 
-The `Transactions` package within the `Model` is designed to encapsulate the transactional details of stock trades, including both purchases and sales. It defines a base interface and concrete classes to represent transaction-specific information.
+The `Transactions` package within the `model` is designed to encapsulate the transactional details of stock trades, including both purchases and sales. It defines a base interface and concrete classes to represent transaction-specific information.
 
 ### Service
 
