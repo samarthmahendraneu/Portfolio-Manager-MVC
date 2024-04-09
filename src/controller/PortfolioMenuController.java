@@ -66,9 +66,22 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     guiView.setLoadPortfolioButtonListener(e->loadPortfolio());
     guiView.setGraphButtonListener(e->calculateGraph());
     guiView.setInspectStockPerformanceButtonListener(e->inspectStockPerformance());
+    guiView.setnormalCreatePortfolioAction(e -> createNewPortfolio());
+    guiView.setnormalExaminePortfolioButtonListener(e->examinePortfolio());
+    guiView.setnormalCalculatePortfolioValueButtonListener(e->calculatePortfolioValue());
+    guiView.setnormalSavePortfolioButtonListener(e->savePortfolio());
+    guiView.setnormalLoadPortfolioButtonListener(e->loadPortfolio());
+    guiView.setnormalGraphButtonListener(e->calculateGraph());
+    guiView.setnormalInspectStockPerformanceButtonListener(e->inspectStockPerformance());
     guiView.setAddButtonListener(e->addStockToPortfolio());
     guiView.setSellButtonListener(e->sellStockFromPortfolio());
-    // Continue initializing listeners for other buttons...
+    guiView.setDollarCostButtonListener(e->dollarCostAveraging());
+    guiView.setMovingCrossoverButtonListener(e->findMovingCrossOverDays());
+    guiView.setCrossoverButtonListener(e->findCrossOverDays());
+    guiView.setInvestmentButtonListener(e->calculateInvestment());
+    guiView.setnormalCalculateXDayMovingAverageButtonListener(e->computeStockMovingAverage());
+    guiView.setCalculateXDayMovingAverageButtonListener(e->computeStockMovingAverage());
+
   }
 
   /**
@@ -508,7 +521,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // Request portfolio name
     String name = view.requestInput("Enter new portfolio name:");
     if (name == null || name.trim().isEmpty()) {
-      view.displayMessage("Portfolio name cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered");
       return;
     }
 
@@ -520,7 +533,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     boolean flag = true;
     while (flag) {
-      String symbol = view.requestInput("Enter the stock symbol to add to the portfolio, or cancel to finish:");
+      String symbol = view.requestInput("Enter the stock symbol to add to the portfolio," +
+              " or cancel to finish:");
       if (symbol == null || symbol.trim().isEmpty()) {
         flag = false;
         continue;
@@ -579,14 +593,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // Request portfolio name
     String portfolioName = view.requestInput("Enter the name of the portfolio to add the stock to:");
     if (portfolioName == null || portfolioName.trim().isEmpty()) {
-      view.displayMessage("Portfolio name cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered.");
       return;
     }
 
     // Request stock symbol
     String symbol = view.requestInput("Enter the stock symbol:");
     if (symbol == null || symbol.trim().isEmpty()) {
-      view.displayMessage("Stock symbol cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered.");
       return;
     }
 
@@ -643,14 +657,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // Request portfolio name
     String portfolioName = view.requestInput("Enter the name of the portfolio to sell the stock from:");
     if (portfolioName == null || portfolioName.trim().isEmpty()) {
-      view.displayMessage("Portfolio name cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered");
       return;
     }
 
     // Request stock symbol
     String symbol = view.requestInput("Enter the stock symbol:");
     if (symbol == null || symbol.trim().isEmpty()) {
-      view.displayMessage("Stock symbol cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered");
       return;
     }
 
@@ -698,7 +712,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // Request the portfolio name
     String name = view.requestInput("Enter the name of the portfolio:");
     if (name == null || name.trim().isEmpty()) {
-      view.displayMessage("Portfolio name cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered");
       return;
     }
 
@@ -747,7 +761,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // Request the name of the portfolio to examine
     String name = view.requestInput("Enter the name of the portfolio to examine:");
     if (name == null || name.trim().isEmpty()) {
-      view.displayMessage("Portfolio name cannot be empty.");
+      view.displayMessage("Operation Cancelled or no name entered");
       return;
     }
 
@@ -777,7 +791,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       // Request the name of the portfolio to calculate its value
       String name = view.requestInput("Enter the name of the portfolio:");
       if (name == null || name.trim().isEmpty()) {
-        view.displayMessage("Portfolio name cannot be empty.");
+        view.displayMessage("Operation Cancelled or no name entered");
         return;
       }
 
@@ -809,7 +823,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       // Request the file path to save the portfolio
       String filePath = view.requestInput("Enter the file path to save the portfolio (.csv):");
       if (filePath == null || filePath.trim().isEmpty()) {
-        view.displayMessage("File path cannot be empty.");
+        view.displayMessage("Operation Cancelled or no path entered");
         return;
       }
 
@@ -829,7 +843,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       // Request the file path from which to load portfolios
       String filePath = view.requestInput("Enter the file path to load portfolios from (.csv):");
       if (filePath == null || filePath.trim().isEmpty()) {
-        view.displayMessage("File path cannot be empty.");
+        view.displayMessage("Operation Cancelled or no path entered");
         return;
       }
 
@@ -853,12 +867,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       String filePath = "cache.csv";
       Payload payload = portfolioController.saveCache(filePath);
       if (payload.isError()) {
-        this.view.inputMessage("Error: " + payload.getMessage());
+        this.view.displayMessage("Error: " + payload.getMessage());
         return;
       }
-      view.inputMessage("Cache have been saved successfully to " + filePath + "\n");
+      view.displayMessage("Cache have been saved successfully to " + filePath + "\n");
     } catch (Exception e) {
-      this.view.inputMessage("Error: " + e.getMessage());
+      this.view.displayMessage("Error: " + e.getMessage());
       this.view.readLine(); // Consume newline
     }
   }
@@ -873,7 +887,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       if (Objects.nonNull(payload) && payload.isError()) {
         return;
       }
-      view.inputMessage("Cache have been loaded successfully.\n");
+      view.displayMessage("Cache have been loaded successfully.\n");
     } catch (Exception e) {
       return;
     }

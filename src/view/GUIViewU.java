@@ -30,6 +30,18 @@ public class GUIViewU extends JFrame implements GUIInterface {
   private JButton sellButton;
   private JButton investmentButton;
   private JButton backButton;
+  private JButton normalCreatePortfolioButton;
+  private JButton normalExaminePortfolioButton;
+  private JButton normalCalculatePortfolioValueButton;
+  private JButton normalSavePortfolioButton;
+  private  JButton normalLoadPortfolioButton;
+  private JButton normalGraphButton;
+  private JButton normalInspectStockPerformanceButton;
+  private JButton normalCalculateXDayMovingAverageButton;
+  private JButton crossoverDays;
+  private JButton movingCrossoverDays;
+  private JButton dollarCostAverage;
+
 
   public GUIViewU() {
     // Create the main frame
@@ -48,7 +60,7 @@ public class GUIViewU extends JFrame implements GUIInterface {
     cards = new JPanel(new CardLayout());
     JPanel mainMenuPanel = createMainMenuPanel();
     JPanel normalPortfolioPanel = createNormalPortfolioPanel();
-    JPanel flexiblePortfolioPanel = createFlexiblePortfolioPanel();
+   JPanel flexiblePortfolioPanel = createFlexiblePortfolioPanel();
 
     cards.add(mainMenuPanel, MAIN_MENU);
     cards.add(normalPortfolioPanel, NORMAL_PORTFOLIO);
@@ -89,37 +101,38 @@ public class GUIViewU extends JFrame implements GUIInterface {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 1)); // Single column layout
 
-    createPortfolioButton = new JButton("Create a new portfolio");
+    normalCreatePortfolioButton = new JButton("Create a new portfolio");
     // Add ActionListener for createPortfolioButton
-    panel.add(createPortfolioButton);
+    panel.add(normalCreatePortfolioButton);
 
-    examinePortfolioButton = new JButton("Examine a portfolio");
+     normalExaminePortfolioButton = new JButton("Examine a portfolio");
     // Add ActionListener for examinePortfolioButton
-    panel.add(examinePortfolioButton);
+    panel.add(normalExaminePortfolioButton);
 
-    calculatePortfolioValueButton = new JButton("Calculate portfolio value");
+    normalCalculatePortfolioValueButton = new JButton("Calculate portfolio value");
     // Add ActionListener for calculatePortfolioValueButton
-    panel.add(calculatePortfolioValueButton);
+    panel.add(normalCalculatePortfolioValueButton);
 
-    savePortfolioButton = new JButton("Save portfolio");
+    normalSavePortfolioButton = new JButton("Save portfolio");
     // Add ActionListener for savePortfolioButton
-    panel.add(savePortfolioButton);
+    panel.add(normalSavePortfolioButton);
 
-    loadPortfolioButton = new JButton("Load portfolio");
+    normalLoadPortfolioButton = new JButton("Load portfolio");
     // Add ActionListener for loadPortfolioButton
-    panel.add(loadPortfolioButton);
+    panel.add(normalLoadPortfolioButton);
 
-    graphButton = new JButton("Graph");
+    normalGraphButton = new JButton("Graph");
     // Add ActionListener for graphButton
-    panel.add(graphButton);
+    panel.add(normalGraphButton);
 
-    inspectStockPerformanceButton = new JButton("Inspect Stock performance");
+    normalInspectStockPerformanceButton = new JButton("Inspect Stock performance");
     // Add ActionListener for inspectStockPerformanceButton
-    panel.add(inspectStockPerformanceButton);
+    panel.add(normalInspectStockPerformanceButton);
 
-    calculateXDayMovingAverageButton = new JButton("Calculate X-Day Moving Average");
+    normalCalculateXDayMovingAverageButton = new JButton("Calculate X-Day Moving Average");
     // Add ActionListener for calculateXDayMovingAverageButton
-    panel.add(calculateXDayMovingAverageButton);
+    panel.add(normalCalculateXDayMovingAverageButton);
+
 
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
@@ -131,7 +144,6 @@ public class GUIViewU extends JFrame implements GUIInterface {
   private JPanel createFlexiblePortfolioPanel() {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 1)); // Single column layout
-    // Add buttons for flexible portfolio actions here, similar to the NormalPortfolioPanel
     createPortfolioButton = new JButton("Create a new portfolio");
     // Add ActionListener for createPortfolioButton
     panel.add(createPortfolioButton);
@@ -176,7 +188,17 @@ public class GUIViewU extends JFrame implements GUIInterface {
     // Add ActionListener for investmentButton
     panel.add(investmentButton);
 
-    // Include other buttons for actions like saving/loading portfolios, graphing, inspecting stock performance, calculating moving averages, crossover days, etc.
+    crossoverDays = new JButton("Crossover Days");
+    // Add ActionListener for investmentButton
+    panel.add(crossoverDays);
+
+    movingCrossoverDays = new JButton("Moving Crossover Days");
+    // Add ActionListener for investmentButton
+    panel.add(movingCrossoverDays);
+
+    dollarCostAverage = new JButton("Dollar Cost Averaging");
+    // Add ActionListener for investmentButton
+    panel.add(dollarCostAverage);
 
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
@@ -234,9 +256,49 @@ public class GUIViewU extends JFrame implements GUIInterface {
     investmentButton.addActionListener(listener);
   }
 
-  public void setBackButtonListener(ActionListener listener) {
-    backButton.addActionListener(listener);
+  public void setCrossoverButtonListener(ActionListener listener) {
+    crossoverDays.addActionListener(listener);
   }
+
+  public void setMovingCrossoverButtonListener(ActionListener listener) {
+    movingCrossoverDays.addActionListener(listener);
+  }
+
+  public void setDollarCostButtonListener(ActionListener listener) {
+    dollarCostAverage.addActionListener(listener);
+  }
+
+  public void setnormalCreatePortfolioAction(ActionListener actionListener) {
+    normalCreatePortfolioButton.addActionListener(actionListener);
+  }
+  public void setnormalExaminePortfolioButtonListener(ActionListener listener) {
+    normalExaminePortfolioButton.addActionListener(listener);
+  }
+
+  public void setnormalCalculatePortfolioValueButtonListener(ActionListener listener) {
+    normalCalculatePortfolioValueButton.addActionListener(listener);
+  }
+
+  public void setnormalSavePortfolioButtonListener(ActionListener listener) {
+    normalSavePortfolioButton.addActionListener(listener);
+  }
+
+  public void setnormalLoadPortfolioButtonListener(ActionListener listener) {
+    normalLoadPortfolioButton.addActionListener(listener);
+  }
+
+  public void setnormalGraphButtonListener(ActionListener listener) {
+    normalGraphButton.addActionListener(listener);
+  }
+
+  public void setnormalInspectStockPerformanceButtonListener(ActionListener listener) {
+    normalInspectStockPerformanceButton.addActionListener(listener);
+  }
+
+  public void setnormalCalculateXDayMovingAverageButtonListener(ActionListener listener) {
+    normalCalculateXDayMovingAverageButton.addActionListener(listener);
+  }
+
 
   public void displayAvailablePortfolios(List<String> portfolioNames) {
     StringBuilder message = new StringBuilder("Available portfolios:\n");
@@ -400,31 +462,6 @@ public class GUIViewU extends JFrame implements GUIInterface {
     }
   }
 
-  public interface Tradable {
-    String getSymbol();
-    int getQuantity();
-  }
-
-  // Example implementation of Tradable interface (you need to use your actual implementation)
-  public static class Stock implements Tradable {
-    private String symbol;
-    private int quantity;
-
-    public Stock(String symbol, int quantity) {
-      this.symbol = symbol;
-      this.quantity = quantity;
-    }
-
-    @Override
-    public String getSymbol() {
-      return symbol;
-    }
-
-    @Override
-    public int getQuantity() {
-      return quantity;
-    }
-  }
 
 
 }
