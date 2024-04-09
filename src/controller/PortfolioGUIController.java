@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import javax.swing.*;
 
-import View.GUIView;
+import view.GUIView;
 import model.PortfolioInterface;
 import model.service.PortfolioService;
 import model.service.PortfolioServiceInterface;
@@ -197,7 +197,8 @@ public class PortfolioGUIController {
     // Display the chart
 
     // Now, tell the view to display this chart
-    view.displayPerformanceChart(values);  }
+    view.displayPerformanceChart(values);
+  }
 
   private void addStockToPortfolio(){
     // Prompt for the portfolio name

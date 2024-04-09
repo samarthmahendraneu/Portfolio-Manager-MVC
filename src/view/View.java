@@ -1,18 +1,20 @@
 package view;
 
 
-import model.Tradable;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import model.Tradable;
+
 /**
- * View class for the Portfolio Management System.
+ * view class for the Portfolio Management System.
  */
-public class View {
+public class View implements UnifiedViewInterface {
 
   private final Appendable out;
   private Readable in;
@@ -29,7 +31,7 @@ public class View {
    * @param message the message to write.
    * @throws IllegalStateException if there is an error in writing.
    */
-  public void writeMessage(String message) throws IllegalStateException {
+  public void inputMessage(String message) throws IllegalStateException {
     try {
       this.out.append(message);
 
@@ -60,6 +62,13 @@ public class View {
 
   }
 
+
+  @Override
+  public String requestInput(String prompt) {
+    Scanner scanner = new Scanner(this.in);
+    System.out.println(prompt);
+    return scanner.nextLine().trim();
+  }
   /**
    * set the input stream.
    */
@@ -203,7 +212,7 @@ public class View {
    * @param filePath The file path where the portfolios were saved.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displaySaveSuccess(String filePath, Appendable out) throws IOException {
+  public void displaySaveSuccess(String filePath) throws IOException {
     this.out.append("Portfolios have been saved successfully to ").append(filePath).append("\n");
   }
 
@@ -236,14 +245,30 @@ public class View {
         .append(" sold from portfolio ").append(portfolioName).append("\n");
   }
 
+  @Override
+  public void displayMessage(String message) {
+    System.out.println(message);
+  }
+
   /**
    * Display an error message.
    *
    * @param errorMessage The error message to display.
    * @throws IOException If an error occurs while writing to the output.
    */
-  public void displayError(String errorMessage) throws IOException {
-    this.out.append("Error: ").append(errorMessage).append("\n");
+  public void displayError(String errorMessage)  {
+    inputMessage("Error: " +errorMessage);
+  }
+
+
+  @Override
+  public LocalDate requestDate(String prompt) {
+    return null;
+  }
+
+  @Override
+  public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
+
   }
 
   /**

@@ -1,8 +1,10 @@
 package controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +13,8 @@ import java.util.Optional;
 import model.Portfolio;
 import model.PortfolioInterface;
 import model.service.PortfolioServiceInterface;
-import view.View;
+import view.GUIInterface;
+import view.UnifiedViewInterface;
 
 
 /**
@@ -24,7 +27,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   private final PortfolioServiceInterface portfolioService;
 
-  private final View view;
+  private final UnifiedViewInterface view;
 
   /**
    * Controller class for managing the interaction between user inputs and portfolio operations
@@ -33,25 +36,39 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * @param portfolioController The portfolio controller to interact with.
    * @param view                The view for displaying messages.
    */
-  public PortfolioMenuController(PortfolioControllerInterface portfolioController, View view) {
+  public PortfolioMenuController(PortfolioControllerInterface portfolioController, UnifiedViewInterface view)  {
     this.portfolioController = portfolioController;
     this.view = view;
     this.loadStockCache();
     this.portfolioService = portfolioController.getPortfolioService();
+    setupView();
   }
 
-  /**
-   * set streamble input for testing.
-   */
-  public void setStreamableInput(Readable input) {
-    this.view.setStreamableInput(input);
+  private void setupView()  {
+    if (view instanceof GUIInterface) {
+      setupGUIViewListeners((GUIInterface) view);
+      try {
+        view.displayMainMenu();
+      }
+      catch (IOException ignored)
+      {}
+    }else {
+      displayMainMenu();
+    }
+    // No setup needed for textual view as it handles inputs differently
   }
 
-  /**
-   * get streamble output for testing.
-   */
-  public Appendable getStreamableOutput() {
-    return this.view.getStreamableOutput();
+  private void setupGUIViewListeners(GUIInterface guiView) {
+    guiView.setCreatePortfolioAction(e -> createNewPortfolio());
+    guiView.setExaminePortfolioButtonListener(e->examinePortfolio());
+    guiView.setCalculatePortfolioValueButtonListener(e->calculatePortfolioValue());
+    guiView.setSavePortfolioButtonListener(e->savePortfolio());
+    guiView.setLoadPortfolioButtonListener(e->loadPortfolio());
+    guiView.setGraphButtonListener(e->calculateGraph());
+    guiView.setInspectStockPerformanceButtonListener(e->inspectStockPerformance());
+    guiView.setAddButtonListener(e->addStockToPortfolio());
+    guiView.setSellButtonListener(e->sellStockFromPortfolio());
+    // Continue initializing listeners for other buttons...
   }
 
   /**
@@ -71,14 +88,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.displayFlexiblePortfolioMenu();
             break;
           case 3:
-            this.view.writeMessage("Exiting...");
+            this.view.inputMessage("Exiting...");
             running = false;
             break;
           default:
-            this.view.writeMessage("Invalid option. Please try again.");
+            this.view.inputMessage("Invalid option. Please try again.");
         }
       } catch (Exception e) {
-        this.view.writeMessage("Error: " + e.getMessage());
+        this.view.inputMessage("Error: " + e.getMessage());
       }
     }
   }
@@ -138,18 +155,18 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.findMovingCrossOverDays();
             break;
           case 14:
-            this.dollarCostAvergaing();
+            this.dollarCostAveraging();
             break;
           case 15:
-            this.view.writeMessage("Exiting...");
+            this.view.inputMessage("Exiting...");
             this.saveStockCache();
             running = false;
             break;
           default:
-            this.view.writeMessage("Invalid option. Please try again.");
+            this.view.inputMessage("Invalid option. Please try again.");
         }
       } catch (Exception e) {
-        this.view.writeMessage("Error: " + e.getMessage());
+        this.view.inputMessage("Error: " + e.getMessage());
       }
     }
   }
@@ -157,21 +174,31 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   /**
    * Dollar Cost Averaging.
    */
-  public void dollarCostAvergaing(){
-      this.view.writeMessage("Enter the Portfolio Name:");
-      String name = this.view.readLine().trim();
-      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
-      String startDateString = this.view.readLine().trim();
+  public void dollarCostAveraging() {
+    try {
+      String name = view.requestInput("Enter the Portfolio Name:");
+      String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
       LocalDate startDate = LocalDate.parse(startDateString);
-      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
-      String endDateString = this.view.readLine().trim();
+
+      String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = LocalDate.parse(endDateString);
-      this.view.writeMessage("Enter the investment amount per month in USD:");
-      BigDecimal investmentAmount = new BigDecimal(this.view.readLine().trim());
-      this.view.writeMessage("Enter the frequency type : 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
-      int frequency = this.view.readInt();
+
+      String investmentAmountString = view.requestInput("Enter the investment amount per month in USD:");
+      BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
+
+      String frequencyString = view.requestInput("Enter the frequency type: 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
+      int frequency = Integer.parseInt(frequencyString);
+
       this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate, frequency);
-      this.view.writeMessage("Dollar Cost Averaging has been successfully applied to the portfolio.");
+
+      view.displayMessage("Dollar Cost Averaging has been successfully applied to the portfolio: " + name);
+    } catch (DateTimeParseException dtpe) {
+      view.displayMessage("Error: Invalid date format.");
+    } catch (NumberFormatException nfe) {
+      view.displayMessage("Error: Invalid number format.");
+    } catch (Exception e) {
+      view.displayMessage("An error occurred: " + e.getMessage());
+    }
   }
 
   /**
@@ -180,24 +207,32 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    */
   public void findCrossOverDays() {
     try {
-      this.view.writeMessage("Enter the stock symbol:");
-      String symbol = this.view.readLine().trim();
-      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
-      String startDateString = this.view.readLine().trim();
-      LocalDate startDate = LocalDate.parse(startDateString);
-      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
-      String endDateString = this.view.readLine().trim();
-      LocalDate endDate = LocalDate.parse(endDateString);
-      Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
-      if (this.printIfError(payload)) {
+      String symbol = view.requestInput("Enter the stock symbol:");
+      if (symbol == null || symbol.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
         return;
       }
+
+      String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
+      LocalDate startDate = validateAndParseDate(startDateString);
+      if (startDate == null) return; // Error message already shown by validateAndParseDate
+
+      String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
+      LocalDate endDate = validateAndParseDate(endDateString);
+      if (endDate == null) return; // Error message already shown by validateAndParseDate
+
+      Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
+      if (payload.isError()) {
+        view.displayMessage("Error finding crossover days: " + payload.getMessage());
+        return;
+      }
+      // Assuming displayCrossoverDays can handle showing the results appropriately
       view.displayCrossoverDays(symbol, startDate, endDate, (List<LocalDate>) payload.getData());
     } catch (Exception e) {
-      this.view.writeMessage("Error finding crossover days: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error finding crossover days: " + e.getMessage());
     }
   }
+
 
   /**
    * Finds moving crossover days for a given stock symbol within a specified date range. A moving
@@ -205,29 +240,50 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    */
   public void findMovingCrossOverDays() {
     try {
-      this.view.writeMessage("Enter the stock symbol:");
-      String symbol = this.view.readLine().trim();
-      this.view.writeMessage("Enter the start date (YYYY-MM-DD):");
-      String startDateString = this.view.readLine().trim();
-      LocalDate startDate = LocalDate.parse(startDateString);
-      this.view.writeMessage("Enter the end date (YYYY-MM-DD):");
-      String endDateString = this.view.readLine().trim();
-      LocalDate endDate = LocalDate.parse(endDateString);
-      this.view.writeMessage("Enter the short moving period:");
-      int shortMovingPeriod = this.view.readInt();
-      this.view.writeMessage("Enter the long moving period:");
-      int longMovingPeriod = this.view.readInt();
-      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate,
-          shortMovingPeriod, longMovingPeriod);
-      if (this.printIfError(payload)) {
+      String symbol = view.requestInput("Enter the stock symbol:");
+      if (symbol == null || symbol.trim().isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
         return;
       }
-      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod,
-          longMovingPeriod, (Map<String, Object>) payload.getData());
+
+      String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
+      LocalDate startDate = validateAndParseDate(startDateString);
+      if (startDate == null) return;
+
+      String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
+      LocalDate endDate = validateAndParseDate(endDateString);
+      if (endDate == null) return;
+
+      String shortMovingPeriodString = view.requestInput("Enter the short moving period:");
+      Integer shortMovingPeriod = validateAndParseInt(shortMovingPeriodString);
+      if (shortMovingPeriod == null) return;
+
+      String longMovingPeriodString = view.requestInput("Enter the long moving period:");
+      Integer longMovingPeriod = validateAndParseInt(longMovingPeriodString);
+      if (longMovingPeriod == null) return;
+
+      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod);
+      if (payload.isError()) {
+        view.displayMessage("Error finding moving crossover days: " + payload.getMessage());
+        return;
+      }
+
+      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod, (Map<String, Object>) payload.getData());
     } catch (Exception e) {
-      this.view.writeMessage("Error finding moving crossover days: " + e.getMessage());
+      view.displayMessage("Error finding moving crossover days: " + e.getMessage());
     }
   }
+
+
+  private Integer validateAndParseInt(String intString) {
+    try {
+      return Integer.parseInt(intString);
+    } catch (NumberFormatException e) {
+      view.displayMessage("Invalid number format. Please enter a valid integer.");
+      return null;
+    }
+  }
+
 
 
   /**
@@ -266,16 +322,16 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.computeStockMovingAverage();
             break;
           case 9:
-            this.view.writeMessage("Exiting...");
+            this.view.inputMessage("Exiting...");
             this.saveStockCache();
             running = false;
             break;
 
           default:
-            this.view.writeMessage("Invalid option. Please try again.");
+            this.view.inputMessage("Invalid option. Please try again.");
         }
       } catch (Exception e) {
-        this.view.writeMessage("Error: " + e.getMessage());
+        this.view.inputMessage("Error: " + e.getMessage());
       }
     }
 
@@ -285,32 +341,62 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * Calculate the graph for the given stock or portfolio.
    */
   public void calculateGraph() {
-    LocalDate date;
-    LocalDate date2;
-    this.view.writeMessage("Enter Stock or Portfolio name:");
-    String name = this.view.readLine();
-    this.view.writeMessage("Enter Start Date");
-    date = dateValidator();
-    this.view.writeMessage("Enter End Date");
-    date2 = dateValidator();
-    StringBuilder str = portfolioController.genGraph(name, date, date2);
-    this.view.writeMessage(str.toString());
+    try {
+      String name = view.requestInput("Enter Stock or Portfolio name:");
+      if (name == null || name.isEmpty()) {
+        view.displayMessage("Operation cancelled or no name entered.");
+        return;
+      }
+
+      String startDateString = view.requestInput("Enter Start Date (YYYY-MM-DD):");
+      LocalDate startDate = validateAndParseDate(startDateString);
+      if (startDate == null) return; // Error message already shown by validateAndParseDate
+
+      String endDateString = view.requestInput("Enter End Date (YYYY-MM-DD):");
+      LocalDate endDate = validateAndParseDate(endDateString);
+      if (endDate == null) return; // Error message already shown by validateAndParseDate
+
+      // Assuming genGraph returns a StringBuilder or String representing the graph
+      StringBuilder graphData = portfolioController.genGraph(name, startDate, endDate);
+      view.displayMessage(graphData.toString());
+    } catch (DateTimeParseException dtpe) {
+      view.displayMessage("Error: Invalid date format.");
+    } catch (Exception e) {
+      view.displayMessage("An error occurred: " + e.getMessage());
+    }
   }
+
+  private LocalDate validateAndParseDate(String dateString) {
+    try {
+      return LocalDate.parse(dateString);
+    } catch (DateTimeParseException e) {
+      view.displayMessage("Invalid date format. Please try again with format YYYY-MM-DD.");
+      return null;
+    }
+  }
+
 
   /**
    * Inspect the stock performance for a given stock symbol on a specified date.
    */
   public void inspectStockPerformance() {
-    this.view.writeMessage("Enter the stock symbol:");
-    String symbol = this.view.readLine();
-    this.view.writeMessage("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
-    LocalDate date = dateValidator();
+    String symbol = view.requestInput("Enter the stock symbol:");
+    if (symbol == null || symbol.trim().isEmpty()) {
+      view.displayMessage("Operation cancelled or no symbol entered.");
+      return;
+    }
+
+    String dateString = view.requestInput("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    LocalDate date = validateAndParseDate(dateString);
+
+    if (date == null) return;
+
     Payload result = portfolioController.inspectStockPerformance(symbol, date);
 
     if (!result.isError()) {
-      this.view.writeMessage("Stock Performance on " + date + ": " + result.getData());
+      view.displayMessage("Stock Performance on " + date + ": " + result.getData());
     } else {
-      this.view.writeMessage("Error: " + result.getMessage());
+      view.displayMessage("Error: " + result.getMessage());
     }
   }
 
@@ -325,7 +411,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     while (!isValidInput) {
       try {
-        days = Integer.parseInt(this.view.readLine());
+        String input = view.requestInput("Enter the number of days for the moving average:");
+        if (input == null || input.trim().isEmpty()) {
+          view.displayMessage("Operation cancelled.");
+          break; // Or return a default value or throw an exception based on your flow.
+        }
+        days = Integer.parseInt(input.trim());
 
         if (days <= 0) {
           throw new NumberFormatException("The number of days must be greater than 0.");
@@ -333,31 +424,49 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
         isValidInput = true;
       } catch (NumberFormatException e) {
-        this.view.writeMessage("Invalid input: " + e.getMessage() + " Please try again.");
+        view.displayMessage("Invalid input: " + e.getMessage() + ". Please enter a positive integer.");
       }
     }
     return days;
   }
 
+
   /**
    * Compute the moving average for a given stock symbol on a specified date.
    */
   public void computeStockMovingAverage() {
-    this.view.writeMessage("Enter the stock symbol:");
-    String symbol = this.view.readLine();
-    this.view.writeMessage("Enter the end date (YYYY-MM-DD) for the moving average calculation:");
-    LocalDate endDate = dateValidator();
-    this.view.writeMessage("Enter the number of days for the moving average:");
-    int days = getValidNumberOfDays();// Ensure proper error handling or validation here
+    // Requesting stock symbol input
+    String symbol = view.requestInput("Enter the stock symbol:");
+    if (symbol == null) {
+      view.displayMessage("Operation cancelled.");
+      return;
+    }
 
-    Payload result = portfolioController.computeStockMovingAverage(symbol, endDate, days);
+    // Requesting end date input and validating it
+    String endDate = view.requestInput("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    LocalDate date = validateAndParseDate(endDate);
+    if (endDate == null) {
+      view.displayMessage("Invalid or no date provided.");
+      return;
+    }
 
-    if (!result.isError()) {
-      this.view.writeMessage(
-          days + "-Day Moving Average for "
-              + symbol + " as of " + endDate + ": " + result.getData());
-    } else {
-      this.view.writeMessage("Error: " + result.getMessage());
+    // Requesting number of days for moving average calculation
+    int days = getValidNumberOfDays();
+    if (days <= 0) {
+      view.displayMessage("Invalid number of days provided.");
+      return;
+    }
+
+    // Perform the moving average computation
+    try {
+      Payload result = portfolioController.computeStockMovingAverage(symbol, date, days);
+      if (!result.isError()) {
+        view.displayMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": " + result.getData());
+      } else {
+        view.displayMessage("Error: " + result.getMessage());
+      }
+    } catch (Exception e) {
+      view.displayMessage("Error while computing moving average: " + e.getMessage());
     }
   }
 
@@ -374,17 +483,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       try {
         date = LocalDate.parse(dateString);
       } catch (Exception e) {
-        this.view.writeMessage("Invalid date format. Please try again.");
+        this.view.inputMessage("Invalid date format. Please try again.");
         continue;
       }
       date = LocalDate.parse(dateString);
       if (!date.isBefore(LocalDate.now())) {
-        this.view.writeMessage("Date must be before today. Please try again.");
+        this.view.inputMessage("Date must be before today. Please try again.");
         continue;
       }
       DayOfWeek dayOfWeek = date.getDayOfWeek();
       if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-        this.view.writeMessage("Date must be on a weekday. Please try again.");
+        this.view.inputMessage("Date must be on a weekday. Please try again.");
         continue;
       }
       break;
@@ -396,62 +505,61 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * Create a new portfolio.
    */
   public void createNewPortfolio() {
-    this.view.writeMessage("Enter new portfolio name:\n");
-    String name = this.view.readLine().trim();
+    // Request portfolio name
+    String name = view.requestInput("Enter new portfolio name:");
+    if (name == null || name.trim().isEmpty()) {
+      view.displayMessage("Portfolio name cannot be empty.");
+      return;
+    }
+
     Payload payload = portfolioController.createNewPortfolio(name);
     if (this.printIfError(payload)) {
       return;
     }
     Portfolio newPortfolio = (Portfolio) payload.getData();
+
     boolean flag = true;
-    this.view.writeMessage("Enter the stocks you want to add to the portfolio \n");
-    int quantity = 0;
     while (flag) {
-      this.view.writeMessage("Enter the stock symbol:\n");
-      String symbol = this.view.readLine().trim();
-      while (true) {
-        this.view.writeMessage("Enter the quantity of the stock:\n");
-        quantity = this.view.readInt();
-        if (quantity > 0) {
-          break;
-        } else {
-          this.view.writeMessage("Quantity must be greater than 0\n");
-        }
-      }
-      LocalDate date;
-      while (true) {
-        this.view.writeMessage("\nEnter the purchase date (YYYY-MM-DD):\n");
-        String dateString = this.view.readLine().trim();
-        try {
-          date = LocalDate.parse(dateString);
-        } catch (Exception e) {
-          this.view.writeMessage("Invalid date format. Please try again.\n");
-          continue;
-        }
-        date = LocalDate.parse(dateString);
-        if (!date.isBefore(LocalDate.now())) {
-          this.view.writeMessage("Date must be before today. Please try again.\n");
-          continue;
-        }
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-          this.view.writeMessage("Date must be on a weekday. Please try again.\n");
-          continue;
-        }
-        break;
-      }
-      payload = portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
-      if (this.printIfError(payload)) {
-        return;
-      }
-      this.view.writeMessage("Press q to exit, Press n to go on: \n");
-      String exitChar = this.view.readLine().trim();
-      if (exitChar.equals("q")) {
+      String symbol = view.requestInput("Enter the stock symbol to add to the portfolio, or cancel to finish:");
+      if (symbol == null || symbol.trim().isEmpty()) {
         flag = false;
+        continue;
       }
 
+      int quantity = 0;
+      while (quantity <= 0) {
+        try {
+          String quantityStr = view.requestInput("Enter the quantity of the stock:");
+          quantity = Integer.parseInt(quantityStr);
+          if (quantity <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+          view.displayMessage("Please enter a valid quantity greater than 0.");
+        }
+      }
+
+      LocalDate date = null;
+      while (date == null) {
+        try {
+          String dateString = view.requestInput("Enter the purchase date (YYYY-MM-DD):");
+          date = LocalDate.parse(dateString);
+          // Additional validation can be performed here if necessary
+        } catch (DateTimeParseException e) {
+          view.displayMessage("Please enter a valid date in the format YYYY-MM-DD.");
+        }
+      }
+
+      payload = portfolioController.addStockToPortfolio(newPortfolio, symbol, quantity, date);
+      if (this.printIfError(payload)) {
+        continue;
+      }
+
+      String continueAdding = view.requestInput("Press 'n' to add more stocks or any other key to finish:");
+      if (!"n".equalsIgnoreCase(continueAdding.trim())) {
+        flag = false;
+      }
     }
-    this.view.writeMessage("Portfolio '" + name + "' has been created and populated.\n");
+
+    view.displayMessage("Portfolio '" + name + "' has been created and populated.");
   }
 
   /**
@@ -459,88 +567,167 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * the portfolio.
    */
   public void addStockToPortfolio() {
+    // Display available portfolios
     try {
-      view.displayAvailablePortfolios(
-          portfolioController.getPortfolioService().listPortfolioNames());
-      this.view.writeMessage("Enter the name of the portfolio to add the stock to:\n");
-      String portfolioName = this.view.readLine().trim();
-      this.view.writeMessage("Enter the stock symbol:\n");
-      String symbol = this.view.readLine().trim();
-      this.view.writeMessage("Enter the quantity of the stock to be added:\n");
-      int quantity = this.view.readInt();
-      this.view.readLine(); // Consume newline
-      this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):\n");
-      LocalDate date = this.dateValidator();
-      // get the portfolio by name
-      PortfolioInterface portfolio = portfolioController.getPortfolioService()
-          .getPortfolioByName(portfolioName).orElse(null);
+      List<String> portfolioNames = portfolioController.getPortfolioService().listPortfolioNames();
+      view.displayAvailablePortfolios(portfolioNames);
+    } catch (Exception e) {
+      view.displayMessage("Error retrieving portfolio names: " + e.getMessage());
+      return;
+    }
+
+    // Request portfolio name
+    String portfolioName = view.requestInput("Enter the name of the portfolio to add the stock to:");
+    if (portfolioName == null || portfolioName.trim().isEmpty()) {
+      view.displayMessage("Portfolio name cannot be empty.");
+      return;
+    }
+
+    // Request stock symbol
+    String symbol = view.requestInput("Enter the stock symbol:");
+    if (symbol == null || symbol.trim().isEmpty()) {
+      view.displayMessage("Stock symbol cannot be empty.");
+      return;
+    }
+
+    // Request quantity
+    int quantity = 0;
+    while (quantity <= 0) {
+      try {
+        String quantityStr = view.requestInput("Enter the quantity of the stock:");
+        quantity = Integer.parseInt(quantityStr);
+      } catch (NumberFormatException e) {
+        view.displayMessage("Please enter a valid quantity greater than 0.");
+      }
+    }
+
+    // Request purchase date
+    LocalDate date = null;
+    while (date == null) {
+      try {
+        String dateString = view.requestInput("Enter the purchase date (YYYY-MM-DD):");
+        date = LocalDate.parse(dateString);
+      } catch (DateTimeParseException e) {
+        view.displayMessage("Please enter a valid date in the format YYYY-MM-DD.");
+      }
+    }
+
+    // Add stock to the portfolio
+    try {
+      PortfolioInterface portfolio = portfolioController.getPortfolioService().getPortfolioByName(portfolioName).orElse(null);
       Payload payload = portfolioController.addStockToPortfolio(portfolio, symbol, quantity, date);
       if (this.printIfError(payload)) {
         return;
       }
       view.displayStockAdded(portfolioName, symbol, quantity);
     } catch (Exception e) {
-      this.view.writeMessage("Error adding stock to portfolio: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error adding stock to portfolio: " + e.getMessage());
     }
   }
+
 
   /**
    * Sell a specific number of shares of a specific stock on a specified date from a given
    * portfolio.
    */
   public void sellStockFromPortfolio() {
+    // Display available portfolios
     try {
-      view.displayAvailablePortfolios(
-          portfolioController.getPortfolioService().listPortfolioNames());
-      this.view.writeMessage("Enter the name of the portfolio to sell the stock from:");
-      String portfolioName = this.view.readLine().trim();
-      this.view.writeMessage("Enter the stock symbol:");
-      String symbol = this.view.readLine().trim();
-      this.view.writeMessage("Enter the quantity of the stock to be sold:");
-      int quantity = this.view.readInt();
-      this.view.readLine(); // Consume newline
-      this.view.writeMessage("Enter the purchase date (YYYY-MM-DD):");
-      LocalDate date = this.dateValidator();
-      // get the portfolio by name
-      PortfolioInterface portfolio = portfolioController.getPortfolioService()
-          .getPortfolioByName(portfolioName).orElse(null);
-      Payload payload = portfolioController.sellStockFromPortfolio(portfolio, symbol, quantity,
-          date);
+      List<String> portfolioNames = portfolioController.getPortfolioService().listPortfolioNames();
+      view.displayAvailablePortfolios(portfolioNames);
+    } catch (Exception e) {
+      view.displayMessage("Error retrieving portfolio names: " + e.getMessage());
+      return;
+    }
+
+    // Request portfolio name
+    String portfolioName = view.requestInput("Enter the name of the portfolio to sell the stock from:");
+    if (portfolioName == null || portfolioName.trim().isEmpty()) {
+      view.displayMessage("Portfolio name cannot be empty.");
+      return;
+    }
+
+    // Request stock symbol
+    String symbol = view.requestInput("Enter the stock symbol:");
+    if (symbol == null || symbol.trim().isEmpty()) {
+      view.displayMessage("Stock symbol cannot be empty.");
+      return;
+    }
+
+    // Request quantity
+    int quantity = 0;
+    while (quantity <= 0) {
+      try {
+        String quantityStr = view.requestInput("Enter the quantity of the stock to be sold:");
+        quantity = Integer.parseInt(quantityStr);
+      } catch (NumberFormatException e) {
+        view.displayMessage("Please enter a valid quantity greater than 0.");
+      }
+    }
+
+    // Request sale date
+    LocalDate date = null;
+    while (date == null) {
+      try {
+        String dateString = view.requestInput("Enter the sale date (YYYY-MM-DD):");
+        date = LocalDate.parse(dateString);
+      } catch (DateTimeParseException e) {
+        view.displayMessage("Please enter a valid date in the format YYYY-MM-DD.");
+      }
+    }
+
+    // Attempt to sell stock
+    try {
+      PortfolioInterface portfolio = portfolioService.getPortfolioByName(portfolioName).orElse(null);
+
+      Payload payload = portfolioController.sellStockFromPortfolio(portfolio, symbol, quantity, date);
       if (this.printIfError(payload)) {
         return;
       }
       view.displayStockSold(portfolioName, symbol, quantity);
     } catch (Exception e) {
-      this.view.writeMessage("Error selling stock from portfolio: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error selling stock from portfolio: " + e.getMessage());
     }
   }
+
 
   /**
    * Calculate the total amount of money invested in a portfolio by a specific date.
    */
   public void calculateInvestment() {
+    // Request the portfolio name
+    String name = view.requestInput("Enter the name of the portfolio:");
+    if (name == null || name.trim().isEmpty()) {
+      view.displayMessage("Portfolio name cannot be empty.");
+      return;
+    }
+
+    // Request the date for calculation
+    String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to calculate the investment:");
+    LocalDate date;
     try {
-      this.view.writeMessage("Enter the name of the portfolio:");
-      String name = this.view.readLine().trim();
-      this.view.writeMessage("Enter the date (YYYY-MM-DD) to calculate the investment:");
-      String dateInput = this.view.readLine().trim();
-      Payload payload = portfolioController.calculateTotalInvestment(name,
-          LocalDate.parse(dateInput));
-      if (this.printIfError(payload)) {
+      date = LocalDate.parse(dateInput);
+    } catch (DateTimeParseException e) {
+      view.displayMessage("Invalid date format. Please use YYYY-MM-DD.");
+      return;
+    }
+
+    // Calculate investment
+    try {
+      Payload payload = portfolioController.calculateTotalInvestment(name, date);
+      if (payload.isError()) {
+        view.displayMessage(payload.getMessage());
         return;
       }
 
       Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
       if (portfolioValue.isPresent()) {
-        BigDecimal value = portfolioValue.get();
-        view.displayPortfolioInvestment(name, dateInput, value.toString());
+        view.displayMessage(String.format("Investment of the portfolio '%s' on %s: %s", name, dateInput, portfolioValue.get().toString()));
       } else {
-        this.view.writeMessage("No value found for the portfolio '" + name + "' on " + dateInput);
+        view.displayMessage(String.format("No value found for the portfolio '%s' on %s.", name, dateInput));
       }
     } catch (Exception e) {
-      this.view.writeMessage("Error calculating portfolio value: " + e.getMessage());
+      view.displayMessage("Error calculating portfolio investment: " + e.getMessage());
     }
   }
 
@@ -549,21 +736,35 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * quantities.
    */
   public void examinePortfolio() {
-    try {
-      view.displayAvailablePortfolios(
-          portfolioController.getPortfolioService().listPortfolioNames());
-      this.view.writeMessage("Enter the name of the portfolio to examine:");
-      String name = this.view.readLine().trim();
-      PortfolioInterface portfolio = portfolioController.getPortfolioService()
-          .getPortfolioByName(name).orElse(null);
+    // Display available portfolios before requesting user input
+    List<String> portfolioNames = portfolioController.getPortfolioService().listPortfolioNames();
+    if (portfolioNames.isEmpty()) {
+      view.displayMessage("No portfolios available to examine.");
+      return;
+    }
+    view.displayMessage("Available portfolios: " + String.join(", ", portfolioNames));
 
-      if (portfolio != null) {
-        view.displayPortfolioDetails(name, portfolio.getStocks());
+    // Request the name of the portfolio to examine
+    String name = view.requestInput("Enter the name of the portfolio to examine:");
+    if (name == null || name.trim().isEmpty()) {
+      view.displayMessage("Portfolio name cannot be empty.");
+      return;
+    }
+
+    // Attempt to get and display the portfolio details
+    try {
+      Optional<PortfolioInterface> portfolioOpt = portfolioController.getPortfolioService().getPortfolioByName(name);
+
+      if (portfolioOpt.isPresent()) {
+        PortfolioInterface portfolio = portfolioOpt.get();
+        StringBuilder details = new StringBuilder("Stocks in " + name + ":\n");
+        portfolio.getStocks().forEach(stock -> details.append(stock.getSymbol()).append(" - Quantity: ").append(stock.getQuantity()).append("\n"));
+        view.displayMessage(details.toString());
       } else {
-        this.view.writeMessage("Portfolio not found.");
+        view.displayMessage("Portfolio not found.");
       }
     } catch (Exception e) {
-      this.view.writeMessage("Error: " + e.getMessage());
+      view.displayMessage("Error examining portfolio: " + e.getMessage());
     }
   }
 
@@ -573,64 +774,74 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    */
   public void calculatePortfolioValue() {
     try {
-      this.view.writeMessage("Enter the name of the portfolio:");
-      String name = this.view.readLine().trim();
-      this.view.writeMessage("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
-      String dateInput = this.view.readLine().trim();
-      Payload payload = portfolioController.calculatePortfolioValue(name,
-          LocalDate.parse(dateInput));
-      if (this.printIfError(payload)) {
+      // Request the name of the portfolio to calculate its value
+      String name = view.requestInput("Enter the name of the portfolio:");
+      if (name == null || name.trim().isEmpty()) {
+        view.displayMessage("Portfolio name cannot be empty.");
         return;
       }
 
-      Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
-      if (portfolioValue.isPresent()) {
-        BigDecimal value = portfolioValue.get();
-        view.displayPortfolioValue(name, dateInput, value.toString());
+      // Request the date for which to calculate the portfolio value
+      String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
+      LocalDate date = LocalDate.parse(dateInput); // Consider adding date validation
+
+      // Calculate the portfolio value
+      Optional<BigDecimal> portfolioValueOpt = portfolioService.calculatePortfolioValue(name, date);
+      if (portfolioValueOpt.isPresent()) {
+        BigDecimal portfolioValue = portfolioValueOpt.get();
+        view.displayMessage("Value of the portfolio '" + name + "' on " + dateInput + ": " + portfolioValue.toString());
       } else {
-        this.view.writeMessage("No value found for the portfolio '" + name + "' on " + dateInput);
+        view.displayMessage("No value found for the portfolio '" + name + "' on " + dateInput);
       }
+    } catch (DateTimeParseException e) {
+      view.displayMessage("Invalid date format. Please use YYYY-MM-DD format.");
     } catch (Exception e) {
-      this.view.writeMessage("Error calculating portfolio value: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error calculating portfolio value: " + e.getMessage());
     }
   }
+
 
   /**
    * Saves the portfolio to a specified file path.
    */
   public void savePortfolio() {
     try {
-      this.view.writeMessage("Enter the file path to save the portfolio (.csv):");
-      String filePath = this.view.readLine().trim();
-      Payload payload = portfolioController.savePortfolio(filePath);
-      if (payload.isError()) {
-        this.view.writeMessage("Error: " + payload.getMessage());
+      // Request the file path to save the portfolio
+      String filePath = view.requestInput("Enter the file path to save the portfolio (.csv):");
+      if (filePath == null || filePath.trim().isEmpty()) {
+        view.displayMessage("File path cannot be empty.");
         return;
       }
-      view.displaySaveSuccess(filePath, System.out);
+
+      // Attempt to save the portfolio to the specified file
+      try{
+        portfolioService.savePortfoliosToCSV(filePath);
+        view.displayMessage("Portfolio has been saved successfully to " + filePath);
+      }
+      catch (IOException e) {throw e;}
     } catch (Exception e) {
-      this.view.writeMessage("Error: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error saving portfolio.");
     }
   }
 
-  /**
-   * Loads portfolios from a specified file path.
-   */
   public void loadPortfolio() {
     try {
-      this.view.writeMessage("Enter the file path to load portfolios from (.csv):");
-      String filePath = this.view.readLine().trim();
-      Payload payload = portfolioController.loadPortfolio(filePath);
-      if (Objects.nonNull(payload) && payload.isError()) {
-        this.view.writeMessage("Error: " + payload);
+      // Request the file path from which to load portfolios
+      String filePath = view.requestInput("Enter the file path to load portfolios from (.csv):");
+      if (filePath == null || filePath.trim().isEmpty()) {
+        view.displayMessage("File path cannot be empty.");
         return;
       }
-      view.displayLoadSuccess();
+
+      // Attempt to load the portfolio from the specified file
+      String success = portfolioService.loadPortfoliosFromCSV(filePath);
+      if (success!=null) {
+        view.displayMessage("Portfolios have been loaded successfully from " + filePath);
+      } else {
+        view.displayMessage("Error loading portfolios.");
+      }
     } catch (Exception e) {
-      this.view.writeMessage("Error: " + e.getMessage());
-      this.view.readLine(); // Consume newline
+      view.displayMessage("Error: " + e.getMessage());
     }
   }
 
@@ -642,12 +853,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       String filePath = "cache.csv";
       Payload payload = portfolioController.saveCache(filePath);
       if (payload.isError()) {
-        this.view.writeMessage("Error: " + payload.getMessage());
+        this.view.inputMessage("Error: " + payload.getMessage());
         return;
       }
-      view.writeMessage("Cache have been saved successfully to " + filePath + "\n");
+      view.inputMessage("Cache have been saved successfully to " + filePath + "\n");
     } catch (Exception e) {
-      this.view.writeMessage("Error: " + e.getMessage());
+      this.view.inputMessage("Error: " + e.getMessage());
       this.view.readLine(); // Consume newline
     }
   }
@@ -662,7 +873,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       if (Objects.nonNull(payload) && payload.isError()) {
         return;
       }
-      view.writeMessage("Cache have been loaded successfully.\n");
+      view.inputMessage("Cache have been loaded successfully.\n");
     } catch (Exception e) {
       return;
     }
@@ -679,7 +890,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       try {
         view.displayError(payload.getMessage());
       } catch (Exception e) {
-        this.view.writeMessage("Error: " + e.getMessage());
+        this.view.inputMessage("Error: " + e.getMessage());
       }
       return true;
     }

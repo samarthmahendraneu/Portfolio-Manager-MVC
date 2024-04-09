@@ -5,7 +5,7 @@ The Portfolio Management System is a comprehensive Java-based application design
 ## Features
 
 - **Create a Portfolio**: Users can create multiple portfolios to manage different sets of stock investments.
-- **Examine a Portfolio**: View detailed information about the stocks in a portfolio, including current holdings and transaction history.
+- **Examine a Portfolio**: view detailed information about the stocks in a portfolio, including current holdings and transaction history.
 - **Calculate Portfolio Value**: Determine the total value of a portfolio on a specified date.
 - **Add Stock to Portfolio**: Purchase stocks to add to a portfolio by specifying the stock symbol, quantity, and purchase date.
 - **Sell Stock from Portfolio**: Sell stocks from a portfolio, adjusting the portfolio's holdings accordingly.

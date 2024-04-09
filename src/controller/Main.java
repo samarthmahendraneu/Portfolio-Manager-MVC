@@ -1,7 +1,8 @@
 package controller;
 
 import model.service.StockService;
-import view.View;
+import view.GUIViewU;
+import view.UnifiedViewInterface;
 
 /**
  * Main class for the Portfolio Management System.
@@ -16,13 +17,15 @@ public class Main {
   public static void main(String[] args) {
     PortfolioControllerInterface portfolioController = new PortfolioController(
         new StockService("FIR1DN0VB7SQ4SGD"));
-    View view = new View();
+    UnifiedViewInterface view = new GUIViewU();
     PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController,
         view);
 
     // interaction with the user
-    // [View] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [model]
-    controller.displayMainMenu();
+    // [view] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [model]
+    //controller.displayMainMenu();
 
   }
+
+
 }

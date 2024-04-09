@@ -6,13 +6,14 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
 
 import model.utilities.BarChartPanel;
 
-public class GUIView extends JFrame {
+public class GUIViewU extends JFrame implements GUIInterface {
   private JPanel cards; // a panel that uses CardLayout
   private final String MAIN_MENU = "Main Menu";
   private final String NORMAL_PORTFOLIO = "Normal Portfolio";
@@ -30,13 +31,11 @@ public class GUIView extends JFrame {
   private JButton investmentButton;
   private JButton backButton;
 
-  public GUIView() {
+  public GUIViewU() {
     // Create the main frame
     setTitle("Portfolio Management System");
     setSize(800, 600);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    // Set up the main menu bar
     JMenuBar menuBar = new JMenuBar();
     JMenu menu = new JMenu("File");
     JMenuItem exitItem = new JMenuItem("Exit");
@@ -58,10 +57,13 @@ public class GUIView extends JFrame {
     // Add the card panel to the frame
     add(cards, BorderLayout.CENTER);
 
+
+  }
+  @Override
+  public void displayMainMenu() {
+
     // Show the frame
     setVisible(true);
-
-
   }
 
   private JPanel createMainMenuPanel() {
@@ -176,12 +178,13 @@ public class GUIView extends JFrame {
 
     // Include other buttons for actions like saving/loading portfolios, graphing, inspecting stock performance, calculating moving averages, crossover days, etc.
 
-     backButton = new JButton("Back to Main Menu");
+    backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
     panel.add(backButton);
 
     return panel;
   }
+
 
   private void switchToCard(String cardName) {
     CardLayout cl = (CardLayout)(cards.getLayout());
@@ -235,40 +238,105 @@ public class GUIView extends JFrame {
     backButton.addActionListener(listener);
   }
 
-  /**
-   * Shows a message dialog.
-   *
-   * @param message The message to display.
-   * @param title The title of the message dialog.
-   * @param messageType The type of message (e.g., JOptionPane.INFORMATION_MESSAGE, JOptionPane.ERROR_MESSAGE).
-   */
-  public void showMessage(String message) {
+  public void displayAvailablePortfolios(List<String> portfolioNames) {
+    StringBuilder message = new StringBuilder("Available portfolios:\n");
+    for (String name : portfolioNames) {
+      message.append(name).append("\n");
+    }
+    JOptionPane.showMessageDialog(null, message.toString());
+  }
+
+  public void displayPortfolioDetails(String name, List<model.Tradable> stocks){
+    StringBuilder message = new StringBuilder("Stocks in ").append(name).append(":\n");
+    for (model.Tradable stock : stocks) {
+      message.append(stock.getSymbol()).append(" - Quantity: ")
+              .append(stock.getQuantity()).append("\n");
+    }
+    JOptionPane.showMessageDialog(null, message.toString());
+  }
+
+  public void displayPortfolioValue(String name, String date, String value) {
+    String message = "Value of the portfolio '" + name + "' on " + date + ": " + value;
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+  public void displayPortfolioInvestment(String name, String date, String value) {
+    String message = "Investment of the portfolio '" + name + "' on " + date + ": " + value;
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+  public void displaySaveSuccess(String filePath) {
+    String message = "Portfolios have been saved successfully to " + filePath;
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+  public void displayLoadSuccess() {
+    String message = "Portfolios have been loaded successfully.";
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+  public void displayStockAdded(String portfolioName, String stockSymbol, int quantity) {
+    String message = "Stock " + stockSymbol + " with quantity " + quantity +
+            " added to portfolio " + portfolioName;
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+  public void displayStockSold(String portfolioName, String symbol, int quantity) {
+    String message = "Stock " + symbol + " with quantity " + quantity +
+            " sold from portfolio " + portfolioName;
+    JOptionPane.showMessageDialog(null, message);
+  }
+
+
+  @Override
+  public void displayMessage(String message) {
     JOptionPane.showMessageDialog(this, message);
+}
+
+  public void displayError(String errorMessage) {
+    JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
   }
 
-  /**
-   * Shows an error message dialog.
-   *
-   * @param errorMessage The error message to display.
-   */
-  public void showErrorMessage(String errorMessage) {
-    showMessage(errorMessage);
+  @Override
+  public String requestInput(String prompt) {
+    return JOptionPane.showInputDialog(this, prompt);
   }
 
-  /**
-   * Shows an information message dialog.
-   *
-   * @param infoMessage The information message to display.
-   */
-  public void showInfoMessage(String infoMessage) {
-    showMessage(infoMessage);
-  }
-  public String showInputDialog(String message) {
-    return JOptionPane.showInputDialog(this, message);
+  @Override
+  public void inputMessage(String message) {
+    requestInput(message);
   }
 
-  public void showMessageDialog(String message) {
-    JOptionPane.showMessageDialog(this, message);
+  @Override
+  public String readLine() {
+    return null;
+  }
+
+  @Override
+  public LocalDate requestDate(String message) {
+    LocalDate date = null;
+    while (date == null) {
+      String dateString = requestInput( message);
+      if (dateString == null || dateString.isEmpty()) {
+        displayMessage( "Operation cancelled or no date entered.");
+        break; // Exit the method if user cancels or inputs an empty string
+      }
+
+      try {
+        date = LocalDate.parse(dateString);
+        if (!date.isBefore(LocalDate.now())) {
+          displayMessage("Date must be before today. Please try again.");
+          date = null; // Reset date to null to continue the loop
+        } else if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+          displayMessage("Date must be on a weekday. Please try again.");
+          date = null; // Reset date to null to continue the loop
+        }
+      } catch (DateTimeParseException e) {
+        displayMessage("Invalid date format. Please try again.");
+        // No need to reset date to null here because it's already null
+      }
+    }
+    return date;
   }
 
   public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
@@ -279,33 +347,84 @@ public class GUIView extends JFrame {
 
   }
 
-  // Method to prompt for a date with validation
-  public LocalDate promptForDate(String message) {
-    LocalDate date = null;
-    while (date == null) {
-      String dateString = showInputDialog( message);
-      if (dateString == null || dateString.isEmpty()) {
-        showMessage( "Operation cancelled or no date entered.");
-        break; // Exit the method if user cancels or inputs an empty string
-      }
 
-      try {
-        date = LocalDate.parse(dateString);
-        if (!date.isBefore(LocalDate.now())) {
-          showMessage("Date must be before today. Please try again.");
-          date = null; // Reset date to null to continue the loop
-        } else if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-          showMessage("Date must be on a weekday. Please try again.");
-          date = null; // Reset date to null to continue the loop
-        }
-      } catch (DateTimeParseException e) {
-        showMessage("Invalid date format. Please try again.");
-        // No need to reset date to null here because it's already null
-      }
-    }
-    return date;
+
+  @Override
+  public Integer readInt() {
+    return 0;
   }
 
+  @Override
+  public void displayFlexiblePortfolioMenu() {
+
+  }
+
+
+  public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate, List<LocalDate> dates) {
+    StringBuilder message = new StringBuilder("Crossover days for stock " + symbol + " between " +
+            startDate + " and " + endDate + ":\n");
+    for (LocalDate date : dates) {
+      message.append(date.toString()).append("\n");
+    }
+    JOptionPane.showMessageDialog(null, message.toString());
+  }
+
+  @Override
+  public void displayNormalPortfolioMenu() {
+
+  }
+
+  public void displayMovingCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
+                                                int shortMovingPeriod, int longMovingPeriod, Map<String, Object> result) {
+    StringBuilder message = new StringBuilder();
+    message.append("Moving crossover days for stock ").append(symbol).append(" between ")
+            .append(startDate).append(" and ").append(endDate).append(":\n")
+            .append("Short moving period: ").append(shortMovingPeriod)
+            .append(", Long moving period: ").append(longMovingPeriod).append("\n");
+
+    List<LocalDate> goldenCrosses = (List<LocalDate>) result.get("goldenCrosses");
+    List<LocalDate> deathCrosses = (List<LocalDate>) result.get("deathCrosses");
+    List<LocalDate> movingCrossoverDays = (List<LocalDate>) result.get("movingCrossoverDays");
+
+    appendDateListToMessage("Golden Crosses:", goldenCrosses, message);
+    appendDateListToMessage("Death Crosses:", deathCrosses, message);
+    appendDateListToMessage("Moving Crossover Days:", movingCrossoverDays, message);
+
+    JOptionPane.showMessageDialog(null, message.toString());
+  }
+
+  private static void appendDateListToMessage(String title, List<LocalDate> dates, StringBuilder message) {
+    message.append(title).append("\n");
+    for (LocalDate date : dates) {
+      message.append(date.toString()).append("\n");
+    }
+  }
+
+  public interface Tradable {
+    String getSymbol();
+    int getQuantity();
+  }
+
+  // Example implementation of Tradable interface (you need to use your actual implementation)
+  public static class Stock implements Tradable {
+    private String symbol;
+    private int quantity;
+
+    public Stock(String symbol, int quantity) {
+      this.symbol = symbol;
+      this.quantity = quantity;
+    }
+
+    @Override
+    public String getSymbol() {
+      return symbol;
+    }
+
+    @Override
+    public int getQuantity() {
+      return quantity;
+    }
+  }
 
 
 }

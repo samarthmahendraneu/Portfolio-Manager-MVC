@@ -1,6 +1,6 @@
 # Portfolio Management System Design Overview
 
-The Portfolio Management System is a sophisticated Java application tailored for users aiming to meticulously manage their stock portfolios. By adhering to the model-View-Controller (MVC) architectural pattern, the system ensures a clear separation of concerns, thus fostering maintainability and scalability. Users are equipped with comprehensive functionalities including the creation and examination of portfolios, value calculations, as well as robust file management capabilities for portfolio data persistence.
+The Portfolio Management System is a sophisticated Java application tailored for users aiming to meticulously manage their stock portfolios. By adhering to the model-view-Controller (MVC) architectural pattern, the system ensures a clear separation of concerns, thus fostering maintainability and scalability. Users are equipped with comprehensive functionalities including the creation and examination of portfolios, value calculations, as well as robust file management capabilities for portfolio data persistence.
 
 ## Components
 
@@ -41,9 +41,9 @@ The `Transactions` package within the `model` is designed to encapsulate the tra
 - Provide domain-specific services related to portfolio management and stock data retrieval.
 - Interact with external data sources and caches to fetch and store stock information, enhancing system performance and reducing dependency on external services.
 
-### View
+### view
 - Manages all user interface and display logic, presenting information to users and collecting user inputs.
-- Utilizes `View` components to display errors, portfolio details, and success messages.
+- Utilizes `view` components to display errors, portfolio details, and success messages.
 
 ### Enhancements
 - **Date Handling**: With `DateUtils`, the system now includes advanced date manipulation capabilities, supporting dynamic resolution adjustment and end-of-period calculations to cater to various reporting needs.

@@ -74,15 +74,6 @@ public interface PortfolioMenuControllerInterface {
    */
   void computeStockMovingAverage();
 
-  /**
-   * for setting the input stream.
-   */
-  void setStreamableInput(Readable input);
-
-  /**
-   * for getting the output stream.
-   */
-  Appendable getStreamableOutput();
 
   /**
    * adding a stock to the portfolio.
