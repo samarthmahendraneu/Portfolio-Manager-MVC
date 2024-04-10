@@ -16,7 +16,7 @@ public class Main {
    * Main method for the Portfolio Management System.
    *
    * @param args The command line arguments.
-    */
+   */
   public static void main(String[] args) {
     System.out.println("Select the interface type:");
     System.out.println("1. Graphical User Interface (GUI)");
@@ -42,8 +42,9 @@ public class Main {
     }
 
     PortfolioControllerInterface portfolioController = new PortfolioController(
-            new StockService("FIR1DN0VB7SQ4SGD"));
-    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
+        new StockService("FIR1DN0VB7SQ4SGD"));
+    PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController,
+        view);
   }
 
 

@@ -27,7 +27,7 @@ public interface StockServiceInterface {
    * Fetches the closing price of the stock with the given symbol on the previous trading day.
    *
    * @param symbol The symbol of the stock.
-   * @param date  The date for which the price is to be fetched.
+   * @param date   The date for which the price is to be fetched.
    * @return The price of the stock on the given date.
    */
   Payload fetchLastClosePrice(String symbol, LocalDate date);

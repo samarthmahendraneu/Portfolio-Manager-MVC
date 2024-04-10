@@ -47,11 +47,7 @@ public class AlphaVantageApiSource implements ApiSource {
         }
       }
 
-      if (response.toString().contains("Error Message")) {
-        return false;
-      } else {
-        return true;
-      }
+      return !response.toString().contains("Error Message");
 
     } catch (Exception e) {
       System.out.println("An error occurred while validating the stock symbol: " + e.getMessage());

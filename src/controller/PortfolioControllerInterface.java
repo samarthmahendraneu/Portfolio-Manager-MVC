@@ -7,7 +7,8 @@ import model.PortfolioInterface;
 import model.service.PortfolioServiceInterface;
 
 /**
- * Interface for the Portfolio Management System Controller.
+ * Interface for the Portfolio Management System Controller which acts as Bridge between the
+ * portfolio service and menu controller.
  */
 public interface PortfolioControllerInterface {
 

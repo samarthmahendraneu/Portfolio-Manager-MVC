@@ -26,5 +26,6 @@ public interface FileIO {
    * @param type      The type of the portfolio to write
    * @return True if the write was successful, false otherwise
    */
-  Boolean writeFile(List<PortfolioInterface> portfolio, String filePath, String type) throws IOException;
+  Boolean writeFile(List<PortfolioInterface> portfolio, String filePath, String type)
+      throws IOException;
 }

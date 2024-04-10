@@ -105,7 +105,8 @@ public interface UnifiedViewInterface {
   void displayNormalPortfolioMenu() throws IOException;
 
   /**
-   * Displays the moving crossover days for a given stock within a specified date range and moving average periods.
+   * Displays the moving crossover days for a given stock within a specified date range and moving
+   * average periods.
    *
    * @param symbol            Stock symbol.
    * @param startDate         Start date.

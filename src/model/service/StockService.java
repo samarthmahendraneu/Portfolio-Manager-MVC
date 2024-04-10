@@ -174,8 +174,7 @@ public class StockService implements StockServiceInterface {
     // Loop through dates in the range
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Payload info = this.fetchPriceOnDate(symbol, date);
-      float closePrice = ((BigDecimal)info.getData()).floatValue();
-
+      float closePrice = ((BigDecimal) info.getData()).floatValue();
 
       // Calculate the moving average if we have enough data points
       movingAverage = calculateMovingAverage(symbol, date, 30);
@@ -267,7 +266,7 @@ public class StockService implements StockServiceInterface {
       if (info.getData() == null) {
         throw new IllegalArgumentException("Invalid stock symbol:" + symbol);
       }
-      float closePrice = ((BigDecimal)info.getData()).floatValue();
+      float closePrice = ((BigDecimal) info.getData()).floatValue();
       sum += closePrice;
     }
 

@@ -64,6 +64,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   /**
    * GUI View Listeners for the Portfolio Management System.
+   *
    * @param guiView the GUI view to set up listeners for the Portfolio Management System.
    */
   private void setupGUIViewListeners(GUIInterface guiView) {
@@ -315,7 +316,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   /**
    * Validate and parse an integer from a string.
-   * @param intString
+   *
+   * @param intString the string to parse
    * @return the parsed integer, or null if the string is not a valid integer
    */
   private Integer validateAndParseInt(String intString) {
@@ -563,7 +565,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     boolean flag = true;
     while (flag) {
-      String symbol = view.requestInput("Enter the stock symbol to add to the portfolio," +
+      String symbol = view.requestInput("Enter the stock symbol to add to the portfolio,"
+          +
           " or cancel to finish:");
       if (symbol == null || symbol.trim().isEmpty()) {
         flag = false;
@@ -870,6 +873,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   /**
    * Saves the portfolio to a specified file path.
+   *
+   * @param type the type of portfolio to save
    */
   public void savePortfolio(String type) {
     try {
@@ -892,6 +897,11 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  /**
+   * Loads portfolios from a specified file path.
+   *
+   * @param type the type of portfolio to load
+   */
   public void loadPortfolio(String type) {
     try {
       // Request the file path from which to load portfolios

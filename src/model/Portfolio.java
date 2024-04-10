@@ -64,7 +64,9 @@ public class Portfolio implements PortfolioInterface {
     for (Tradable stock : this.stocks) {
       float percentage = (stock.getQuantity(startDate)) / (totalQuantity);
       BigDecimal stockInvestment = amount.multiply(new BigDecimal(percentage));
-      Float quantity = stockInvestment.floatValue() / ((BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), investDate).getData()).floatValue();
+      Float quantity =
+          stockInvestment.floatValue() / ((BigDecimal) stockService.fetchLastClosePrice(
+              stock.getSymbol(), investDate).getData()).floatValue();
       stock.buy(quantity, investDate,
           (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), investDate).getData());
     }

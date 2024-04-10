@@ -157,9 +157,18 @@ public class Stock implements Tradable {
    */
   @Override
   public String toString() {
-    return "Stock {" +
-        "symbol='" + symbol + '\'' +
-        ", quantity=" + quantity +
+    return "Stock {"
+        +
+        "symbol='"
+        +
+        symbol
+        +
+        '\''
+        +
+        ", quantity="
+        +
+        quantity
+        +
         '}';
   }
 

@@ -164,12 +164,13 @@ public class PortfolioService implements PortfolioServiceInterface {
   /**
    * dollar cost averaging for a portfolio.
    */
-  public void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate, LocalDate endDate, int frequency) {
+  public void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate,
+      LocalDate endDate, int frequency) {
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
         .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
     portfolio.dollarCostAveraging(amount, startDate, endDate, stockService, frequency);
     return;
-    }
+  }
 
   /**
    * Fetches a portfolio by its name.
@@ -427,17 +428,26 @@ public class PortfolioService implements PortfolioServiceInterface {
     }
     return chartBuilder;
   }
-  public Map<LocalDate, BigDecimal>  plotPerformanceChartGUI(String identifier, LocalDate startDate, LocalDate endDate) {
+
+
+  /**
+   * Plots a performance chart for a given stock or portfolio over a specified time frame. The chart
+   * @param identifier The stock symbol or portfolio name to plot.
+   * @param startDate The start date of the period to plot.
+   * @param endDate The end date of the period to plot.
+   * @return A map of dates to total values for the given identifier.
+   */
+  public Map<LocalDate, BigDecimal> plotPerformanceChartGUI(String identifier, LocalDate startDate,
+      LocalDate endDate) {
     Map<LocalDate, BigDecimal> values = portfolioExists(identifier)
-            ? fetchPortfolioValuesForPeriod(identifier, startDate, endDate) :
-            fetchValuesForPeriod(identifier, startDate, endDate);
+        ? fetchPortfolioValuesForPeriod(identifier, startDate, endDate) :
+        fetchValuesForPeriod(identifier, startDate, endDate);
 
     if (values.isEmpty()) {
       System.out.println(
-              "No data available for " + identifier + " from " + startDate + " to " + endDate);
+          "No data available for " + identifier + " from " + startDate + " to " + endDate);
       return null;
     }
-
 
     return values;
   }

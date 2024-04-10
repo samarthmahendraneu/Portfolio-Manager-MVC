@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import java.math.RoundingMode;
 
 /**
@@ -95,7 +96,7 @@ public class PortfolioControllerTest {
     Portfolio portfolio = (Portfolio) payload.getData();
 
     Stock stock = new Stock("AAPL", 10, new BigDecimal("100.00"), LocalDate.now());
-    portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), (int)stock.getQuantity(),
+    portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(), (int) stock.getQuantity(),
         LocalDate.now());
     assertEquals(1, portfolio.getStocks().size());
   }
@@ -110,7 +111,7 @@ public class PortfolioControllerTest {
     PortfolioInterface portfolio = (Portfolio) payload.getData();
     Tradable stock = new Stock("AAPL", 0, new BigDecimal("100.00"), LocalDate.now());
     payload = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
-        (int)stock.getQuantity(),
+        (int) stock.getQuantity(),
         LocalDate.now());
     assertEquals("Quantity must be positive: 0", payload.getMessage());
 
@@ -125,7 +126,7 @@ public class PortfolioControllerTest {
     Portfolio portfolio = (Portfolio) payload.getData();
     Tradable stock = new Stock("AAPL", -10, new BigDecimal("100.00"), LocalDate.now());
     Payload paylpad = portfolioController.addStockToPortfolio(portfolio, stock.getSymbol(),
-        (int)stock.getQuantity(),
+        (int) stock.getQuantity(),
         LocalDate.now());
     assertEquals("Quantity must be positive: -10", paylpad.getMessage());
   }
@@ -580,7 +581,7 @@ public class PortfolioControllerTest {
     // add a new date - 1 of current date
     LocalDate newDate = LocalDate.now().minusDays(1);
     payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 5, newDate);
-    assertEquals(15, (int)portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(15, (int) portfolio.getStockQuantity("AAPL", LocalDate.now()));
   }
 
   // add same stock thrice to the portfolio
@@ -594,8 +595,8 @@ public class PortfolioControllerTest {
     // add a new date - 1 of current date
     LocalDate newDate = LocalDate.now().minusDays(1);
     payload = portfolioController.addStockToPortfolio(portfolio, "AAPL", 5, newDate);
-    assertEquals(15, (int)portfolio.getStockQuantity("AAPL", LocalDate.now()));
-    assertEquals(5, (int)portfolio.getStockQuantity("AAPL", newDate));
+    assertEquals(15, (int) portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(5, (int) portfolio.getStockQuantity("AAPL", newDate));
 
   }
 
@@ -635,7 +636,7 @@ public class PortfolioControllerTest {
         portfolio, "AAPL", 10, LocalDate.now().minusDays(2));
     payload = portfolioController.sellStockFromPortfolio(
         portfolio, "AAPL", 5, LocalDate.now());
-    assertEquals(5, (int)portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(5, (int) portfolio.getStockQuantity("AAPL", LocalDate.now()));
   }
 
   // 5. sell stock from a portfolio that has the stock and the quantity but on a different date
@@ -647,8 +648,8 @@ public class PortfolioControllerTest {
         portfolio, "AAPL", 10, LocalDate.now().minusDays(12));
     payload = portfolioController.sellStockFromPortfolio(
         portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
-    assertEquals(5, (int)portfolio.getStockQuantity("AAPL", LocalDate.now()));
-    assertEquals(10, (int)portfolio.getStockQuantity(
+    assertEquals(5, (int) portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(10, (int) portfolio.getStockQuantity(
         "AAPL", LocalDate.now().minusDays(2)));
   }
 
@@ -675,10 +676,10 @@ public class PortfolioControllerTest {
         portfolio, "AAPL", 5, LocalDate.now().minusDays(1));
     payload = portfolioController.sellStockFromPortfolio(
         portfolio, "AAPL", 3, LocalDate.now().minusDays(2));
-    assertEquals(2, (int)portfolio.getStockQuantity("AAPL", LocalDate.now()));
-    assertEquals(2, (int)portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(1)));
-    assertEquals(7, (int)portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
-    assertEquals(10, (int)portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(3)));
+    assertEquals(2, (int) portfolio.getStockQuantity("AAPL", LocalDate.now()));
+    assertEquals(2, (int) portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(1)));
+    assertEquals(7, (int) portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(2)));
+    assertEquals(10, (int) portfolio.getStockQuantity("AAPL", LocalDate.now().minusDays(3)));
   }
 
   // 8. try to sell stock more than the quantity available
@@ -1220,6 +1221,9 @@ public class PortfolioControllerTest {
   }
 
 
+  /**
+   * Test for graph generation with valid input.
+   */
   @Test
   public void testPlotPerformanceChartForAAPL() {
     StringBuilder expectedOutput = new StringBuilder();
@@ -1242,6 +1246,9 @@ public class PortfolioControllerTest {
     assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
   }
 
+  /**
+   * Plot performance chart for GOOG.
+   */
   @Test
   public void testPlotPerformanceChartForGOOG() {
 
@@ -1261,6 +1268,9 @@ public class PortfolioControllerTest {
     assertEquals(expectedOutput.toString().trim(), actualOutput.toString().trim());
   }
 
+  /**
+   * Test for graph generation with valid input.
+   */
   @Test
   public void testCreatePortfolioAndGenerateGraph() {
     Payload createPayload = portfolioController.createNewPortfolio("Test");
@@ -1290,6 +1300,9 @@ public class PortfolioControllerTest {
     assertEquals(expectedGraph.toString(), actualOutput.toString());
   }
 
+  /**
+   * Test for year wise graph generation.
+   */
   @Test
   public void testCreatePortfolioAndGenerateGraphYearly() {
     Payload createPayload = portfolioController.createNewPortfolio("Test");
@@ -1335,21 +1348,8 @@ public class PortfolioControllerTest {
     assertEquals(expectedGraph.toString(), actualOutput.toString());
   }
 
-
-  // this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate,
-  //          frequency);
-
-  // all possible test cases for dollarCostAveraging
-
-  // 2. invalid name, valid investmentAmount, startDate, endDate, frequency
-  // 3. valid name, invalid investmentAmount, startDate, endDate, frequency
-  // 4. valid name, valid investmentAmount, invalid startDate, endDate, frequency
-  // 5. valid name, valid investmentAmount, startDate, invalid endDate, frequency
-  // 6. valid name, valid investmentAmount, startDate, endDate, invalid frequency
-  // 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly
-
   /**
-   * Test for dollarCostAveraging with valid input
+   * Test for dollarCostAveraging with valid input.
    */
   @Test
   public void testDollarCostAveraging_ValidInput() {
@@ -1371,11 +1371,12 @@ public class PortfolioControllerTest {
     BigDecimal ExpectedInvestmentAmount = new BigDecimal(12625.2528);
     BigDecimal total = ((Optional<BigDecimal>) result.getData()).get();
     // round off to 3 decimal places and compare
-    assertEquals(0, ExpectedInvestmentAmount.setScale(3, RoundingMode.HALF_UP).compareTo(total.setScale(3, RoundingMode.HALF_UP)));
+    assertEquals(0, ExpectedInvestmentAmount.setScale(3, RoundingMode.HALF_UP)
+        .compareTo(total.setScale(3, RoundingMode.HALF_UP)));
   }
 
   /**
-   * Test for dollarCostAveraging with invalid name
+   * Test for dollarCostAveraging with invalid name.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testDollarCostAveraging_InvalidName() {
@@ -1396,7 +1397,7 @@ public class PortfolioControllerTest {
   }
 
   /**
-   * Test for dollarCostAveraging with invalid investmentAmount
+   * Test for dollarCostAveraging with invalid investmentAmount.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testDollarCostAveraging_InvalidInvestmentAmount() {
@@ -1417,7 +1418,7 @@ public class PortfolioControllerTest {
   }
 
   /**
-   * Test for dollarCostAveraging with invalid startDate
+   * Test for dollarCostAveraging with invalid startDate.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testDollarCostAveraging_InvalidStartDate() {
@@ -1438,28 +1439,28 @@ public class PortfolioControllerTest {
   }
 
   /**
-   * Test for dollarCostAveraging with invalid endDate
+   * Test for dollarCostAveraging with invalid endDate.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testDollarCostAveraging_InvalidEndDate() {
-      // create a new portfolio with name "Test"
-      // add IBM and AAPL stocks to the portfolio 10, 20
-      // call dollarCostAveraging with name "Test", investmentAmount 1000, startDate 2021-03-04,
-      Payload createPayload = portfolioController.createNewPortfolio("Test");
-      assertNotNull(createPayload.getData());
-      Portfolio portfolio = (Portfolio) createPayload.getData();
-      Payload addIbmPayload = portfolioController.addStockToPortfolio(portfolio,
-          "IBM", 10, LocalDate.of(2023, 1, 9));
-      Payload addAaplPayload = portfolioController.addStockToPortfolio(portfolio,
-          "AAPL", 20, LocalDate.of(2023, 3, 9));
-      portfolio = (Portfolio) createPayload.getData();
-      BigDecimal investmentAmount = new BigDecimal(1000);
-      portfolioController.getPortfolioService().dollarCostAveraging("Test", investmentAmount,
-          LocalDate.of(2023, 9, 4), LocalDate.of(2024, 9, 9), 3);
-    }
+    // create a new portfolio with name "Test"
+    // add IBM and AAPL stocks to the portfolio 10, 20
+    // call dollarCostAveraging with name "Test", investmentAmount 1000, startDate 2021-03-04,
+    Payload createPayload = portfolioController.createNewPortfolio("Test");
+    assertNotNull(createPayload.getData());
+    Portfolio portfolio = (Portfolio) createPayload.getData();
+    Payload addIbmPayload = portfolioController.addStockToPortfolio(portfolio,
+        "IBM", 10, LocalDate.of(2023, 1, 9));
+    Payload addAaplPayload = portfolioController.addStockToPortfolio(portfolio,
+        "AAPL", 20, LocalDate.of(2023, 3, 9));
+    portfolio = (Portfolio) createPayload.getData();
+    BigDecimal investmentAmount = new BigDecimal(1000);
+    portfolioController.getPortfolioService().dollarCostAveraging("Test", investmentAmount,
+        LocalDate.of(2023, 9, 4), LocalDate.of(2024, 9, 9), 3);
+  }
 
   /**
-   * Test for dollarCostAveraging with invalid frequency
+   * Test for dollarCostAveraging with invalid frequency.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testDollarCostAveraging_InvalidFrequency() {
