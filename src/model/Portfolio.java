@@ -52,7 +52,6 @@ public class Portfolio implements PortfolioInterface {
 
   /**
    * A function to invest in portfolio rather than buying a stock.
-   *
    */
   private void invest(BigDecimal amount, LocalDate date, StockServiceInterface stockService) {
     // get percentage for each stock by investment amount
@@ -60,23 +59,29 @@ public class Portfolio implements PortfolioInterface {
     for (Tradable stock : this.stocks) {
       BigDecimal percentage = stock.calculateInvestment(date).divide(totalInvestment);
       BigDecimal stockInvestment = amount.multiply(percentage);
-      stock.buy(stockInvestment.floatValue(), date, (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), date).getData());
+      stock.buy(stockInvestment.floatValue(), date,
+          (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), date).getData());
     }
   }
 
   /**
    * function that implements dollar cost averaging using helper function invest.
    */
-  public void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate, StockServiceInterface stockService, int frequency) {
+  public void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
+      StockServiceInterface stockService, int frequency) {
 
     // frequency 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly
     LocalDate date = startDate;
     while (date.isBefore(endDate)) {
       invest(amount, date, stockService);
-      if (frequency == 1) date = date.plusDays(1);
-      else if (frequency == 2) date = date.plusWeeks(1);
-      else if (frequency == 3) date = date.plusMonths(1);
-      else if (frequency == 4) date = date.plusYears(1);
+      if (frequency == 1)
+        date = date.plusDays(1);
+      else if (frequency == 2)
+        date = date.plusWeeks(1);
+      else if (frequency == 3)
+        date = date.plusMonths(1);
+      else if (frequency == 4)
+        date = date.plusYears(1);
     }
   }
 
@@ -110,7 +115,7 @@ public class Portfolio implements PortfolioInterface {
             () -> {
               throw new IllegalArgumentException("Stock not found");
             }
-    );
+        );
   }
 
 
@@ -169,5 +174,18 @@ public class Portfolio implements PortfolioInterface {
   public float getStockQuantity(String symbol, LocalDate date) {
     return this.stocks.stream().filter(s -> s.getSymbol().equals(symbol)).findFirst()
         .map(s -> s.getQuantity(date)).orElse(0.0f);
+  }
+
+  /**
+   * Get the portfolio details on a given date.
+   */
+  public List<Tradable> getPortfolio(LocalDate date) {
+    List<Tradable> portfolioDetails = new ArrayList<>();
+    for (Tradable stock : this.stocks) {
+      if (stock.getQuantity(date) > 0) {
+        portfolioDetails.add(new Stock(stock.getSymbol(), stock.getQuantity(date), null, null));
+      }
+    }
+    return portfolioDetails;
   }
 }

@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import model.Portfolio;
 import model.PortfolioInterface;
+import model.Tradable;
 import model.service.PortfolioServiceInterface;
 import view.GUIInterface;
 import view.UnifiedViewInterface;
@@ -765,18 +766,29 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return;
     }
 
+    // request the date for which to examine the portfolio
+    String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to examine the portfolio:");
+    LocalDate date = LocalDate.parse(dateInput); // Consider adding date validation
+    // check if the date is valid, it should be before today and validate
+    if (date.isAfter(LocalDate.now())) {
+      view.displayMessage("Invalid date. Please enter a date before today.");
+      return;
+    }
+
+
     // Attempt to get and display the portfolio details
     try {
-      Optional<PortfolioInterface> portfolioOpt = portfolioController.getPortfolioService().getPortfolioByName(name);
+      PortfolioServiceInterface portfolioOpt = portfolioController.getPortfolioService();
 
-      if (portfolioOpt.isPresent()) {
-        PortfolioInterface portfolio = portfolioOpt.get();
-        StringBuilder details = new StringBuilder("Stocks in " + name + ":\n");
-        portfolio.getStocks().forEach(stock -> details.append(stock.getSymbol()).append(" - Quantity: ").append(stock.getQuantity()).append("\n"));
-        view.displayMessage(details.toString());
-      } else {
-        view.displayMessage("Portfolio not found.");
+
+      List<Tradable> data = portfolioOpt.examinePortfolioDetails(name, date);
+      StringBuilder details = new StringBuilder();
+      // for  each stock in data add the stock details to the details string
+      for (Tradable stock : data) {
+        details.append(stock.toString()).append("\n");
       }
+
+      view.displayMessage(details.toString());
     } catch (Exception e) {
       view.displayMessage("Error examining portfolio: " + e.getMessage());
     }

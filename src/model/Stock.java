@@ -152,4 +152,15 @@ public class Stock implements Tradable {
     return this.Activity;
   }
 
+  /**
+   * to string method for the stock.
+   */
+  @Override
+  public String toString() {
+    return "Stock {" +
+        "symbol='" + symbol + '\'' +
+        ", quantity=" + quantity +
+        '}';
+  }
+
 }

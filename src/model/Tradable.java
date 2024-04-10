@@ -77,5 +77,10 @@ public interface Tradable {
    */
   Map<LocalDate, TranactionInfo> getActivityLog();
 
+  /**
+   * to string method for the tradable asset.
+   */
+  String toString();
+
 
 }

@@ -21,6 +21,7 @@ import controller.fileio.CsvFileIO;
 import controller.fileio.FileIO;
 import model.Portfolio;
 import model.PortfolioInterface;
+import model.Tradable;
 import model.utilities.DateUtils;
 
 
@@ -148,6 +149,17 @@ public class PortfolioService implements PortfolioServiceInterface {
     });
     return true;
   }
+
+  /**
+   * Examine the details of a portfolio on a particular date.
+   */
+  public List<Tradable> examinePortfolioDetails(String portfolioName, LocalDate date) {
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName)
+        .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
+    return portfolio.getPortfolio(date);
+
+  }
+
 
   /**
    * dollar cost averaging for a portfolio.

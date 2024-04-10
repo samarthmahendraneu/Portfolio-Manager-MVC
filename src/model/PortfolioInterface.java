@@ -72,4 +72,6 @@ public interface PortfolioInterface {
 
   void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate, StockServiceInterface stockService, int frequency);
 
+  List<Tradable> getPortfolio(LocalDate date);
+
 }

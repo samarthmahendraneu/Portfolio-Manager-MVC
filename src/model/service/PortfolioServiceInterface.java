@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import model.PortfolioInterface;
+import model.Tradable;
 
 /**
  * Interface for the PortfolioService class.
@@ -137,4 +138,6 @@ public interface PortfolioServiceInterface {
   Map<LocalDate, BigDecimal> plotPerformanceChartGUI(String identifier, LocalDate startDate, LocalDate endDate);
 
   void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate, LocalDate endDate, int frequency);
+
+  List<Tradable> examinePortfolioDetails(String portfolioName, LocalDate date);
 }
