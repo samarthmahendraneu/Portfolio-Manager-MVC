@@ -57,6 +57,7 @@ public interface PortfolioInterface {
   /**
    * Calculate investment in the portfolio.
    *
+   * @param date The date to calculate the investment for.
    * @return The total investment in the portfolio.
    */
   BigDecimal calculateInvestment(LocalDate date);
@@ -70,7 +71,17 @@ public interface PortfolioInterface {
    */
   float getStockQuantity(String symbol, LocalDate date);
 
-  void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate, StockServiceInterface stockService, int frequency);
+  /**
+   * Function for Dollar cost averaging strategy.
+   *
+   * @param amount       amount to invest
+   * @param startDate    start date
+   * @param endDate      end date
+   * @param stockService stock service
+   * @param frequency    frequency
+   */
+  void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
+      StockServiceInterface stockService, int frequency);
 
   List<Tradable> getPortfolio(LocalDate date);
 

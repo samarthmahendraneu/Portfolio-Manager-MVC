@@ -59,12 +59,13 @@ public class Portfolio implements PortfolioInterface {
     List<Tradable> stocks = this.getPortfolio(startDate);
     float totalQuantity = 0;
     for (Tradable stock : stocks) {
-      totalQuantity += stock.getQuantity(startDate);
+      totalQuantity += stock.getQuantity();
     }
     for (Tradable stock : this.stocks) {
-      Float percentage = (stock.getQuantity(startDate)) / (totalQuantity);
+      float percentage = (stock.getQuantity(startDate)) / (totalQuantity);
       BigDecimal stockInvestment = amount.multiply(new BigDecimal(percentage));
-      stock.buy(stockInvestment.floatValue(), investDate,
+      Float quantity = stockInvestment.floatValue() / ((BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), investDate).getData()).floatValue();
+      stock.buy(quantity, investDate,
           (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), investDate).getData());
     }
   }
@@ -74,6 +75,21 @@ public class Portfolio implements PortfolioInterface {
    */
   public void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
       StockServiceInterface stockService, int frequency) {
+
+    // start date should be before end date and start date should be before today
+    if (startDate.isAfter(endDate) || startDate.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Invalid start date");
+    }
+
+    // frequency should be between 1 and 4
+    if (frequency < 1 || frequency > 4) {
+      throw new IllegalArgumentException("Invalid frequency");
+    }
+
+    // end date should be before today
+    if (endDate.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Invalid end date");
+    }
 
     // frequency 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly
     LocalDate date = startDate;

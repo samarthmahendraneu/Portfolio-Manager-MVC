@@ -103,6 +103,11 @@ public class PortfolioController implements PortfolioControllerInterface {
   /**
    * Sell a specific number of shares of a specific stock on a specified date from a given
    * portfolio.
+   *
+   * @param portfolio   The portfolio from which the stock will be sold.
+   * @param stockSymbol The symbol of the stock to be sold.
+   * @param quantity    The number of shares to be sold.
+   * @param date        The date on which the stock will be sold.
    */
   public Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol,
       int quantity,
@@ -120,6 +125,8 @@ public class PortfolioController implements PortfolioControllerInterface {
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path where the portfolios will be saved.
+   * @param type     The type of the portfolio to save.
+   * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
   public Payload savePortfolio(String filePath, String type) throws IllegalArgumentException {
@@ -135,6 +142,7 @@ public class PortfolioController implements PortfolioControllerInterface {
    * Saves the cache to a CSV file at the given file path.
    *
    * @param filePath The file path where the cache will be saved.
+   * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error saving the cache to the file.
    */
   public Payload saveCache(String filePath) throws IllegalArgumentException {
@@ -165,6 +173,8 @@ public class PortfolioController implements PortfolioControllerInterface {
    * Loads portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
+   * @param type     The type of the portfolio to load.
+   * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
   public Payload loadPortfolio(String filePath, String type) throws IllegalArgumentException {

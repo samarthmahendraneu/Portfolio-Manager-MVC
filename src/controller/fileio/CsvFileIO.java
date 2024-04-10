@@ -26,6 +26,7 @@ public class CsvFileIO implements FileIO {
    * Reads the file.
    *
    * @param filePath The path of the file to read.
+   * @param type     The type of the portfolio to read.
    * @return List of portfolios
    */
   @Override
@@ -41,7 +42,7 @@ public class CsvFileIO implements FileIO {
       reader.lines().forEach(line -> {
         String[] data = line.split(",");
         Portfolio portfolio = portfolioMap.computeIfAbsent(data[0], Portfolio::new);
-        if(!type.equals(data[5])) {
+        if (!type.equals(data[5])) {
           throw new IllegalArgumentException("Invalid Portfolio Type");
         }
         if (Float.parseFloat(data[2]) < 0) {
@@ -62,6 +63,7 @@ public class CsvFileIO implements FileIO {
    *
    * @param portfolios portfolios to write to the file
    * @param filePath   path of the file to write
+   * @param type       type of the portfolio to write
    * @return true if the file was written successfully
    * @throws IOException if there was an error writing to the file
    */
@@ -69,7 +71,8 @@ public class CsvFileIO implements FileIO {
   public Boolean writeFile(List<PortfolioInterface> portfolios, String filePath, String type)
       throws IOException {
     try (FileWriter writer = new FileWriter(filePath)) {
-      writer.append("Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date,Portfolio Type\n");
+      writer.append(
+          "Portfolio Name,Stock Symbol,Quantity,Purchase Price,Purchase Date,Portfolio Type\n");
       for (PortfolioInterface portfolio : portfolios) {
         for (Tradable stock : portfolio.getStocks()) {
           for (Map.Entry<LocalDate, TranactionInfo> entry : stock.getActivityLog().entrySet()) {

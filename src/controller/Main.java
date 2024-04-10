@@ -29,9 +29,11 @@ public class Main {
     UnifiedViewInterface view = null;
     switch (choice) {
       case 1:
+        // create a GUI view
         view = new GUIViewU();
         break;
       case 2:
+        // create a text view
         view = new View();
         break;
       default:
@@ -42,12 +44,6 @@ public class Main {
     PortfolioControllerInterface portfolioController = new PortfolioController(
             new StockService("FIR1DN0VB7SQ4SGD"));
     PortfolioMenuControllerInterface controller = new PortfolioMenuController(portfolioController, view);
-
-
-    // interaction with the user
-    // [view] <- [PortfolioMenuController] -> [PortfolioController] -> [PortfolioService] -> [model]
-    //controller.displayMainMenu();
-
   }
 
 

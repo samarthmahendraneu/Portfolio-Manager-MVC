@@ -46,6 +46,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     setupView();
   }
 
+  /**
+   * sets up initial view for Management of Portfolio.
+   */
   private void setupView() {
     if (view instanceof GUIInterface) {
       setupGUIViewListeners((GUIInterface) view);
@@ -59,6 +62,10 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     // No setup needed for textual view as it handles inputs differently
   }
 
+  /**
+   * GUI View Listeners for the Portfolio Management System.
+   * @param guiView the GUI view to set up listeners for the Portfolio Management System.
+   */
   private void setupGUIViewListeners(GUIInterface guiView) {
     guiView.setCreatePortfolioAction(e -> createNewPortfolio());
     guiView.setExaminePortfolioButtonListener(e -> examinePortfolio());
@@ -186,7 +193,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
   /**
-   * Dollar Cost Averaging.
+   * Dollar Cost Averaging for a given portfolio.
    */
   public void dollarCostAveraging() {
     try {
@@ -306,7 +313,11 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
-
+  /**
+   * Validate and parse an integer from a string.
+   * @param intString
+   * @return the parsed integer, or null if the string is not a valid integer
+   */
   private Integer validateAndParseInt(String intString) {
     try {
       return Integer.parseInt(intString);
@@ -401,6 +412,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  /**
+   * Validate and parse a date from a string.
+   *
+   * @param dateString the string to parse
+   * @return the parsed date, or null if the string is not a valid date
+   */
   private LocalDate validateAndParseDate(String dateString) {
     try {
       return LocalDate.parse(dateString);
@@ -516,30 +533,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    *
    * @return the validated date.
    */
-  public LocalDate dateValidator() {
-    LocalDate date;
-
-    while (true) {
-      String dateString = this.view.readLine().trim();
-      try {
-        date = LocalDate.parse(dateString);
-      } catch (Exception e) {
-        this.view.inputMessage("Invalid date format. Please try again.");
-        continue;
-      }
-      date = LocalDate.parse(dateString);
-      if (!date.isBefore(LocalDate.now())) {
-        this.view.inputMessage("Date must be before today. Please try again.");
-        continue;
-      }
-      DayOfWeek dayOfWeek = date.getDayOfWeek();
-      if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-        this.view.inputMessage("Date must be on a weekday. Please try again.");
-        continue;
-      }
-      break;
+  public Boolean dateValidator(LocalDate date) {
+    if (!date.isBefore(LocalDate.now())) {
+      this.view.inputMessage("Date must be before today. Please try again.");
     }
-    return date;
+    DayOfWeek dayOfWeek = date.getDayOfWeek();
+    if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+      this.view.inputMessage("Date must be on a weekday. Please try again.");
+    }
+    return true;
   }
 
   /**

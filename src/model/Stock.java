@@ -72,6 +72,10 @@ public class Stock implements Tradable {
 
   /**
    * Updates the stock and add stock history.
+   *
+   * @param quantity     The new quantity of the stock.
+   * @param date         The date of the update.
+   * @param sellingPrice The price of the sale.
    */
   public void sell(float quantity, LocalDate date, BigDecimal sellingPrice) {
     if (quantity < 0) {
@@ -129,12 +133,8 @@ public class Stock implements Tradable {
 
     for (Map.Entry<LocalDate, TranactionInfo> entry : this.Activity.entrySet()) {
       if (entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
-        if (entry.getValue() instanceof PurchangeInfo) {
-          totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
-        } else {
-          // value of sale is  already stored as negative quantity
-          totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
-        }
+        // value of sale is  already stored as negative quantity
+        totalQuantity = totalQuantity.add(new BigDecimal(entry.getValue().getQuantity()));
       }
     }
 

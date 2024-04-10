@@ -56,6 +56,4 @@ public class Payload {
     return !message.contains("Error");
   }
 
-  //Complete this interface
-
 }

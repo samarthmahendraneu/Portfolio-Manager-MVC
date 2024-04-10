@@ -5,11 +5,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class AlphaVantageApiSource implements ApiSource{
+/**
+ * Class to represent an API source for the Alpha Vantage API.
+ */
+public class AlphaVantageApiSource implements ApiSource {
 
 
   private final String apiKey;
 
+  /**
+   * Constructor for the AlphaVantageApiSource class.
+   *
+   * @param apiKey The API key to use for the requests.
+   */
   public AlphaVantageApiSource(String apiKey) {
     this.apiKey = apiKey;
   }
@@ -17,7 +25,8 @@ public class AlphaVantageApiSource implements ApiSource{
   /**
    * Function to check if a given symbol is valid.
    *
-   * @param symbol
+   * @param symbol The symbol to check.
+   * @return true if the symbol is valid, false otherwise.
    */
   @Override
   public boolean isValidSymbol(String symbol) {

@@ -168,33 +168,21 @@ public class StockService implements StockServiceInterface {
     }
 
     // Initialize variables for tracking moving average and previous day's price
-    float sum = 0;
     float movingAverage = 0;
     float prevClosePrice = 0;
-    int count = 0;
 
     // Loop through dates in the range
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Payload info = this.fetchPriceOnDate(symbol, date);
-      float closePrice = (Float) info.getData();
+      float closePrice = ((BigDecimal)info.getData()).floatValue();
 
-      // Update the sum and count for calculating moving average
-      sum += closePrice;
-      count++;
 
       // Calculate the moving average if we have enough data points
-      if (count >= 30) {
-        movingAverage = sum / 30;
+      movingAverage = calculateMovingAverage(symbol, date, 30);
 
-        // Check for a positive crossover (buy signal)
-        if (prevClosePrice < movingAverage && closePrice > movingAverage) {
-          crossoverDays.add(date);
-        }
-
-        // Remove the oldest price from the sum
-        Payload oldestInfo = this.fetchPriceOnDate(symbol, date.minusDays(29));
-        float oldestClosePrice = (Float) oldestInfo.getData();
-        sum -= oldestClosePrice;
+      // Check for a positive crossover (buy signal)
+      if (prevClosePrice < movingAverage && closePrice > movingAverage) {
+        crossoverDays.add(date);
       }
 
       // Update the previous day's close price
@@ -275,7 +263,11 @@ public class StockService implements StockServiceInterface {
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       Payload info = this.fetchPriceOnDate(symbol, date);
-      float closePrice = (Float) info.getData();
+
+      if (info.getData() == null) {
+        throw new IllegalArgumentException("Invalid stock symbol:" + symbol);
+      }
+      float closePrice = ((BigDecimal)info.getData()).floatValue();
       sum += closePrice;
     }
 
