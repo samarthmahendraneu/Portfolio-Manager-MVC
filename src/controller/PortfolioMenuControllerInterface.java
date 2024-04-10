@@ -38,12 +38,12 @@ public interface PortfolioMenuControllerInterface {
   /**
    * Save the portfolio.
    */
-  void savePortfolio();
+  void savePortfolio(String type);
 
   /**
    * Load the portfolio.
    */
-  void loadPortfolio();
+  void loadPortfolio(String type);
 
   /**
    * Load the stock cache.

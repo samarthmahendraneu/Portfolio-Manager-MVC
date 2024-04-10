@@ -15,7 +15,7 @@ public interface FileIO {
    * @param filePath The path of the file to read
    * @return List of portfolios
    */
-  List<PortfolioInterface> readFile(String filePath) throws IOException;
+  List<PortfolioInterface> readFile(String filePath, String type) throws IOException;
 
   /**
    * Writes to the file.
@@ -24,5 +24,5 @@ public interface FileIO {
    * @param filePath  The path of the file to write the portfolios to
    * @return True if the write was successful, false otherwise
    */
-  Boolean writeFile(List<PortfolioInterface> portfolio, String filePath) throws IOException;
+  Boolean writeFile(List<PortfolioInterface> portfolio, String filePath, String type) throws IOException;
 }

@@ -83,7 +83,7 @@ public interface PortfolioServiceInterface {
    * @param filePath The file path to which the portfolios will be saved.
    * @throws IOException If an error occurs while writing to the file.
    */
-  void savePortfoliosToCSV(String filePath) throws IOException;
+  void savePortfoliosToCSV(String filePath, String type) throws IOException;
 
   /**
    * Loads portfolios from a CSV file at the given file path.
@@ -92,7 +92,7 @@ public interface PortfolioServiceInterface {
    * @return The file path from which the portfolios were loaded.
    * @throws IOException If an error occurs while reading from the file.
    */
-  String loadPortfoliosFromCSV(String filePath) throws IOException;
+  String loadPortfoliosFromCSV(String filePath, String type) throws IOException;
 
   /**
    * Checks if a portfolio with the given name exists.

@@ -59,7 +59,7 @@ public interface PortfolioControllerInterface {
    * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
-  Payload savePortfolio(String filePath) throws IllegalArgumentException;
+  Payload savePortfolio(String filePath, String type) throws IllegalArgumentException;
 
   /**
    * Loads the portfolios from a CSV file at the given file path.
@@ -68,7 +68,7 @@ public interface PortfolioControllerInterface {
    * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
-  Payload loadPortfolio(String filePath) throws IllegalArgumentException;
+  Payload loadPortfolio(String filePath, String type) throws IllegalArgumentException;
 
   /**
    * get Portfolio service.

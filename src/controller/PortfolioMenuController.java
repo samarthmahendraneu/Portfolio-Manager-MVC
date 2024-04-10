@@ -37,7 +37,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * @param portfolioController The portfolio controller to interact with.
    * @param view                The view for displaying messages.
    */
-  public PortfolioMenuController(PortfolioControllerInterface portfolioController, UnifiedViewInterface view)  {
+  public PortfolioMenuController(PortfolioControllerInterface portfolioController,
+      UnifiedViewInterface view) {
     this.portfolioController = portfolioController;
     this.view = view;
     this.loadStockCache();
@@ -45,15 +46,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     setupView();
   }
 
-  private void setupView()  {
+  private void setupView() {
     if (view instanceof GUIInterface) {
       setupGUIViewListeners((GUIInterface) view);
       try {
         view.displayMainMenu();
+      } catch (IOException ignored) {
       }
-      catch (IOException ignored)
-      {}
-    }else {
+    } else {
       displayMainMenu();
     }
     // No setup needed for textual view as it handles inputs differently
@@ -61,27 +61,27 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
   private void setupGUIViewListeners(GUIInterface guiView) {
     guiView.setCreatePortfolioAction(e -> createNewPortfolio());
-    guiView.setExaminePortfolioButtonListener(e->examinePortfolio());
-    guiView.setCalculatePortfolioValueButtonListener(e->calculatePortfolioValue());
-    guiView.setSavePortfolioButtonListener(e->savePortfolio());
-    guiView.setLoadPortfolioButtonListener(e->loadPortfolio());
-    guiView.setGraphButtonListener(e->calculateGraph());
-    guiView.setInspectStockPerformanceButtonListener(e->inspectStockPerformance());
+    guiView.setExaminePortfolioButtonListener(e -> examinePortfolio());
+    guiView.setCalculatePortfolioValueButtonListener(e -> calculatePortfolioValue());
+    guiView.setSavePortfolioButtonListener(e -> savePortfolio("Flexible"));
+    guiView.setLoadPortfolioButtonListener(e -> loadPortfolio("Flexible"));
+    guiView.setGraphButtonListener(e -> calculateGraph());
+    guiView.setInspectStockPerformanceButtonListener(e -> inspectStockPerformance());
     guiView.setnormalCreatePortfolioAction(e -> createNewPortfolio());
-    guiView.setnormalExaminePortfolioButtonListener(e->examinePortfolio());
-    guiView.setnormalCalculatePortfolioValueButtonListener(e->calculatePortfolioValue());
-    guiView.setnormalSavePortfolioButtonListener(e->savePortfolio());
-    guiView.setnormalLoadPortfolioButtonListener(e->loadPortfolio());
-    guiView.setnormalGraphButtonListener(e->calculateGraph());
-    guiView.setnormalInspectStockPerformanceButtonListener(e->inspectStockPerformance());
-    guiView.setAddButtonListener(e->addStockToPortfolio());
-    guiView.setSellButtonListener(e->sellStockFromPortfolio());
-    guiView.setDollarCostButtonListener(e->dollarCostAveraging());
-    guiView.setMovingCrossoverButtonListener(e->findMovingCrossOverDays());
-    guiView.setCrossoverButtonListener(e->findCrossOverDays());
-    guiView.setInvestmentButtonListener(e->calculateInvestment());
-    guiView.setnormalCalculateXDayMovingAverageButtonListener(e->computeStockMovingAverage());
-    guiView.setCalculateXDayMovingAverageButtonListener(e->computeStockMovingAverage());
+    guiView.setnormalExaminePortfolioButtonListener(e -> examinePortfolio());
+    guiView.setnormalCalculatePortfolioValueButtonListener(e -> calculatePortfolioValue());
+    guiView.setnormalSavePortfolioButtonListener(e -> savePortfolio("Normal"));
+    guiView.setnormalLoadPortfolioButtonListener(e -> loadPortfolio("Normal"));
+    guiView.setnormalGraphButtonListener(e -> calculateGraph());
+    guiView.setnormalInspectStockPerformanceButtonListener(e -> inspectStockPerformance());
+    guiView.setAddButtonListener(e -> addStockToPortfolio());
+    guiView.setSellButtonListener(e -> sellStockFromPortfolio());
+    guiView.setDollarCostButtonListener(e -> dollarCostAveraging());
+    guiView.setMovingCrossoverButtonListener(e -> findMovingCrossOverDays());
+    guiView.setCrossoverButtonListener(e -> findCrossOverDays());
+    guiView.setInvestmentButtonListener(e -> calculateInvestment());
+    guiView.setnormalCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
+    guiView.setCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
 
   }
 
@@ -148,10 +148,10 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.calculateInvestment();
             break;
           case 7:
-            this.savePortfolio();
+            this.savePortfolio("Flexible");
             break;
           case 8:
-            this.loadPortfolio();
+            this.loadPortfolio("Flexible");
             break;
           case 9:
             this.calculateGraph();
@@ -197,15 +197,19 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = LocalDate.parse(endDateString);
 
-      String investmentAmountString = view.requestInput("Enter the investment amount per month in USD:");
+      String investmentAmountString = view.requestInput(
+          "Enter the investment amount per month in USD:");
       BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
 
-      String frequencyString = view.requestInput("Enter the frequency type: 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
+      String frequencyString = view.requestInput(
+          "Enter the frequency type: 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
       int frequency = Integer.parseInt(frequencyString);
 
-      this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate, frequency);
+      this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate,
+          frequency);
 
-      view.displayMessage("Dollar Cost Averaging has been successfully applied to the portfolio: " + name);
+      view.displayMessage(
+          "Dollar Cost Averaging has been successfully applied to the portfolio: " + name);
     } catch (DateTimeParseException dtpe) {
       view.displayMessage("Error: Invalid date format.");
     } catch (NumberFormatException nfe) {
@@ -229,11 +233,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
       LocalDate startDate = validateAndParseDate(startDateString);
-      if (startDate == null) return; // Error message already shown by validateAndParseDate
+      if (startDate == null) {
+        return; // Error message already shown by validateAndParseDate
+      }
 
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = validateAndParseDate(endDateString);
-      if (endDate == null) return; // Error message already shown by validateAndParseDate
+      if (endDate == null) {
+        return; // Error message already shown by validateAndParseDate
+      }
 
       Payload payload = portfolioController.findCrossoverDays(symbol, startDate, endDate);
       if (payload.isError()) {
@@ -262,27 +270,37 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
       LocalDate startDate = validateAndParseDate(startDateString);
-      if (startDate == null) return;
+      if (startDate == null) {
+        return;
+      }
 
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = validateAndParseDate(endDateString);
-      if (endDate == null) return;
+      if (endDate == null) {
+        return;
+      }
 
       String shortMovingPeriodString = view.requestInput("Enter the short moving period:");
       Integer shortMovingPeriod = validateAndParseInt(shortMovingPeriodString);
-      if (shortMovingPeriod == null) return;
+      if (shortMovingPeriod == null) {
+        return;
+      }
 
       String longMovingPeriodString = view.requestInput("Enter the long moving period:");
       Integer longMovingPeriod = validateAndParseInt(longMovingPeriodString);
-      if (longMovingPeriod == null) return;
+      if (longMovingPeriod == null) {
+        return;
+      }
 
-      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod);
+      Payload payload = portfolioController.findMovingCrossoverDays(symbol, startDate, endDate,
+          shortMovingPeriod, longMovingPeriod);
       if (payload.isError()) {
         view.displayMessage("Error finding moving crossover days: " + payload.getMessage());
         return;
       }
 
-      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod, longMovingPeriod, (Map<String, Object>) payload.getData());
+      view.displayMovingCrossoverDays(symbol, startDate, endDate, shortMovingPeriod,
+          longMovingPeriod, (Map<String, Object>) payload.getData());
     } catch (Exception e) {
       view.displayMessage("Error finding moving crossover days: " + e.getMessage());
     }
@@ -297,7 +315,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return null;
     }
   }
-
 
 
   /**
@@ -321,10 +338,10 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.calculatePortfolioValue();
             break;
           case 4:
-            this.savePortfolio();
+            this.savePortfolio("Normal");
             break;
           case 5:
-            this.loadPortfolio();
+            this.loadPortfolio("Normal");
             break;
           case 6:
             this.calculateGraph();
@@ -364,11 +381,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       String startDateString = view.requestInput("Enter Start Date (YYYY-MM-DD):");
       LocalDate startDate = validateAndParseDate(startDateString);
-      if (startDate == null) return; // Error message already shown by validateAndParseDate
+      if (startDate == null) {
+        return; // Error message already shown by validateAndParseDate
+      }
 
       String endDateString = view.requestInput("Enter End Date (YYYY-MM-DD):");
       LocalDate endDate = validateAndParseDate(endDateString);
-      if (endDate == null) return; // Error message already shown by validateAndParseDate
+      if (endDate == null) {
+        return; // Error message already shown by validateAndParseDate
+      }
 
       // Assuming genGraph returns a StringBuilder or String representing the graph
       StringBuilder graphData = portfolioController.genGraph(name, startDate, endDate);
@@ -400,10 +421,13 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return;
     }
 
-    String dateString = view.requestInput("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    String dateString = view.requestInput(
+        "Enter the date (YYYY-MM-DD) to inspect the stock performance:");
     LocalDate date = validateAndParseDate(dateString);
 
-    if (date == null) return;
+    if (date == null) {
+      return;
+    }
 
     Payload result = portfolioController.inspectStockPerformance(symbol, date);
 
@@ -438,7 +462,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
         isValidInput = true;
       } catch (NumberFormatException e) {
-        view.displayMessage("Invalid input: " + e.getMessage() + ". Please enter a positive integer.");
+        view.displayMessage(
+            "Invalid input: " + e.getMessage() + ". Please enter a positive integer.");
       }
     }
     return days;
@@ -457,7 +482,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
 
     // Requesting end date input and validating it
-    String endDate = view.requestInput("Enter the date (YYYY-MM-DD) to inspect the stock performance:");
+    String endDate = view.requestInput(
+        "Enter the date (YYYY-MM-DD) to inspect the stock performance:");
     LocalDate date = validateAndParseDate(endDate);
     if (endDate == null) {
       view.displayMessage("Invalid or no date provided.");
@@ -475,7 +501,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     try {
       Payload result = portfolioController.computeStockMovingAverage(symbol, date, days);
       if (!result.isError()) {
-        view.displayMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": " + result.getData());
+        view.displayMessage(days + "-Day Moving Average for " + symbol + " as of " + endDate + ": "
+            + result.getData());
       } else {
         view.displayMessage("Error: " + result.getMessage());
       }
@@ -535,7 +562,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     boolean flag = true;
     while (flag) {
       String symbol = view.requestInput("Enter the stock symbol to add to the portfolio," +
-              " or cancel to finish:");
+          " or cancel to finish:");
       if (symbol == null || symbol.trim().isEmpty()) {
         flag = false;
         continue;
@@ -546,7 +573,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         try {
           String quantityStr = view.requestInput("Enter the quantity of the stock:");
           quantity = Integer.parseInt(quantityStr);
-          if (quantity <= 0) throw new NumberFormatException();
+          if (quantity <= 0) {
+            throw new NumberFormatException();
+          }
         } catch (NumberFormatException e) {
           view.displayMessage("Please enter a valid quantity greater than 0.");
         }
@@ -568,7 +597,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         continue;
       }
 
-      String continueAdding = view.requestInput("Press 'n' to add more stocks or any other key to finish:");
+      String continueAdding = view.requestInput(
+          "Press 'n' to add more stocks or any other key to finish:");
       if (!"n".equalsIgnoreCase(continueAdding.trim())) {
         flag = false;
       }
@@ -592,7 +622,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
 
     // Request portfolio name
-    String portfolioName = view.requestInput("Enter the name of the portfolio to add the stock to:");
+    String portfolioName = view.requestInput(
+        "Enter the name of the portfolio to add the stock to:");
     if (portfolioName == null || portfolioName.trim().isEmpty()) {
       view.displayMessage("Operation Cancelled or no name entered.");
       return;
@@ -629,7 +660,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     // Add stock to the portfolio
     try {
-      PortfolioInterface portfolio = portfolioController.getPortfolioService().getPortfolioByName(portfolioName).orElse(null);
+      PortfolioInterface portfolio = portfolioController.getPortfolioService()
+          .getPortfolioByName(portfolioName).orElse(null);
       Payload payload = portfolioController.addStockToPortfolio(portfolio, symbol, quantity, date);
       if (this.printIfError(payload)) {
         return;
@@ -656,7 +688,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
 
     // Request portfolio name
-    String portfolioName = view.requestInput("Enter the name of the portfolio to sell the stock from:");
+    String portfolioName = view.requestInput(
+        "Enter the name of the portfolio to sell the stock from:");
     if (portfolioName == null || portfolioName.trim().isEmpty()) {
       view.displayMessage("Operation Cancelled or no name entered");
       return;
@@ -693,9 +726,11 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     // Attempt to sell stock
     try {
-      PortfolioInterface portfolio = portfolioService.getPortfolioByName(portfolioName).orElse(null);
+      PortfolioInterface portfolio = portfolioService.getPortfolioByName(portfolioName)
+          .orElse(null);
 
-      Payload payload = portfolioController.sellStockFromPortfolio(portfolio, symbol, quantity, date);
+      Payload payload = portfolioController.sellStockFromPortfolio(portfolio, symbol, quantity,
+          date);
       if (this.printIfError(payload)) {
         return;
       }
@@ -718,7 +753,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
 
     // Request the date for calculation
-    String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to calculate the investment:");
+    String dateInput = view.requestInput(
+        "Enter the date (YYYY-MM-DD) to calculate the investment:");
     LocalDate date;
     try {
       date = LocalDate.parse(dateInput);
@@ -737,9 +773,12 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       Optional<BigDecimal> portfolioValue = (Optional<BigDecimal>) payload.getData();
       if (portfolioValue.isPresent()) {
-        view.displayMessage(String.format("Investment of the portfolio '%s' on %s: %s", name, dateInput, portfolioValue.get().toString()));
+        view.displayMessage(
+            String.format("Investment of the portfolio '%s' on %s: %s", name, dateInput,
+                portfolioValue.get().toString()));
       } else {
-        view.displayMessage(String.format("No value found for the portfolio '%s' on %s.", name, dateInput));
+        view.displayMessage(
+            String.format("No value found for the portfolio '%s' on %s.", name, dateInput));
       }
     } catch (Exception e) {
       view.displayMessage("Error calculating portfolio investment: " + e.getMessage());
@@ -775,11 +814,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return;
     }
 
-
     // Attempt to get and display the portfolio details
     try {
       PortfolioServiceInterface portfolioOpt = portfolioController.getPortfolioService();
-
 
       List<Tradable> data = portfolioOpt.examinePortfolioDetails(name, date);
       StringBuilder details = new StringBuilder();
@@ -808,14 +845,16 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
 
       // Request the date for which to calculate the portfolio value
-      String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
+      String dateInput = view.requestInput(
+          "Enter the date (YYYY-MM-DD) to calculate the portfolio value:");
       LocalDate date = LocalDate.parse(dateInput); // Consider adding date validation
 
       // Calculate the portfolio value
       Optional<BigDecimal> portfolioValueOpt = portfolioService.calculatePortfolioValue(name, date);
       if (portfolioValueOpt.isPresent()) {
         BigDecimal portfolioValue = portfolioValueOpt.get();
-        view.displayMessage("Value of the portfolio '" + name + "' on " + dateInput + ": " + portfolioValue.toString());
+        view.displayMessage("Value of the portfolio '" + name + "' on " + dateInput + ": "
+            + portfolioValue.toString());
       } else {
         view.displayMessage("No value found for the portfolio '" + name + "' on " + dateInput);
       }
@@ -830,7 +869,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   /**
    * Saves the portfolio to a specified file path.
    */
-  public void savePortfolio() {
+  public void savePortfolio(String type) {
     try {
       // Request the file path to save the portfolio
       String filePath = view.requestInput("Enter the file path to save the portfolio (.csv):");
@@ -840,17 +879,18 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
 
       // Attempt to save the portfolio to the specified file
-      try{
-        portfolioService.savePortfoliosToCSV(filePath);
+      try {
+        portfolioService.savePortfoliosToCSV(filePath, type);
         view.displayMessage("Portfolio has been saved successfully to " + filePath);
+      } catch (IOException e) {
+        throw e;
       }
-      catch (IOException e) {throw e;}
     } catch (Exception e) {
       view.displayMessage("Error saving portfolio.");
     }
   }
 
-  public void loadPortfolio() {
+  public void loadPortfolio(String type) {
     try {
       // Request the file path from which to load portfolios
       String filePath = view.requestInput("Enter the file path to load portfolios from (.csv):");
@@ -860,8 +900,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
 
       // Attempt to load the portfolio from the specified file
-      String success = portfolioService.loadPortfoliosFromCSV(filePath);
-      if (success!=null) {
+      String success = portfolioService.loadPortfoliosFromCSV(filePath, type);
+      if (success != null) {
         view.displayMessage("Portfolios have been loaded successfully from " + filePath);
       } else {
         view.displayMessage("Error loading portfolios.");

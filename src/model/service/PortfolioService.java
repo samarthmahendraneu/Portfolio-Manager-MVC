@@ -276,10 +276,10 @@ public class PortfolioService implements PortfolioServiceInterface {
    *
    * @param filePath The file path to which the portfolios will be saved.
    */
-  public void savePortfoliosToCSV(String filePath) {
+  public void savePortfoliosToCSV(String filePath, String type) {
     FileIO fileio = new CsvFileIO();
     try {
-      fileio.writeFile(portfolios, filePath);
+      fileio.writeFile(portfolios, filePath, type);
     } catch (IOException e) {
       throw new IllegalArgumentException("Error saving portfolios to file: " + e.getMessage());
     }
@@ -292,9 +292,9 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @return Empty string if successful, error message if failed.
    * @throws IOException If an error occurs while reading from the file.
    */
-  public String loadPortfoliosFromCSV(String filePath) throws IOException {
+  public String loadPortfoliosFromCSV(String filePath, String type) throws IOException {
     FileIO fileio = new CsvFileIO();
-    List<PortfolioInterface> loadedPortfolios = fileio.readFile(filePath);
+    List<PortfolioInterface> loadedPortfolios = fileio.readFile(filePath, type);
     portfolios.clear();
     portfolios.addAll(loadedPortfolios);
     return "";

@@ -122,9 +122,9 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path where the portfolios will be saved.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
-  public Payload savePortfolio(String filePath) throws IllegalArgumentException {
+  public Payload savePortfolio(String filePath, String type) throws IllegalArgumentException {
     try {
-      this.portfolioService.savePortfoliosToCSV(filePath);
+      this.portfolioService.savePortfoliosToCSV(filePath, type);
       return new Payload(null, "");
     } catch (Exception e) {
       return new Payload(null, e.getMessage());
@@ -167,9 +167,9 @@ public class PortfolioController implements PortfolioControllerInterface {
    * @param filePath The file path from which the portfolios will be loaded.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
-  public Payload loadPortfolio(String filePath) throws IllegalArgumentException {
+  public Payload loadPortfolio(String filePath, String type) throws IllegalArgumentException {
     try {
-      return new Payload(null, this.portfolioService.loadPortfoliosFromCSV(filePath));
+      return new Payload(null, this.portfolioService.loadPortfoliosFromCSV(filePath, type));
     } catch (Exception e) {
       return new Payload(null, e.getMessage());
     }

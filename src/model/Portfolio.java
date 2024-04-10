@@ -53,14 +53,19 @@ public class Portfolio implements PortfolioInterface {
   /**
    * A function to invest in portfolio rather than buying a stock.
    */
-  private void invest(BigDecimal amount, LocalDate date, StockServiceInterface stockService) {
+  private void invest(BigDecimal amount, LocalDate startDate, LocalDate investDate,
+      StockServiceInterface stockService) {
     // get percentage for each stock by investment amount
-    BigDecimal totalInvestment = calculateInvestment(date);
+    List<Tradable> stocks = this.getPortfolio(startDate);
+    float totalQuantity = 0;
+    for (Tradable stock : stocks) {
+      totalQuantity += stock.getQuantity(startDate);
+    }
     for (Tradable stock : this.stocks) {
-      BigDecimal percentage = stock.calculateInvestment(date).divide(totalInvestment);
-      BigDecimal stockInvestment = amount.multiply(percentage);
-      stock.buy(stockInvestment.floatValue(), date,
-          (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), date).getData());
+      Float percentage = (stock.getQuantity(startDate)) / (totalQuantity);
+      BigDecimal stockInvestment = amount.multiply(new BigDecimal(percentage));
+      stock.buy(stockInvestment.floatValue(), investDate,
+          (BigDecimal) stockService.fetchLastClosePrice(stock.getSymbol(), investDate).getData());
     }
   }
 
@@ -73,15 +78,16 @@ public class Portfolio implements PortfolioInterface {
     // frequency 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly
     LocalDate date = startDate;
     while (date.isBefore(endDate)) {
-      invest(amount, date, stockService);
-      if (frequency == 1)
+      invest(amount, startDate, date, stockService);
+      if (frequency == 1) {
         date = date.plusDays(1);
-      else if (frequency == 2)
+      } else if (frequency == 2) {
         date = date.plusWeeks(1);
-      else if (frequency == 3)
+      } else if (frequency == 3) {
         date = date.plusMonths(1);
-      else if (frequency == 4)
+      } else if (frequency == 4) {
         date = date.plusYears(1);
+      }
     }
   }
 
