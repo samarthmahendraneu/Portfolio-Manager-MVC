@@ -1368,10 +1368,10 @@ public class PortfolioControllerTest {
     portfolioController.getPortfolioService().dollarCostAveraging("Test", investmentAmount,
         LocalDate.of(2023, 9, 4), LocalDate.of(2024, 3, 9), 3);
     Payload result = portfolioController.calculatePortfolioValue("Test", LocalDate.of(2024, 3, 10));
-    BigDecimal ExpectedInvestmentAmount = new BigDecimal(12625.2528);
+    BigDecimal expectedInvestmentAmount = new BigDecimal(12625.2528);
     BigDecimal total = ((Optional<BigDecimal>) result.getData()).get();
     // round off to 3 decimal places and compare
-    assertEquals(0, ExpectedInvestmentAmount.setScale(3, RoundingMode.HALF_UP)
+    assertEquals(0, expectedInvestmentAmount.setScale(3, RoundingMode.HALF_UP)
         .compareTo(total.setScale(3, RoundingMode.HALF_UP)));
   }
 

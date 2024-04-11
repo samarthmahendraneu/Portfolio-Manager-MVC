@@ -67,7 +67,7 @@ public class View implements UnifiedViewInterface {
   }
 
   /**
-   * This method is used for input
+   * This method is used for input.
    *
    * @param prompt The prompt to display to the user.
    * @return the user's input.
@@ -293,7 +293,8 @@ public class View implements UnifiedViewInterface {
    */
   @Override
   public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
-
+    // not implemented
+    return;
   }
 
   /**

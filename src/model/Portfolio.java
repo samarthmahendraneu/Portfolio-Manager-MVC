@@ -138,8 +138,7 @@ public class Portfolio implements PortfolioInterface {
             },
             () -> {
               throw new IllegalArgumentException("Stock not found");
-            }
-        );
+            });
   }
 
 

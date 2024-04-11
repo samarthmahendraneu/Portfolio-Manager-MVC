@@ -1,6 +1,8 @@
 package view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -9,7 +11,13 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import model.utilities.BarChartPanel;
 
@@ -386,7 +394,7 @@ public class GUIViewU extends JFrame implements GUIInterface {
   /**
    * Sets the action listener for the normal calculate portfolio value button.
    *
-   * @param listener
+   * @param listener The action listener for the normal calculate portfolio value button.
    */
   public void setnormalCalculatePortfolioValueButtonListener(ActionListener listener) {
     normalCalculatePortfolioValueButton.addActionListener(listener);
@@ -516,8 +524,16 @@ public class GUIViewU extends JFrame implements GUIInterface {
    * @param quantity      Quantity of stock.
    */
   public void displayStockAdded(String portfolioName, String stockSymbol, int quantity) {
-    String message = "Stock " + stockSymbol + " with quantity " + quantity +
-        " added to portfolio " + portfolioName;
+    String message = "Stock "
+        +
+        stockSymbol
+        +
+        " with quantity "
+        +
+        quantity
+        +
+        " added to portfolio "
+        + portfolioName;
     JOptionPane.showMessageDialog(null, message);
   }
 
@@ -529,8 +545,16 @@ public class GUIViewU extends JFrame implements GUIInterface {
    * @param quantity      Quantity of stock.
    */
   public void displayStockSold(String portfolioName, String symbol, int quantity) {
-    String message = "Stock " + symbol + " with quantity " + quantity +
-        " sold from portfolio " + portfolioName;
+    String message = "Stock "
+        +
+        symbol
+        +
+        " with quantity "
+        +
+        quantity
+        +
+        " sold from portfolio "
+        + portfolioName;
     JOptionPane.showMessageDialog(null, message);
   }
 
@@ -647,6 +671,8 @@ public class GUIViewU extends JFrame implements GUIInterface {
    */
   @Override
   public void displayFlexiblePortfolioMenu() {
+    // empty method
+    return;
 
   }
 
@@ -661,7 +687,13 @@ public class GUIViewU extends JFrame implements GUIInterface {
   public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       List<LocalDate> dates) {
     StringBuilder message = new StringBuilder("Crossover days for stock " + symbol + " between " +
-        startDate + " and " + endDate + ":\n");
+        startDate
+        +
+        " and "
+        +
+        endDate
+        +
+        ":\n");
     for (LocalDate date : dates) {
       message.append(date.toString()).append("\n");
     }
@@ -673,7 +705,8 @@ public class GUIViewU extends JFrame implements GUIInterface {
    */
   @Override
   public void displayNormalPortfolioMenu() {
-
+    // empty method
+    return;
   }
 
   /**

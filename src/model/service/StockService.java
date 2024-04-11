@@ -92,7 +92,8 @@ public class StockService implements StockServiceInterface {
 
       date = date.minusDays(1);
       traverseCount++;
-    } while (traverseCount < 4);
+    }
+    while (traverseCount < 4);
 
     return new Payload(BigDecimal.ZERO, "");
   }
