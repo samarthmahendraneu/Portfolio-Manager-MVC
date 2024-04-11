@@ -40,6 +40,9 @@ public class GUIViewU extends JFrame implements GUIInterface {
   private JButton crossoverDays;
   private JButton movingCrossoverDays;
   private JButton dollarCostAverage;
+  private JButton normalCrossoverDays;
+  private JButton normalMovingCrossoverDays;
+  private JButton normalDollarCostAverage;
 
   /**
    * Constructor for the GUIView class.
@@ -145,6 +148,18 @@ public class GUIViewU extends JFrame implements GUIInterface {
     normalCalculateXDayMovingAverageButton = new JButton("Calculate X-Day Moving Average");
     // Add ActionListener for calculateXDayMovingAverageButton
     panel.add(normalCalculateXDayMovingAverageButton);
+
+    normalCrossoverDays = new JButton("Crossover Days");
+    // Add ActionListener for investmentButton
+    panel.add(normalCrossoverDays);
+
+    normalMovingCrossoverDays = new JButton("Moving Crossover Days");
+    // Add ActionListener for investmentButton
+    panel.add(normalMovingCrossoverDays);
+
+    normalDollarCostAverage = new JButton("Dollar Cost Averaging");
+    // Add ActionListener for investmentButton
+    panel.add(normalDollarCostAverage);
 
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
@@ -430,6 +445,23 @@ public class GUIViewU extends JFrame implements GUIInterface {
    */
   public void setnormalCalculateXDayMovingAverageButtonListener(ActionListener listener) {
     normalCalculateXDayMovingAverageButton.addActionListener(listener);
+  }
+
+  @Override
+  public void setNormalCrossoverButtonListener(ActionListener listener) {
+    normalCrossoverDays.addActionListener(listener);
+
+  }
+
+  @Override
+  public void setNormalMovingCrossoverButtonListener(ActionListener listener) {
+    normalMovingCrossoverDays.addActionListener(listener);
+
+  }
+
+  @Override
+  public void setNormalDollarCostButtonListener(ActionListener listener) {
+    normalDollarCostAverage.addActionListener(listener);
   }
 
 

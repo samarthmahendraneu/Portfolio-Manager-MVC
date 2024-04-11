@@ -128,7 +128,26 @@ public interface GUIInterface extends UnifiedViewInterface {
    * @param listener The action listener to be set.
    */
   void setnormalCalculateXDayMovingAverageButtonListener(ActionListener listener);
+  /**
+   * Sets an action listener for the "Crossover" button.
+   *
+   * @param listener The action listener to be set.
+   */
+  void setNormalCrossoverButtonListener(ActionListener listener);
 
+  /**
+   * Sets an action listener for the "Moving Crossover" button.
+   *
+   * @param listener The action listener to be set.
+   */
+  void setNormalMovingCrossoverButtonListener(ActionListener listener);
+
+  /**
+   * Sets an action listener for the "Dollar Cost" button.
+   *
+   * @param listener The action listener to be set.
+   */
+  void setNormalDollarCostButtonListener(ActionListener listener);
   /**
    * Sets an action listener for the "Crossover" button.
    *

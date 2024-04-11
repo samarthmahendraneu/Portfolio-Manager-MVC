@@ -90,6 +90,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     guiView.setInvestmentButtonListener(e -> calculateInvestment());
     guiView.setnormalCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
     guiView.setCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
+    guiView.setNormalDollarCostButtonListener(e -> dollarCostAveraging());
+    guiView.setNormalMovingCrossoverButtonListener(e -> findMovingCrossOverDays());
+    guiView.setNormalCrossoverButtonListener(e -> findCrossOverDays());
 
   }
 
@@ -199,18 +202,30 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public void dollarCostAveraging() {
     try {
       String name = view.requestInput("Enter the Portfolio Name:");
+      if (name == null || name.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
       String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
-      LocalDate startDate = LocalDate.parse(startDateString);
+      LocalDate startDate = validateAndParseDate(startDateString);
 
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
-      LocalDate endDate = LocalDate.parse(endDateString);
+      LocalDate endDate = validateAndParseDate(endDateString);
 
       String investmentAmountString = view.requestInput(
           "Enter the investment amount per month in USD:");
+      if (investmentAmountString == null || investmentAmountString.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
       BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
 
       String frequencyString = view.requestInput(
           "Enter the frequency type: 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
+      if (frequencyString == null || frequencyString.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
       int frequency = Integer.parseInt(frequencyString);
 
       this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate,
@@ -366,6 +381,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.computeStockMovingAverage();
             break;
           case 9:
+            this.findCrossOverDays();
+            break;
+          case 10:
+            this.findMovingCrossOverDays();
+            break;
+          case 11:
+            this.dollarCostAveraging();
+            break;
+          case 12:
             this.view.inputMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -421,8 +445,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
    * @return the parsed date, or null if the string is not a valid date
    */
   private LocalDate validateAndParseDate(String dateString) {
+
     try {
-      return LocalDate.parse(dateString);
+      LocalDate date = LocalDate.parse(dateString);
+        if (!date.isBefore(LocalDate.now())) {
+            throw new DateTimeParseException("Date is Null",null,1);
+        }
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+          throw new DateTimeParseException("Date is Weekend",null,1);
+        }
+        return LocalDate.parse(dateString);
     } catch (DateTimeParseException e) {
       view.displayMessage("Invalid date format. Please try again with format YYYY-MM-DD.");
       return null;
