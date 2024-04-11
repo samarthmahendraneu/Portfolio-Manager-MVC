@@ -448,20 +448,19 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
     try {
       LocalDate date = LocalDate.parse(dateString);
-        if (!date.isBefore(LocalDate.now())) {
-            throw new DateTimeParseException("Date is Null",null,1);
-        }
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-          throw new DateTimeParseException("Date is Weekend",null,1);
-        }
-        return LocalDate.parse(dateString);
+      if (!date.isBefore(LocalDate.now())) {
+        throw new DateTimeParseException("Date is in the future", null, 1);
+      }
+      DayOfWeek dayOfWeek = date.getDayOfWeek();
+      if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+        throw new DateTimeParseException("Date is Weekend", null, 1);
+      }
+      return LocalDate.parse(dateString);
     } catch (DateTimeParseException e) {
       view.displayMessage("Invalid date format. Please try again with format YYYY-MM-DD.");
       return null;
     }
   }
-
 
 
   /**
@@ -567,6 +566,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   /**
    * Validates the date input.
    *
+   * @param date the date to validate.
    * @return the validated date.
    */
   public Boolean dateValidator(LocalDate date) {

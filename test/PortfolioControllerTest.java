@@ -517,7 +517,9 @@ public class PortfolioControllerTest {
     assertFalse("Cache loading should succeed.", loadResult.isError());
   }
 
-
+  /**
+   * Tests adding a stock to a portfolio with a valid set of stocks and shares.
+   */
   @Test
   public void testAdditionalAddStockToPortfolio() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
@@ -572,6 +574,10 @@ public class PortfolioControllerTest {
   }
 
   // add same stock twice to the portfolio
+
+  /**
+   * Tests adding the same stock twice to a portfolio.
+   */
   @Test
   public void testAddSameStockTwiceToPortfolio() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
@@ -586,6 +592,10 @@ public class PortfolioControllerTest {
 
   // add same stock thrice to the portfolio
   // validate on different dates
+
+  /**
+   * Tests adding the same stock thrice to a portfolio on different dates.
+   */
   @Test
   public void testAddSameStockTwiceToPortfolioValidateDifferentDays() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
@@ -832,8 +842,12 @@ public class PortfolioControllerTest {
     assertTrue(((String) result.getData()).contains("Gained by"));
   }
 
-
   // 1. add stock to portfolio, sell stock from portfolio and then calculate value
+
+  /**
+   * Tests adding a stock to a portfolio, selling the stock, and then calculating the portfolio
+   * value.
+   */
   @Test
   public void testAddStockSellStockCalculateValue() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");
@@ -850,6 +864,10 @@ public class PortfolioControllerTest {
     assertEquals(0, total.compareTo(((Optional<BigDecimal>) payload.getData()).get()));
   }
 
+  /**
+   * Tests adding a stock to a portfolio, selling the stock, and then calculating the portfolio
+   * value.
+   */
   @Test
   public void testAddStockSellStockCalculateValueDifferentDates() {
     Payload payload = portfolioController.createNewPortfolio("Test Portfolio");

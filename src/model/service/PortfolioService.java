@@ -377,7 +377,6 @@ public class PortfolioService implements PortfolioServiceInterface {
    * @param identifier The stock symbol or portfolio name to plot.
    * @param startDate  The start date of the period to plot.
    * @param endDate    The end date of the period to plot.
-   * @throws Exception If any error occurs during the plotting process.
    */
 
   public StringBuilder plotPerformanceChart(String identifier, LocalDate startDate,

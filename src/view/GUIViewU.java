@@ -1,12 +1,19 @@
 package view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 /**
  * Class to represent the GUI view of the application.
@@ -447,18 +454,33 @@ public class GUIViewU extends JFrame implements GUIInterface {
     normalCalculateXDayMovingAverageButton.addActionListener(listener);
   }
 
+  /**
+   * Sets the action listener for the normal crossover button.
+   *
+   * @param listener The action listener to be set.
+   */
   @Override
   public void setNormalCrossoverButtonListener(ActionListener listener) {
     normalCrossoverDays.addActionListener(listener);
 
   }
 
+  /**
+   * Sets the action listener for the normal moving crossover button.
+   *
+   * @param listener The action listener to be set.
+   */
   @Override
   public void setNormalMovingCrossoverButtonListener(ActionListener listener) {
     normalMovingCrossoverDays.addActionListener(listener);
 
   }
 
+  /**
+   * Sets the action listener for the normal dollar cost averaging button.
+   *
+   * @param listener The action listener to be set.
+   */
   @Override
   public void setNormalDollarCostButtonListener(ActionListener listener) {
     normalDollarCostAverage.addActionListener(listener);
@@ -659,7 +681,7 @@ public class GUIViewU extends JFrame implements GUIInterface {
    */
   public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       List<LocalDate> dates) {
-    StringBuilder message = new StringBuilder("Crossover days for stock " + symbol + " between " +
+    StringBuilder message = new StringBuilder("Crossover (Buy) days for stock " + symbol + " between " +
         startDate
         +
         " and "
@@ -704,8 +726,8 @@ public class GUIViewU extends JFrame implements GUIInterface {
     List<LocalDate> deathCrosses = (List<LocalDate>) result.get("deathCrosses");
     List<LocalDate> movingCrossoverDays = (List<LocalDate>) result.get("movingCrossoverDays");
 
-    appendDateListToMessage("Golden Crosses:", goldenCrosses, message);
-    appendDateListToMessage("Death Crosses:", deathCrosses, message);
+    appendDateListToMessage("Golden Crosses / Upward trend:", goldenCrosses, message);
+    appendDateListToMessage("Death Crosses / Downward trend:", deathCrosses, message);
     appendDateListToMessage("Moving Crossover Days:", movingCrossoverDays, message);
 
     JOptionPane.showMessageDialog(null, message.toString());

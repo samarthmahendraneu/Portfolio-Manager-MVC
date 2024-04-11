@@ -44,11 +44,20 @@ public interface PortfolioControllerInterface {
 
   /**
    * Calculate total investment in a perticular portfolio by a given date.
+   *
+   * @param name   The name of the portfolio for which the value will be calculated.
+   * @param onDate The date on which the value of the portfolio will be calculated.
+   * @return The total investment in the portfolio on the given date.
    */
   Payload calculateTotalInvestment(String name, LocalDate onDate);
 
   /**
    * Buys a stock with the given symbol and quantity on the given date at the given price.
+   * @param portfolio The portfolio to which the stock will be added.
+   * @param stockSymbol The symbol of the stock to be bought.
+   * @param quantity The quantity of the stock to be bought.
+   * @param date The date on which the stock was bought.
+   * @return The updated portfolio.
    */
   Payload sellStockFromPortfolio(PortfolioInterface portfolio, String stockSymbol, int quantity,
       LocalDate date);
@@ -57,6 +66,7 @@ public interface PortfolioControllerInterface {
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path where the portfolios will be saved.
+   * @param type     The type of the portfolio to save.
    * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error saving the portfolios to the file.
    */
@@ -66,6 +76,7 @@ public interface PortfolioControllerInterface {
    * Loads the portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
+   * @param type     The type of the portfolio to load.
    * @return A Payload object indicating success or containing an error message.
    * @throws IllegalArgumentException if there is an error loading the portfolios from the file.
    */
@@ -93,6 +104,7 @@ public interface PortfolioControllerInterface {
    * @param identifier The stock symbol or portfolio name.
    * @param startDate  The start date of the period for graph generation.
    * @param endDate    The end date of the period for graph generation.
+   * @return A StringBuilder object containing the generated graph.
    */
   StringBuilder genGraph(String identifier, LocalDate startDate, LocalDate endDate);
 

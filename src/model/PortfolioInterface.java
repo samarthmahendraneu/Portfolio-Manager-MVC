@@ -40,6 +40,7 @@ public interface PortfolioInterface {
    * @param stock    The stock to remove.
    * @param quantity The quantity of the stock to remove.
    * @param date     The date of the sale.
+   * @param sellingPrice The selling price of the stock.
    * @throws IllegalArgumentException if the stock is not in the portfolio.
    */
   void sellStock(String stock, int quantity, LocalDate date, BigDecimal sellingPrice)
@@ -83,6 +84,11 @@ public interface PortfolioInterface {
   void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
       StockServiceInterface stockService, int frequency);
 
+  /**
+   * Gets the portfolio on a given date.
+   * @param date The date to get the portfolio for.
+   * @return The portfolio on the given date with the stocks and their quantities.
+   */
   List<Tradable> getPortfolio(LocalDate date);
 
 }

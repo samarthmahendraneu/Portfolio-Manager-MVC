@@ -63,7 +63,6 @@ public interface StockServiceInterface {
    * run, reducing the need for initial API calls.
    *
    * @param filepath The path of the file from which to load the cache.
-   * @throws Exception If an error occurs during the loading process.
    */
   void loadCache(String filepath);
 
@@ -73,7 +72,6 @@ public interface StockServiceInterface {
    * repeated API calls.
    *
    * @param filepath The path of the file where the cache should be saved.
-   * @throws Exception If an error occurs during the saving process.
    */
   void saveCache(String filepath);
 
@@ -121,6 +119,7 @@ public interface StockServiceInterface {
    * these prices.
    *
    * @param symbol object containing stock data for the day.
+   * @param date   The date for which the performance is to be inspected.
    * @return A string message indicating the stock's performance.
    */
   String inspectStockGainOrLoss(String symbol, LocalDate date);

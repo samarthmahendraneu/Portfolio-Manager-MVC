@@ -67,6 +67,7 @@ public interface Tradable {
    *
    * @param stockService The stock service to use to get the stock price.
    * @param date         The date to calculate the value for.
+   * @return The value of the tradable asset on the given date.
    */
   BigDecimal calculateValue(StockServiceInterface stockService, LocalDate date);
 

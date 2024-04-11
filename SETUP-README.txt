@@ -9,7 +9,19 @@ To run the Portfolio Management System from the JAR file, follow these steps:
 3. Navigate to the directory where the JAR file is located.
 4. Run the command `java -jar PortfolioManagementSystem.jar` to start the program.
 
+## Choosing an Interface
+Upon launching the application, you're prompted to choose between the GUI and the textual interface:
+
+Select the interface type:
+1. Graphical User Interface (GUI)
+2. Textual User Interface (Console)
+Enter your choice (1/2):
+
+For GUI: Enter 1. The GUI version provides a visual interface for interacting with the portfolio management functionalities.
+
+For Textual Interface: Enter 2. The console version allows for text-based commands and outputs, suitable for those who prefer a command-line environment.
 ## Creating and Querying Portfolios
+
 
 ### Creating a Portfolio with 3 Different Stocks
 

@@ -128,6 +128,7 @@ public interface GUIInterface extends UnifiedViewInterface {
    * @param listener The action listener to be set.
    */
   void setnormalCalculateXDayMovingAverageButtonListener(ActionListener listener);
+
   /**
    * Sets an action listener for the "Crossover" button.
    *
@@ -148,6 +149,7 @@ public interface GUIInterface extends UnifiedViewInterface {
    * @param listener The action listener to be set.
    */
   void setNormalDollarCostButtonListener(ActionListener listener);
+
   /**
    * Sets an action listener for the "Crossover" button.
    *

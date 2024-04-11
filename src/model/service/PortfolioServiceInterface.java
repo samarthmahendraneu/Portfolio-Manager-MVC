@@ -61,12 +61,22 @@ public interface PortfolioServiceInterface {
 
   /**
    * Sells a stock from a portfolio with the given symbol, quantity, and date.
+   *
+   * @param portfolioName The name of the portfolio from which the stock will be sold.
+   * @param stockSymbol   The symbol of the stock to be sold.
+   * @param quantity      The quantity of the stock to be sold.
+   * @param date          The date on which the stock was sold.
+   * @return True if the stock was successfully sold, false otherwise.
    */
   Boolean sellStockFromPortfolio(String portfolioName, String stockSymbol, int quantity,
       LocalDate date);
 
   /**
    * Calculates the total investment in a portfolio by a given date.
+   *
+   * @param portfolioName The name of the portfolio.
+   * @param onDate        The date for which the investment is to be calculated.
+   * @return The total investment in the portfolio on the given date.
    */
   Optional<BigDecimal> calculatePortfolioInvestment(String portfolioName, LocalDate onDate);
 
@@ -81,6 +91,7 @@ public interface PortfolioServiceInterface {
    * Saves the portfolios to a CSV file at the given file path.
    *
    * @param filePath The file path to which the portfolios will be saved.
+   * @param type     The type of the portfolio to save.
    * @throws IOException If an error occurs while writing to the file.
    */
   void savePortfoliosToCSV(String filePath, String type) throws IOException;
@@ -89,6 +100,7 @@ public interface PortfolioServiceInterface {
    * Loads portfolios from a CSV file at the given file path.
    *
    * @param filePath The file path from which the portfolios will be loaded.
+   * @param type     The type of the portfolio to load.
    * @return The file path from which the portfolios were loaded.
    * @throws IOException If an error occurs while reading from the file.
    */
@@ -131,7 +143,6 @@ public interface PortfolioServiceInterface {
    * @param identifier The stock symbol or portfolio name to plot.
    * @param startDate  The start date of the period to plot.
    * @param endDate    The end date of the period to plot.
-   * @throws Exception If any error occurs during the plotting process.
    */
   StringBuilder plotPerformanceChart(String identifier, LocalDate startDate, LocalDate endDate);
 

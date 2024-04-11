@@ -89,6 +89,7 @@ public class View implements UnifiedViewInterface {
 
   /**
    * get the output stream.
+   * @return the output stream.
    */
   public Appendable getStreamableOutput() {
     return this.out;
@@ -287,7 +288,7 @@ public class View implements UnifiedViewInterface {
    */
   public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       List<LocalDate> dates) throws IOException {
-    this.out.append("Crossover days for stock ").append(symbol).append(" between ")
+    this.out.append("Crossover (Buy) days for stock ").append(symbol).append(" between ")
         .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n");
     for (LocalDate date : dates) {
       this.out.append(date.toString()).append("\n");
@@ -314,12 +315,12 @@ public class View implements UnifiedViewInterface {
         .append(startDate.toString()).append(" and ").append(endDate.toString()).append(":\n")
         .append("Short moving period: ").append(String.valueOf(shortMovingPeriod))
         .append(", Long moving period: ").append(String.valueOf(longMovingPeriod)).append("\n");
-    this.out.append("Golden Crosses:\n");
+    this.out.append("Golden Crosses / Upward trend:\n");
     for (LocalDate goldenDate : goldenCrosses) {
       this.out.append(goldenDate.toString()).append("\n");
     }
     // death crosses
-    this.out.append("Death Crosses:\n");
+    this.out.append("Death Crosses / downward trend:\n");
     for (LocalDate deathDate : deathCrosses) {
       this.out.append(deathDate.toString()).append("\n");
     }

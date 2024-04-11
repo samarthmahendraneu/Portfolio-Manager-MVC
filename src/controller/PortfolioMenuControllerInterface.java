@@ -37,11 +37,13 @@ public interface PortfolioMenuControllerInterface {
 
   /**
    * Save the portfolio.
+   * @param type The type of the portfolio to save
    */
   void savePortfolio(String type);
 
   /**
    * Load the portfolio.
+   * @param type The type of the portfolio to load
    */
   void loadPortfolio(String type);
 
