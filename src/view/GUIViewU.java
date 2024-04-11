@@ -1,25 +1,12 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import model.utilities.BarChartPanel;
+import javax.swing.*;
 
 /**
  * Class to represent the GUI view of the application.
@@ -609,52 +596,6 @@ public class GUIViewU extends JFrame implements GUIInterface {
     return null;
   }
 
-  /**
-   * Requests a date from the user.
-   *
-   * @param message The prompt to display to the user.
-   * @return The user's input date.
-   */
-  @Override
-  public LocalDate requestDate(String message) {
-    LocalDate date = null;
-    while (date == null) {
-      String dateString = requestInput(message);
-      if (dateString == null || dateString.isEmpty()) {
-        displayMessage("Operation cancelled or no date entered.");
-        break; // Exit the method if user cancels or inputs an empty string
-      }
-
-      try {
-        date = LocalDate.parse(dateString);
-        if (!date.isBefore(LocalDate.now())) {
-          displayMessage("Date must be before today. Please try again.");
-          date = null; // Reset date to null to continue the loop
-        } else if (date.getDayOfWeek() == DayOfWeek.SATURDAY
-            || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-          displayMessage("Date must be on a weekday. Please try again.");
-          date = null; // Reset date to null to continue the loop
-        }
-      } catch (DateTimeParseException e) {
-        displayMessage("Invalid date format. Please try again.");
-        // No need to reset date to null here because it's already null
-      }
-    }
-    return date;
-  }
-
-  /**
-   * Displays a performance chart to the user.
-   *
-   * @param data The data to display in the chart.
-   */
-  public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
-    // Create the panel that will display the graph
-    BarChartPanel barChartPanel = new BarChartPanel(data);
-    barChartPanel.displayInWindow();
-    // Create a new JFrame to display the graph
-
-  }
 
   /**
    * Reads an integer from the user.

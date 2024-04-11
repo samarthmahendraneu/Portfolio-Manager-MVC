@@ -1,12 +1,9 @@
 package view;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import model.Tradable;
 
 /**
  * Interface for the View (text view and GUI view).
@@ -48,21 +45,6 @@ public interface UnifiedViewInterface {
    * @return The user's input.
    */
   String readLine();
-
-  /**
-   * Requests a date from the user.
-   *
-   * @param prompt The prompt to display to the user.
-   * @return The user's input date.
-   */
-  LocalDate requestDate(String prompt);
-
-  /**
-   * Displays a performance chart to the user.
-   *
-   * @param data The data to display in the chart.
-   */
-  void displayPerformanceChart(Map<LocalDate, BigDecimal> data);
 
   /**
    * Displays the main menu to the user.
@@ -138,16 +120,6 @@ public interface UnifiedViewInterface {
   void displayStockAdded(String portfolioName, String symbol, int quantity) throws IOException;
 
   /**
-   * Displays information about portfolio investment.
-   *
-   * @param name      Portfolio name.
-   * @param dateInput Date input.
-   * @param string    Additional information.
-   * @throws IOException if an I/O error occurs.
-   */
-  void displayPortfolioInvestment(String name, String dateInput, String string) throws IOException;
-
-  /**
    * Displays information about a sold stock.
    *
    * @param portfolioName Portfolio name.
@@ -157,37 +129,4 @@ public interface UnifiedViewInterface {
    */
   void displayStockSold(String portfolioName, String symbol, int quantity) throws IOException;
 
-  /**
-   * Displays details of a portfolio.
-   *
-   * @param name   Portfolio name.
-   * @param stocks List of stocks in the portfolio.
-   * @throws IOException if an I/O error occurs.
-   */
-  void displayPortfolioDetails(String name, List<Tradable> stocks) throws IOException;
-
-  /**
-   * Displays a message indicating successful saving of data to a file.
-   *
-   * @param filePath File path.
-   * @throws IOException if an I/O error occurs.
-   */
-  void displaySaveSuccess(String filePath) throws IOException;
-
-  /**
-   * Displays a message indicating successful loading of data from a file.
-   *
-   * @throws IOException if an I/O error occurs.
-   */
-  void displayLoadSuccess() throws IOException;
-
-  /**
-   * Displays information about portfolio value.
-   *
-   * @param name      Portfolio name.
-   * @param dateInput Date input.
-   * @param string    Additional information.
-   * @throws IOException if an I/O error occurs.
-   */
-  void displayPortfolioValue(String name, String dateInput, String string) throws IOException;
 }

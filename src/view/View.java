@@ -3,7 +3,6 @@ package view;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -273,28 +272,6 @@ public class View implements UnifiedViewInterface {
    */
   public void displayError(String errorMessage) {
     inputMessage("Error: " + errorMessage);
-  }
-
-  /**
-   * Request a date from the user.
-   *
-   * @param prompt The prompt to display to the user.
-   * @return The date entered by the user.
-   */
-  @Override
-  public LocalDate requestDate(String prompt) {
-    return null;
-  }
-
-  /**
-   * Display a performance chart to the user.
-   *
-   * @param data The data to display in the chart.
-   */
-  @Override
-  public void displayPerformanceChart(Map<LocalDate, BigDecimal> data) {
-    // not implemented
-    return;
   }
 
   /**

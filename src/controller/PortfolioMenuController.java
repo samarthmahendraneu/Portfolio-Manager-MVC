@@ -430,6 +430,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   }
 
 
+
   /**
    * Inspect the stock performance for a given stock symbol on a specified date.
    */
