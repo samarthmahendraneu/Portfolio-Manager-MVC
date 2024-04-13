@@ -3,10 +3,11 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import model.service.StockServiceInterface;
 
 /**
- * Interface for the Portfolio class.
+ * Interface for the Portfolio class that has methods to add and remove stocks from the portfolio.
  */
 public interface PortfolioInterface {
 
@@ -37,9 +38,9 @@ public interface PortfolioInterface {
   /**
    * Sell a stock from the portfolio.
    *
-   * @param stock    The stock to remove.
-   * @param quantity The quantity of the stock to remove.
-   * @param date     The date of the sale.
+   * @param stock        The stock to remove.
+   * @param quantity     The quantity of the stock to remove.
+   * @param date         The date of the sale.
    * @param sellingPrice The selling price of the stock.
    * @throws IllegalArgumentException if the stock is not in the portfolio.
    */
@@ -82,13 +83,25 @@ public interface PortfolioInterface {
    * @param frequency    frequency
    */
   void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
-      StockServiceInterface stockService, int frequency);
+      StockServiceInterface stockService, int frequency, Map<String, Float> stockWeights);
 
   /**
    * Gets the portfolio on a given date.
+   *
    * @param date The date to get the portfolio for.
    * @return The portfolio on the given date with the stocks and their quantities.
    */
   List<Tradable> getPortfolio(LocalDate date);
+
+  /**
+   * Invests in a portfolio using the given stock weights.
+   *
+   * @param investmentAmount The amount to invest.
+   * @param Date             The  date of the investment.
+   * @param stockWeights     A map of stock symbols to their respective weights.
+   * @param stockService     The stock service to use.
+   */
+  void investUsingWeights(Float investmentAmount, LocalDate Date,
+      StockServiceInterface stockService, Map<String, Float> stockWeights);
 
 }

@@ -11,7 +11,7 @@ import model.PortfolioInterface;
 import model.Tradable;
 
 /**
- * Interface for the PortfolioService class.
+ * Interface for the PortfolioService class which provides methods to manage portfolios and stocks.
  */
 public interface PortfolioServiceInterface {
 
@@ -168,7 +168,7 @@ public interface PortfolioServiceInterface {
    * @param frequency     The frequency of investment.
    */
   void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate,
-      LocalDate endDate, int frequency);
+      LocalDate endDate, int frequency, Map<String, Float> stockWeights);
 
   /**
    * Examine the details of a portfolio on a given date.
@@ -178,4 +178,5 @@ public interface PortfolioServiceInterface {
    * @return A list of Tradable objects representing the stocks in the portfolio.
    */
   List<Tradable> examinePortfolioDetails(String portfolioName, LocalDate date);
+
 }

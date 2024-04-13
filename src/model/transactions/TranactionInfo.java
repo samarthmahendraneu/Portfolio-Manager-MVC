@@ -3,7 +3,8 @@ package model.transactions;
 import java.math.BigDecimal;
 
 /**
- * Interface for the TransactionInfo class.
+ * Interface for the TransactionInfo class that has methods to get the quantity and price of a
+ * stock.
  */
 public interface TranactionInfo {
 

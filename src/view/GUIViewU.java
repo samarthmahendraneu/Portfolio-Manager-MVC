@@ -681,14 +681,20 @@ public class GUIViewU extends JFrame implements GUIInterface {
    */
   public void displayCrossoverDays(String symbol, LocalDate startDate, LocalDate endDate,
       List<LocalDate> dates) {
-    StringBuilder message = new StringBuilder("Crossover (Buy) days for stock " + symbol + " between " +
-        startDate
-        +
-        " and "
-        +
-        endDate
-        +
-        ":\n");
+    StringBuilder message = new StringBuilder(
+        "Crossover (Buy) days for stock "
+            +
+            symbol
+            +
+            " between "
+            +
+            startDate
+            +
+            " and "
+            +
+            endDate
+            +
+            ":\n");
     for (LocalDate date : dates) {
       message.append(date.toString()).append("\n");
     }

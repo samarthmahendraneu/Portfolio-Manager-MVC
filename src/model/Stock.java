@@ -17,6 +17,7 @@ public class Stock implements Tradable {
   private final String symbol;
   private float quantity;
   private final Map<LocalDate, TranactionInfo> Activity = new HashMap<>();
+  private String string;
 
 
   /**
@@ -157,19 +158,9 @@ public class Stock implements Tradable {
    */
   @Override
   public String toString() {
-    return "Stock {"
-        +
-        "symbol='"
-        +
-        symbol
-        +
-        '\''
-        +
-        ", quantity="
-        +
-        quantity
-        +
-        '}';
+    if (string == null) {
+      string = "Stock{" + "symbol='" + symbol + '\'' + ", quantity=" + quantity + '}';
+    }
+    return string;
   }
-
 }

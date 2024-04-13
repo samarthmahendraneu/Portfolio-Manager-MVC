@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -196,6 +197,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+
   /**
    * Dollar Cost Averaging for a given portfolio.
    */
@@ -211,6 +213,21 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = validateAndParseDate(endDateString);
+
+      // input stocks and weights
+      String stockAndWeights = view.requestInput(
+          "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...'");
+      if (stockAndWeights == null || stockAndWeights.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
+      // create map containing stock and weight
+      Map<String, Float> stockWeights = new HashMap<>();
+      String[] stockWeightPairs = stockAndWeights.split(",");
+      for (String pair : stockWeightPairs) {
+        String[] stockWeight = pair.split(":");
+        stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
+      }
 
       String investmentAmountString = view.requestInput(
           "Enter the investment amount per month in USD:");
@@ -229,7 +246,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       int frequency = Integer.parseInt(frequencyString);
 
       this.portfolioService.dollarCostAveraging(name, investmentAmount, startDate, endDate,
-          frequency);
+          frequency, stockWeights);
 
       view.displayMessage(
           "Dollar Cost Averaging has been successfully applied to the portfolio: " + name);
@@ -449,16 +466,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     try {
       LocalDate date = LocalDate.parse(dateString);
       if (!date.isBefore(LocalDate.now())) {
-        throw new DateTimeParseException("Date is in the future", null, 1);
+        throw new Exception("Date is in the future. Please try again.");
       }
       DayOfWeek dayOfWeek = date.getDayOfWeek();
       if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-        throw new DateTimeParseException("Date is Weekend", null, 1);
+        throw new Exception("Date is Weekend");
       }
       return LocalDate.parse(dateString);
-    } catch (DateTimeParseException e) {
+    } catch (Exception e) {
       view.displayMessage("Invalid date format. Please try again with format YYYY-MM-DD.");
-      return null;
+      String endDateString = view.requestInput("Enter the date (YYYY-MM-DD):");
+      return validateAndParseDate(endDateString);
     }
   }
 

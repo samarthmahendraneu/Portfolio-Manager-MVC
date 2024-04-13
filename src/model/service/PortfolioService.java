@@ -160,17 +160,18 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   }
 
-
   /**
    * dollar cost averaging for a portfolio.
    */
   public void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate,
-      LocalDate endDate, int frequency) {
+      LocalDate endDate, int frequency, Map<String, Float> stockWeights) {
+    // check if portfolio exists if not create a new one
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
-        .orElseThrow(() -> new IllegalArgumentException("Portfolio not found: " + portfolioName));
-    portfolio.dollarCostAveraging(amount, startDate, endDate, stockService, frequency);
+        .orElseGet(() -> createNewPortfolio(portfolioName));
+    portfolio.dollarCostAveraging(amount, startDate, endDate, stockService, frequency, stockWeights);
     return;
   }
+
 
   /**
    * Fetches a portfolio by its name.

@@ -10,7 +10,8 @@ import java.util.SortedMap;
 import java.math.BigDecimal;
 
 /**
- * Interface for the StockService class.
+ * Interface for the StockService class that has methods to fetch stock data and perform analysis on
+ * stock prices.
  */
 public interface StockServiceInterface {
 
