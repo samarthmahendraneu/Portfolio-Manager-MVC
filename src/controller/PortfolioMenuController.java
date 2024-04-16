@@ -86,12 +86,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     guiView.setAddButtonListener(e -> addStockToPortfolio());
     guiView.setSellButtonListener(e -> sellStockFromPortfolio());
     guiView.setDollarCostButtonListener(e -> dollarCostAveraging());
+    guiView.setValueBasedInvestmentButtonListener(e -> valueBasedInvestment());
     guiView.setMovingCrossoverButtonListener(e -> findMovingCrossOverDays());
     guiView.setCrossoverButtonListener(e -> findCrossOverDays());
     guiView.setInvestmentButtonListener(e -> calculateInvestment());
     guiView.setnormalCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
     guiView.setCalculateXDayMovingAverageButtonListener(e -> computeStockMovingAverage());
     guiView.setNormalDollarCostButtonListener(e -> dollarCostAveraging());
+    guiView.setNormalValueBasedInvestmentButtonListener(e -> valueBasedInvestment());
     guiView.setNormalMovingCrossoverButtonListener(e -> findMovingCrossOverDays());
     guiView.setNormalCrossoverButtonListener(e -> findCrossOverDays());
 
@@ -185,6 +187,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             break;
           case 15:
             this.valueBasedInvestment();
+            break;
           case 16:
             this.view.inputMessage("Exiting...");
             this.saveStockCache();
@@ -220,18 +223,35 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
       BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
 
-      // take in stock symbols
-      String stockSymbols = view.requestInput(
-          "Enter the stock symbols in the format: 'stock1,stock2,...'");
-      if (stockSymbols == null || stockSymbols.isEmpty()) {
-        view.displayMessage("Operation cancelled or no symbol entered.");
-        return;
-      }
       Map<String, Float> stockWeights = new HashMap<>();
-      // create stocks with equal weights
-      String[] stocks = stockSymbols.split(",");
-      for (String stock : stocks) {
-        stockWeights.put(stock, (1.0f / stocks.length)*100);
+      boolean flag = true;
+      while (flag) {
+        // input stocks and weights
+        String stockAndWeights = view.requestInput(
+            "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...as in IBM:50,GOOGL:50");
+        if (stockAndWeights == null || stockAndWeights.isEmpty()) {
+          view.displayMessage("Operation cancelled or no symbol entered.");
+          return;
+        }
+        try {
+          // create map containing stock and weight
+          int sumOFWeights = 0;
+          String[] stockWeightPairs = stockAndWeights.split(",");
+          for (String pair : stockWeightPairs) {
+            String[] stockWeight = pair.split(":");
+            stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
+            sumOFWeights += Float.parseFloat(stockWeight[1]);
+          }
+          if (sumOFWeights != 100) {
+            view.displayMessage("Sum of weights should be 100");
+            continue;
+          } else {
+            flag = false;
+          }
+        }catch (Exception e){
+          view.displayMessage("Please enter a valid format for stock and weight.");
+          continue;
+        }
       }
       this.portfolioService.valueBasedInvestment(name, investmentAmount, startDate, stockWeights);
       view.displayMessage(
@@ -256,10 +276,14 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         return;
       }
       String startDateString = view.requestInput("Enter the start date (YYYY-MM-DD):");
-      LocalDate startDate = validateAndParseDate(startDateString);
+      LocalDate startDate = customValidateAndParseDateForDollarCostAvg(startDateString);
 
-      String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
-      LocalDate endDate = validateAndParseDate(endDateString);
+      String endDateString = view.requestInput(
+          "Enter the end date (YYYY-MM-DD), n to skip enddate:");
+      LocalDate endDate = LocalDate.now();
+      if (endDateString != "n") {
+        endDate = customValidateAndParseDateForDollarCostAvg(endDateString);
+      }
       Map<String, Float> stockWeights = new HashMap<>();
       boolean flag = true;
       while (flag) {
@@ -285,7 +309,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
           flag = false;
         }
       }
-
 
       String investmentAmountString = view.requestInput(
           "Enter the investment amount per month in USD:");
@@ -465,6 +488,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.dollarCostAveraging();
             break;
           case 12:
+            this.valueBasedInvestment();
+            break;
+          case 13:
             this.view.inputMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -537,6 +563,37 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return validateAndParseDate(endDateString);
     }
   }
+
+  /**
+   * Validate and parse a date from a string.
+   *
+   * @param dateString the string to parse
+   * @return the parsed date, or null if the string is not a valid date
+   */
+  private LocalDate customValidateAndParseDateForDollarCostAvg(String dateString) {
+
+    try {
+      LocalDate date = LocalDate.parse(dateString);
+      if (!date.isBefore(LocalDate.now())) {
+        throw new Exception("Date is in the future. Please try again.");
+      }
+      DayOfWeek dayOfWeek = date.getDayOfWeek();
+      if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+        // return next weekday
+        if (dayOfWeek == DayOfWeek.SATURDAY) {
+          return date.plusDays(2);
+        } else {
+          return date.plusDays(1);
+        }
+      }
+      return LocalDate.parse(dateString);
+    } catch (Exception e) {
+      view.displayMessage("Invalid date format. Please try again with format YYYY-MM-DD.");
+      String endDateString = view.requestInput("Enter the date (YYYY-MM-DD):");
+      return validateAndParseDate(endDateString);
+    }
+  }
+
 
 
   /**
@@ -1063,6 +1120,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       }
       view.displayMessage("Cache have been loaded successfully.\n");
     } catch (Exception e) {
+      this.view.displayMessage("Error: " + e.getMessage());
       return;
     }
   }

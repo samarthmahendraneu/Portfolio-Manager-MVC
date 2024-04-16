@@ -101,8 +101,10 @@ public class StockDataCache {
       }
     } catch (FileNotFoundException e) {
       System.out.println("File not found: " + filePath);
+      throw new IllegalArgumentException("File not found: " + filePath);
     } catch (Exception e) {
       System.out.println("Error reading from file: " + e.getMessage());
+      throw new IllegalArgumentException("Error reading from file: " + e.getMessage());
     }
   }
 

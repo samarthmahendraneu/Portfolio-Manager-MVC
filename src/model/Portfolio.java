@@ -54,6 +54,18 @@ public class Portfolio implements PortfolioInterface {
 
   public void investUsingWeights(Float investmentAmount, LocalDate Date,
       StockServiceInterface stockService, Map<String, Float> stockWeights){
+    // check if the investment amount is positive
+    if (investmentAmount <= 0) {
+      throw new IllegalArgumentException("Invalid investment amount");
+    }
+    // check if the date is in the future
+    if (Date.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("Cannot invest in the future");
+    }
+    // check if the stock weights sum to 100
+    if (stockWeights.values().stream().mapToDouble(Float::doubleValue).sum() != 100) {
+      throw new IllegalArgumentException("Invalid stock weights");
+    }
     for (Map.Entry<String, Float> entry : stockWeights.entrySet()) {
       String symbol = entry.getKey();
       Float weight = entry.getValue();

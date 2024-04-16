@@ -171,6 +171,22 @@ public interface GUIInterface extends UnifiedViewInterface {
    */
   void setDollarCostButtonListener(ActionListener listener);
 
+
+  /**
+   * Sets an action listener for the "Investment" button.
+   *
+   * @param listener The action listener to be set.
+   */
+  void setValueBasedInvestmentButtonListener(ActionListener listener);
+
+  /**
+   * Sets an action listener for the "Investment" button.
+   *
+   * @param listener The action listener to be set.
+   */
+  void setNormalValueBasedInvestmentButtonListener(ActionListener listener);
+
+
   /**
    * Sets an action listener for the "Investment" button.
    *

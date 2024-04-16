@@ -51,6 +51,10 @@ public class GUIViewU extends JFrame implements GUIInterface {
   private JButton normalMovingCrossoverDays;
   private JButton normalDollarCostAverage;
 
+  private JButton valueBasedInvestment;
+
+  private JButton NormalvalueBasedInvestment;
+
   /**
    * Constructor for the GUIView class.
    */
@@ -168,6 +172,11 @@ public class GUIViewU extends JFrame implements GUIInterface {
     // Add ActionListener for investmentButton
     panel.add(normalDollarCostAverage);
 
+
+    NormalvalueBasedInvestment = new JButton(" Value Based Investment");
+    // Add ActionListener for investmentButton
+    panel.add(NormalvalueBasedInvestment);
+
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
     panel.add(backButton);
@@ -238,6 +247,10 @@ public class GUIViewU extends JFrame implements GUIInterface {
     dollarCostAverage = new JButton("Dollar Cost Averaging");
     // Add ActionListener for investmentButton
     panel.add(dollarCostAverage);
+
+    valueBasedInvestment = new JButton("Value Based Investment");
+    // Add ActionListener for investmentButton
+    panel.add(valueBasedInvestment);
 
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
@@ -381,6 +394,26 @@ public class GUIViewU extends JFrame implements GUIInterface {
   public void setDollarCostButtonListener(ActionListener listener) {
     dollarCostAverage.addActionListener(listener);
   }
+
+  /**
+   * Sets the action listener for the Value Based Investment button.
+   *
+   * @param listener The action listener for the dollar cost averaging button.
+   */
+  public void setValueBasedInvestmentButtonListener(ActionListener listener) {
+    valueBasedInvestment.addActionListener(listener);
+  }
+
+
+  /**
+   * Sets the action listener for the Value Based Investment button.
+   *
+   * @param listener The action listener for the dollar cost averaging button.
+   */
+  public void setNormalValueBasedInvestmentButtonListener(ActionListener listener) {
+    NormalvalueBasedInvestment.addActionListener(listener);
+  }
+
 
   /**
    * Sets the action listener for the normal create portfolio button.

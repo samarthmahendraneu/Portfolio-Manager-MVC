@@ -152,6 +152,9 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * Examine the details of a portfolio on a particular date.
+   * @param portfolioName The name of the portfolio to examine.
+   * @param date The date to examine the portfolio on.
+   * @return A list of Tradable objects representing the stocks in the portfolio.
    */
   public List<Tradable> examinePortfolioDetails(String portfolioName, LocalDate date) {
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
@@ -163,6 +166,10 @@ public class PortfolioService implements PortfolioServiceInterface {
   /**
    * Value based investment strategy for a portfolio.
    * portfolioService.valueBasedInvestment(name, investmentAmount, startDate, stockWeights)
+   * @param portfolioName   The name of the portfolio to invest in.
+   * @param investmentAmount The amount to invest.
+   * @param startDate       The start date of the investment period.
+   * @param stockWeights    A map of stock symbols to their respective weights.
    */
   public void valueBasedInvestment(String portfolioName, BigDecimal investmentAmount,
       LocalDate startDate, Map<String, Float> stockWeights) {
@@ -175,6 +182,11 @@ public class PortfolioService implements PortfolioServiceInterface {
 
   /**
    * dollar cost averaging for a portfolio.
+   * @param portfolioName The name of the portfolio to invest in.
+   * @param amount The amount to invest.
+   * @param startDate The start date of the investment period.
+   * @param endDate The end date of the investment period.
+   * @param frequency The frequency of investment.
    */
   public void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate,
       LocalDate endDate, int frequency, Map<String, Float> stockWeights) {
