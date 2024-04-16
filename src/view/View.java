@@ -131,7 +131,8 @@ public class View implements UnifiedViewInterface {
     this.out.append("12. Crossover Days\n");
     this.out.append("13. Moving Crossover Days\n");
     this.out.append("14. Dollar cost Averaging\n");
-    this.out.append("15. Exit\n");
+    this.out.append("15. Value based investment\n");
+    this.out.append("16. Exit\n");
     this.out.append("Select an option: \n");
   }
 

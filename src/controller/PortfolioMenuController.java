@@ -184,6 +184,8 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
             this.dollarCostAveraging();
             break;
           case 15:
+            this.valueBasedInvestment();
+          case 16:
             this.view.inputMessage("Exiting...");
             this.saveStockCache();
             running = false;
@@ -197,6 +199,51 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
   }
 
+  /**
+   * Value based investment for a given portfolio.
+   */
+  public void valueBasedInvestment() {
+    try {
+      String name = view.requestInput("Enter the Portfolio Name:");
+      if (name == null || name.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
+      String startDateString = view.requestInput("Enter the date (YYYY-MM-DD):");
+      LocalDate startDate = validateAndParseDate(startDateString);
+
+      String investmentAmountString = view.requestInput(
+          "Enter the investment amount in USD:");
+      if (investmentAmountString == null || investmentAmountString.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
+      BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
+
+      // take in stock symbols
+      String stockSymbols = view.requestInput(
+          "Enter the stock symbols in the format: 'stock1,stock2,...'");
+      if (stockSymbols == null || stockSymbols.isEmpty()) {
+        view.displayMessage("Operation cancelled or no symbol entered.");
+        return;
+      }
+      Map<String, Float> stockWeights = new HashMap<>();
+      // create stocks with equal weights
+      String[] stocks = stockSymbols.split(",");
+      for (String stock : stocks) {
+        stockWeights.put(stock, (1.0f / stocks.length)*100);
+      }
+      this.portfolioService.valueBasedInvestment(name, investmentAmount, startDate, stockWeights);
+      view.displayMessage(
+          "Value Based Investment has been successfully applied to the portfolio: " + name);
+    } catch (DateTimeParseException dtpe) {
+      view.displayMessage("Error: Invalid date format.");
+    } catch (NumberFormatException nfe) {
+      view.displayMessage("Error: Invalid number format.");
+    } catch (Exception e) {
+      view.displayMessage("An error occurred: " + e.getMessage());
+    }
+  }
 
   /**
    * Dollar Cost Averaging for a given portfolio.
@@ -213,21 +260,32 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
 
       String endDateString = view.requestInput("Enter the end date (YYYY-MM-DD):");
       LocalDate endDate = validateAndParseDate(endDateString);
-
-      // input stocks and weights
-      String stockAndWeights = view.requestInput(
-          "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...'");
-      if (stockAndWeights == null || stockAndWeights.isEmpty()) {
-        view.displayMessage("Operation cancelled or no symbol entered.");
-        return;
-      }
-      // create map containing stock and weight
       Map<String, Float> stockWeights = new HashMap<>();
-      String[] stockWeightPairs = stockAndWeights.split(",");
-      for (String pair : stockWeightPairs) {
-        String[] stockWeight = pair.split(":");
-        stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
+      boolean flag = true;
+      while (flag) {
+        // input stocks and weights
+        String stockAndWeights = view.requestInput(
+            "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...as in IBM:50,GOOGL:50");
+        if (stockAndWeights == null || stockAndWeights.isEmpty()) {
+          view.displayMessage("Operation cancelled or no symbol entered.");
+          return;
+        }
+        // create map containing stock and weight
+        int sumOFWeights = 0;
+        String[] stockWeightPairs = stockAndWeights.split(",");
+        for (String pair : stockWeightPairs) {
+          String[] stockWeight = pair.split(":");
+          stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
+          sumOFWeights += Float.parseFloat(stockWeight[1]);
+        }
+        if (sumOFWeights != 100) {
+          view.displayMessage("Sum of weights should be 100");
+          return;
+        } else {
+          flag = false;
+        }
       }
+
 
       String investmentAmountString = view.requestInput(
           "Enter the investment amount per month in USD:");

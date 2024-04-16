@@ -161,6 +161,19 @@ public class PortfolioService implements PortfolioServiceInterface {
   }
 
   /**
+   * Value based investment strategy for a portfolio.
+   * portfolioService.valueBasedInvestment(name, investmentAmount, startDate, stockWeights)
+   */
+  public void valueBasedInvestment(String portfolioName, BigDecimal investmentAmount,
+      LocalDate startDate, Map<String, Float> stockWeights) {
+    // check if portfolio exists if not create a new one
+    PortfolioInterface portfolio = getPortfolioByName(portfolioName)
+        .orElseGet(() -> createNewPortfolio(portfolioName));
+    portfolio.investUsingWeights(investmentAmount.floatValue(), startDate, stockService, stockWeights);
+    return;
+  }
+
+  /**
    * dollar cost averaging for a portfolio.
    */
   public void dollarCostAveraging(String portfolioName, BigDecimal amount, LocalDate startDate,

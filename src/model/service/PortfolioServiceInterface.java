@@ -159,6 +159,16 @@ public interface PortfolioServiceInterface {
       LocalDate endDate);
 
   /**
+   * Value based investment.
+   * @param portfolioName The name of the portfolio to invest in.
+   * @param investmentAmount The amount to invest.
+   * @param startDate The start date of the investment period.
+   * @param stockWeights A map of stock symbols to their respective weights.
+   */
+  void valueBasedInvestment(String portfolioName, BigDecimal investmentAmount,
+      LocalDate startDate, Map<String, Float> stockWeights);
+
+  /**
    * Invests in a portfolio using the dollar cost averaging strategy.
    *
    * @param portfolioName The name of the portfolio to invest in.
