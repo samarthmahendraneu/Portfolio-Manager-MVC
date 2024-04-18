@@ -176,7 +176,8 @@ public class PortfolioService implements PortfolioServiceInterface {
     // check if portfolio exists if not create a new one
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
         .orElseGet(() -> createNewPortfolio(portfolioName));
-    portfolio.investUsingWeights(investmentAmount.floatValue(), startDate, stockService, stockWeights);
+    portfolio.investUsingWeights(investmentAmount.floatValue(), startDate, stockService,
+        stockWeights);
     return;
   }
 
@@ -193,7 +194,8 @@ public class PortfolioService implements PortfolioServiceInterface {
     // check if portfolio exists if not create a new one
     PortfolioInterface portfolio = getPortfolioByName(portfolioName)
         .orElseGet(() -> createNewPortfolio(portfolioName));
-    portfolio.dollarCostAveraging(amount, startDate, endDate, stockService, frequency, stockWeights);
+    portfolio.dollarCostAveraging(amount, startDate, endDate, stockService, frequency,
+        stockWeights);
     return;
   }
 

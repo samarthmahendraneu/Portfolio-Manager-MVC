@@ -97,11 +97,11 @@ public interface PortfolioInterface {
    * Invests in a portfolio using the given stock weights.
    *
    * @param investmentAmount The amount to invest.
-   * @param Date             The  date of the investment.
+   * @param date             The  date of the investment.
    * @param stockWeights     A map of stock symbols to their respective weights.
    * @param stockService     The stock service to use.
    */
-  void investUsingWeights(Float investmentAmount, LocalDate Date,
+  void investUsingWeights(Float investmentAmount, LocalDate date,
       StockServiceInterface stockService, Map<String, Float> stockWeights);
 
 }

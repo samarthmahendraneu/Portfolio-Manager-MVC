@@ -53,7 +53,7 @@ public class GUIViewU extends JFrame implements GUIInterface {
 
   private JButton valueBasedInvestment;
 
-  private JButton NormalvalueBasedInvestment;
+  private JButton normalvalueBasedInvestment;
 
   /**
    * Constructor for the GUIView class.
@@ -173,9 +173,9 @@ public class GUIViewU extends JFrame implements GUIInterface {
     panel.add(normalDollarCostAverage);
 
 
-    NormalvalueBasedInvestment = new JButton(" Value Based Investment");
+    normalvalueBasedInvestment = new JButton(" Value Based Investment");
     // Add ActionListener for investmentButton
-    panel.add(NormalvalueBasedInvestment);
+    panel.add(normalvalueBasedInvestment);
 
     backButton = new JButton("Back to Main Menu");
     backButton.addActionListener(e -> switchToCard(MAIN_MENU));
@@ -411,7 +411,7 @@ public class GUIViewU extends JFrame implements GUIInterface {
    * @param listener The action listener for the dollar cost averaging button.
    */
   public void setNormalValueBasedInvestmentButtonListener(ActionListener listener) {
-    NormalvalueBasedInvestment.addActionListener(listener);
+    normalvalueBasedInvestment.addActionListener(listener);
   }
 
 

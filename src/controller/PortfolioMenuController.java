@@ -228,7 +228,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       while (flag) {
         // input stocks and weights
         String stockAndWeights = view.requestInput(
-            "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...as in IBM:50,GOOGL:50");
+            "Enter the stock symbols and weights in the format: 'stock1:weight1,"
+                +
+                "stock2:weight2,...as in IBM:50,GOOGL:50");
         if (stockAndWeights == null || stockAndWeights.isEmpty()) {
           view.displayMessage("Operation cancelled or no symbol entered.");
           return;
@@ -240,17 +242,15 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
           for (String pair : stockWeightPairs) {
             String[] stockWeight = pair.split(":");
             stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
-            sumOFWeights += Float.parseFloat(stockWeight[1]);
+            sumOFWeights += (int) Float.parseFloat(stockWeight[1]);
           }
           if (sumOFWeights != 100) {
             view.displayMessage("Sum of weights should be 100");
-            continue;
           } else {
             flag = false;
           }
-        }catch (Exception e){
+        } catch (Exception e) {
           view.displayMessage("Please enter a valid format for stock and weight.");
-          continue;
         }
       }
       this.portfolioService.valueBasedInvestment(name, investmentAmount, startDate, stockWeights);
@@ -281,7 +281,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       String endDateString = view.requestInput(
           "Enter the end date (YYYY-MM-DD), n to skip enddate:");
       LocalDate endDate = LocalDate.now();
-      if (endDateString != "n") {
+      if (!Objects.equals(endDateString, "n")) {
         endDate = customValidateAndParseDateForDollarCostAvg(endDateString);
       }
       Map<String, Float> stockWeights = new HashMap<>();
@@ -289,7 +289,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       while (flag) {
         // input stocks and weights
         String stockAndWeights = view.requestInput(
-            "Enter the stock symbols and weights in the format: 'stock1:weight1,stock2:weight2,...as in IBM:50,GOOGL:50");
+            "Enter the stock symbols and weights in the format:"
+                +
+                " 'stock1:weight1,stock2:weight2,...as in IBM:50,GOOGL:50");
         if (stockAndWeights == null || stockAndWeights.isEmpty()) {
           view.displayMessage("Operation cancelled or no symbol entered.");
           return;
@@ -300,7 +302,7 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
         for (String pair : stockWeightPairs) {
           String[] stockWeight = pair.split(":");
           stockWeights.put(stockWeight[0], Float.parseFloat(stockWeight[1]));
-          sumOFWeights += Float.parseFloat(stockWeight[1]);
+          sumOFWeights += (int) Float.parseFloat(stockWeight[1]);
         }
         if (sumOFWeights != 100) {
           view.displayMessage("Sum of weights should be 100");
@@ -319,7 +321,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       BigDecimal investmentAmount = new BigDecimal(investmentAmountString);
 
       String frequencyString = view.requestInput(
-          "Enter the frequency type: 1 for daily, 2 for weekly, 3 for monthly, 4 for yearly");
+          "Enter the frequency type: 1 for daily, "
+              +
+              "2 for weekly, 3 for monthly, 4 for yearly");
       if (frequencyString == null || frequencyString.isEmpty()) {
         view.displayMessage("Operation cancelled or no symbol entered.");
         return;
@@ -593,7 +597,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       return validateAndParseDate(endDateString);
     }
   }
-
 
 
   /**
@@ -978,7 +981,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
     }
 
     // request the date for which to examine the portfolio
-    String dateInput = view.requestInput("Enter the date (YYYY-MM-DD) to examine the portfolio:");
+    String dateInput = view.requestInput("Enter the date (YYYY-MM-DD)"
+        +
+        " to examine the portfolio:");
     LocalDate date = LocalDate.parse(dateInput); // Consider adding date validation
     // check if the date is valid, it should be before today and validate
     if (date.isAfter(LocalDate.now())) {
@@ -1046,19 +1051,17 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public void savePortfolio(String type) {
     try {
       // Request the file path to save the portfolio
-      String filePath = view.requestInput("Enter the file path to save the portfolio (.csv):");
+      String filePath = view.requestInput("Enter the file path "
+          +
+          "to save the portfolio (.csv):");
       if (filePath == null || filePath.trim().isEmpty()) {
         view.displayMessage("Operation Cancelled or no path entered");
         return;
       }
 
       // Attempt to save the portfolio to the specified file
-      try {
-        portfolioService.savePortfoliosToCSV(filePath, type);
-        view.displayMessage("Portfolio has been saved successfully to " + filePath);
-      } catch (IOException e) {
-        throw e;
-      }
+      portfolioService.savePortfoliosToCSV(filePath, type);
+      view.displayMessage("Portfolio has been saved successfully to " + filePath);
     } catch (Exception e) {
       view.displayMessage("Error saving portfolio.");
     }
@@ -1072,7 +1075,9 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
   public void loadPortfolio(String type) {
     try {
       // Request the file path from which to load portfolios
-      String filePath = view.requestInput("Enter the file path to load portfolios from (.csv):");
+      String filePath = view.requestInput("Enter the file path"
+          +
+          " to load portfolios from (.csv):");
       if (filePath == null || filePath.trim().isEmpty()) {
         view.displayMessage("Operation Cancelled or no path entered");
         return;
@@ -1121,7 +1126,6 @@ public class PortfolioMenuController implements PortfolioMenuControllerInterface
       view.displayMessage("Cache have been loaded successfully.\n");
     } catch (Exception e) {
       this.view.displayMessage("Error: " + e.getMessage());
-      return;
     }
   }
 

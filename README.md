@@ -16,6 +16,8 @@ The Portfolio Management System is a comprehensive Java-based application design
 - **Calculate X-Day Moving Average**: Compute the moving average over a specified number of days for a given stock.
 - **Crossover Days**: Identify the days within a specified period when a stock's closing price crossed over its opening price.
 - **Moving Crossover Days**: Find the days where the stock's closing price crossed over its moving average within a specified period.
+- **Dollar Cost Averaging**: Implement a dollar-cost averaging investment strategy by investing a fixed amount periodically in a portfolio.
+- **Value Based Investment**: Invest a fixed amount in a portfolio containing multiple stocks with specified weights for each stock.
 
 ## Getting Started
 
@@ -35,6 +37,7 @@ The Portfolio Management System is a comprehensive Java-based application design
 12. **Crossover Days**
 13. **Moving Crossover Days**
 14. **Dollar Cost Averaging**
+15. **Value Based Investment**
 14. **Exit**
 
 Select an option from the menu to perform the corresponding action. The system is designed to be intuitive and user-friendly, guiding you through each process step by step.
@@ -57,6 +60,11 @@ After launching the application, you will be presented with the main menu. From 
 
 1. Select "10. Inspect Stock performance" from the main menu.
 2. Enter the stock symbol and the date you wish to inspect.
+
+### Value Based Investment
+
+- **Fixed Amount Investment**: Invest a fixed amount into an existing portfolio containing multiple stocks with equal weights for each stock.
+
 
 ### Dollar-Cost Averaging Investment Strategy
 

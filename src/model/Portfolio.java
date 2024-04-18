@@ -51,15 +51,22 @@ public class Portfolio implements PortfolioInterface {
             () -> this.stocks.add(new Stock(symbol, quantity, purchasePrice, purchaseDate)));
   }
 
-
-  public void investUsingWeights(Float investmentAmount, LocalDate Date,
-      StockServiceInterface stockService, Map<String, Float> stockWeights){
+  /**
+   * Invest in the portfolio using weights.
+   *
+   * @param investmentAmount The amount to invest.
+   * @param date             The  date of the investment.
+   * @param stockService     The stock service to use.
+   * @param stockWeights     A map of stock symbols to their respective weights.
+   */
+  public void investUsingWeights(Float investmentAmount, LocalDate date,
+      StockServiceInterface stockService, Map<String, Float> stockWeights) {
     // check if the investment amount is positive
     if (investmentAmount <= 0) {
       throw new IllegalArgumentException("Invalid investment amount");
     }
     // check if the date is in the future
-    if (Date.isAfter(LocalDate.now())) {
+    if (date.isAfter(LocalDate.now())) {
       throw new IllegalArgumentException("Cannot invest in the future");
     }
     // check if the stock weights sum to 100
@@ -69,20 +76,30 @@ public class Portfolio implements PortfolioInterface {
     for (Map.Entry<String, Float> entry : stockWeights.entrySet()) {
       String symbol = entry.getKey();
       Float weight = entry.getValue();
-      BigDecimal stockInvestment = new BigDecimal(investmentAmount * (weight/100));
-      float quantity = stockInvestment.floatValue() / ((BigDecimal) stockService.fetchLastClosePrice(
-          symbol, Date).getData()).floatValue();
+      BigDecimal stockInvestment = new BigDecimal(investmentAmount * (weight / 100));
+      float quantity =
+          stockInvestment.floatValue() / ((BigDecimal) stockService.fetchLastClosePrice(
+              symbol, date).getData()).floatValue();
       // check if the stock is already in the portfolio - > s.buy else new Stock\
       // if not create a new stock
       this.stocks.stream().filter(s -> s.getSymbol().equals(symbol)).findFirst()
-          .ifPresentOrElse(s -> s.buy(quantity, Date, (BigDecimal)stockService.fetchLastClosePrice(symbol, Date).getData()),
-              () -> this.stocks.add(new Stock(symbol, quantity, (BigDecimal)stockService.fetchLastClosePrice(symbol, Date).getData(), Date)));
+          .ifPresentOrElse(s -> s.buy(quantity, date, (BigDecimal) stockService
+                  .fetchLastClosePrice(symbol, date).getData()),
+              () -> this.stocks.add(new Stock(symbol, quantity,
+                  (BigDecimal) stockService.fetchLastClosePrice(symbol, date).getData(), date)));
 
     }
   }
 
   /**
    * function that implements dollar cost averaging using helper function invest.
+   *
+   * @param amount       amount to invest
+   * @param startDate    start date
+   * @param endDate      end date
+   * @param stockService stock service
+   * @param frequency    frequency
+   * @param stockWeights stock weights
    */
   public void dollarCostAveraging(BigDecimal amount, LocalDate startDate, LocalDate endDate,
       StockServiceInterface stockService, int frequency, Map<String, Float> stockWeights) {
@@ -112,7 +129,7 @@ public class Portfolio implements PortfolioInterface {
         date = date.plusWeeks(1);
       } else if (frequency == 3) {
         date = date.plusMonths(1);
-      } else if (frequency == 4) {
+      } else {
         date = date.plusYears(1);
       }
     }
@@ -215,7 +232,8 @@ public class Portfolio implements PortfolioInterface {
     List<Tradable> portfolioDetails = new ArrayList<>();
     for (Tradable stock : this.stocks) {
       if (stock.getQuantity(date) > 0) {
-        portfolioDetails.add(new Stock(stock.getSymbol(), stock.getQuantity(date), null, null));
+        portfolioDetails.add(new Stock(stock.getSymbol(), stock.getQuantity(date),
+            null, null));
       }
     }
     return portfolioDetails;
